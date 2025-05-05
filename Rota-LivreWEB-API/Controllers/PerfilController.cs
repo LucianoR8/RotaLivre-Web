@@ -12,12 +12,12 @@ namespace Rota_LivreWEB_API.Controllers
 
             if (idUsuario == null)
             {
-                return RedirectToAction("Login", "Login"); // se não estiver logado
+                return RedirectToAction("Login", "Login"); 
             }
 
             Usuario usuario = UsuarioDbContext.BuscarUsuarioPorId(idUsuario.Value);
 
-            return View(usuario); // envia os dados pra view
+            return View(usuario); 
         }
 
         public IActionResult Editar()
@@ -59,7 +59,7 @@ namespace Rota_LivreWEB_API.Controllers
         public IActionResult DetalhesPerfil()
         {
             int trofeus = 0;
-            Console.WriteLine("Valor dos troféus: " + trofeus); // <-- Aqui imprime no terminal
+            Console.WriteLine("Valor dos troféus: " + trofeus); 
             return View();
         }
 

@@ -1,0 +1,33 @@
+﻿body {
+    background-color: #ffefe3;
+}
+
+.text {
+    text-align: center;
+    margin-top: 50px;
+    color: #b54200;
+}
+
+.input {
+    margin-top: 5px;
+    border-radius: 330px;
+}
+
+.subtitle {
+    font-size: 20px;
+    text-align: center;
+    color: gray;
+}
+
+.enter {
+    margin-top: 10px;
+    margin-left: 350px;
+    border-radius: 33px;
+    border-color: #ffaa78;
+    background-color: #ffefe3;
+    color: black;
+}
+
+    .enter:hover {
+        background-color: blueviolet;
+    }

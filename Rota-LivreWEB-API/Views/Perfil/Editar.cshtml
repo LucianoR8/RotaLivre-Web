@@ -1,0 +1,33 @@
+﻿@model Rota_LivreWEB_API.Models.Usuario
+@{
+    Layout = null;
+}
+
+<h1>Editar Perfil</h1>
+
+<form asp-action="Editar" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="id_usuario" />
+
+    <div class="mb-2">
+        <label>Nome:</label>
+        <input asp-for="nome_completo" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Email:</label>
+        <input asp-for="email" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Data de Nascimento:</label>
+        <input asp-for="data_nasc" class="form-control" type="date" />
+    </div>
+
+    <div class="mb-2">
+        <label>Senha:</label>
+        <input asp-for="senha" class="form-control" type="password" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Salvar</button>
+</form>

@@ -6,7 +6,7 @@ namespace Rota_LivreWEB_API.Controllers
     public class LoginController : Controller
     {
         
-        public IActionResult Login()
+        public ViewResult Login()
         {
             return View();
         }
@@ -14,7 +14,7 @@ namespace Rota_LivreWEB_API.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Login(string email, string senha)
+        public ActionResult Login(string email, string senha)
         {
             Console.WriteLine($"Tentando login: {email} - {senha}"); 
 

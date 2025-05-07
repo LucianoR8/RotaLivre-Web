@@ -6,7 +6,7 @@ namespace Rota_LivreWEB_API.Controllers
 {
     public class PerfilController : Controller
     {
-        public IActionResult Perfil()
+        public ActionResult Perfil()
         {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
 
@@ -20,7 +20,7 @@ namespace Rota_LivreWEB_API.Controllers
             return View(usuario); 
         }
 
-        public IActionResult Editar()
+        public ActionResult Editar()
         {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
             if (idUsuario == null) return RedirectToAction("Login", "Login");
@@ -31,7 +31,7 @@ namespace Rota_LivreWEB_API.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Editar(Usuario usuario)
+        public ActionResult Editar(Usuario usuario)
         {
             if (ModelState.IsValid)
             {
@@ -44,7 +44,7 @@ namespace Rota_LivreWEB_API.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Deletar()
+        public ActionResult Deletar()
         {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
             if (idUsuario != null)
@@ -56,12 +56,7 @@ namespace Rota_LivreWEB_API.Controllers
             return RedirectToAction("Login", "Login");
         }
 
-        public IActionResult DetalhesPerfil()
-        {
-            int trofeus = 0;
-            Console.WriteLine("Valor dos troféus: " + trofeus); 
-            return View();
-        }
+       
 
 
 

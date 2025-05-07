@@ -6,7 +6,7 @@ namespace Rota_LivreWEB_API.Controllers
 {
     public class HomeBaseController : Controller
     {
-        public IActionResult Home()
+        public ViewResult Home()
         {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
 

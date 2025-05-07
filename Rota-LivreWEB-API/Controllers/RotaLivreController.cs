@@ -15,14 +15,14 @@ namespace Rota_LivreWEB_API.Controllers
         }
 
         
-        public IActionResult Create()
+        public ViewResult Create()
         {
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Usuario usuario)
+        public ActionResult Create(Usuario usuario)
         {
             if (ModelState.IsValid)
             {
@@ -39,7 +39,7 @@ namespace Rota_LivreWEB_API.Controllers
         }
 
         [HttpPost("Cadastrar_Usuario")]
-        public IActionResult CadastrarUsuario(string Novo_Usuario_Nome, string Novo_Usuario_Nasc, string Novo_Usuario_Email, string Novo_Usuario_Senha)
+        public ActionResult CadastrarUsuario(string Novo_Usuario_Nome, string Novo_Usuario_Nasc, string Novo_Usuario_Email, string Novo_Usuario_Senha)
         {
             Usuario NovoUsuario = new Usuario(Novo_Usuario_Nome, Convert.ToDateTime(Novo_Usuario_Nasc), Novo_Usuario_Email, Novo_Usuario_Senha);
 
@@ -53,7 +53,7 @@ namespace Rota_LivreWEB_API.Controllers
             }
         }
 
-        public IActionResult CadastroConcluido()
+        public ViewResult CadastroConcluido()
         {
             return View();
         }

@@ -1,0 +1,136 @@
+﻿@{
+	Layout = null;
+}
+
+@model List<Rota_LivreWEB_API.Models.Avaliacao>
+
+@{
+    ViewData["Title"] = "Avaliações do Passeio";
+    int idPasseio = Model.FirstOrDefault()?.id_passeio ?? 0;
+}
+
+<h2>Avaliações do Passeio</h2>
+
+@if (Model.Any())
+{
+    <div class="avaliacoes-list">
+        @foreach (var item in Model)
+        {
+            <div class="avaliacao-card">
+                <div class="avaliacao-header">
+                    <strong>@item.nome_completo</strong>
+                    <span class="avaliacao-data">
+                        @item.data_feedback.AddHours(-3).ToString("dd/MM/yyyy HH:mm")
+                    </span>
+                </div>
+                <div class="avaliacao-estrelas">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        if (i <= item.nota)
+                        {
+                            <span style="color: gold;">&#9733;</span>
+                        }
+                        else
+                        {
+                            <span style="color: #ccc;">&#9733;</span>
+                        }
+                    }
+                </div>
+                <div class="avaliacao-feedback">@item.feedback</div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>Nenhuma avaliação encontrada para este passeio.</p>
+}
+
+<hr />
+<h4>Deixar uma nova avaliação</h4>
+
+<form asp-action="Comentar" method="post">
+    <input type="hidden" name="id_passeio" value="@ViewBag.IdPasseio" />
+    <input type="hidden" name="id_usuario" value="@ViewBag.IdUsuario" />
+    <input type="hidden" name="nome_completo" value="@ViewBag.NomeUsuario" />
+
+    <div class="form-group">
+        <label for="nota">Nota:</label>
+        <div class="star-rating-input">
+            @for (int i = 5; i >= 1; i--)
+            {
+                <input type="radio" id="star-@i" name="nota" value="@i" required />
+                <label for="star-@i">&#9733;</label>
+            }
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="feedback">Comentário:</label>
+        <textarea name="feedback" class="form-control" rows="4" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-2">Enviar Avaliação</button>
+</form>
+
+<style>
+    .avaliacoes-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .avaliacao-card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .avaliacao-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .avaliacao-data {
+        font-size: 0.9rem;
+        color: #777;
+    }
+
+    .avaliacao-estrelas {
+        font-size: 1.4rem;
+        margin-bottom: 8px;
+    }
+
+    .avaliacao-feedback {
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .star-rating-input {
+        direction: rtl;
+        display: inline-flex;
+        gap: 5px;
+        font-size: 2rem;
+        margin: 10px 0;
+    }
+
+        .star-rating-input input[type="radio"] {
+            display: none;
+        }
+
+        .star-rating-input label {
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.2s;
+        }
+
+            .star-rating-input input[type="radio"]:checked ~ label,
+            .star-rating-input label:hover,
+            .star-rating-input label:hover ~ label {
+                color: gold;
+            }
+</style>

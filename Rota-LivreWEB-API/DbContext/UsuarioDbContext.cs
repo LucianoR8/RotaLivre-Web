@@ -1,6 +1,9 @@
 ﻿using MySql.Data.MySqlClient;
 using Org.BouncyCastle.Crypto.Digests;
 using Rota_LivreWEB_API.Models;
+using System.Security.Cryptography;
+using System.Text;
+
 
 namespace Rota_LivreWEB_API.DbContext
 {
@@ -21,7 +24,8 @@ namespace Rota_LivreWEB_API.DbContext
                 comando.Parameters.AddWithValue("@Novo_Usuario_Nome", NovoUsuario.nome_completo);
                 comando.Parameters.AddWithValue("@Novo_Usuario_Nasc", NovoUsuario.data_nasc);
                 comando.Parameters.AddWithValue("@Novo_Usuario_Email", NovoUsuario.email);
-                comando.Parameters.AddWithValue("@Novo_Usuario_Senha", NovoUsuario.senha);
+                string senhaHash = GerarHash(NovoUsuario.senha);
+                comando.Parameters.AddWithValue("@Novo_Usuario_Senha", senhaHash);
                 conexao.Open();
                 comando.ExecuteNonQuery();
                 conexao.Close();
@@ -69,7 +73,9 @@ namespace Rota_LivreWEB_API.DbContext
                     string query = "SELECT COUNT(*) FROM usuario WHERE email = @Email AND senha = @Senha";
                     MySqlCommand comando = new(query, conexao);
                     comando.Parameters.AddWithValue("@Email", email);
-                    comando.Parameters.AddWithValue("@Senha", senha);
+                    string senhaHash = GerarHash(senha);
+                    comando.Parameters.AddWithValue("@Senha", senhaHash);
+
 
                     conexao.Open();
                     int resultado = Convert.ToInt32(comando.ExecuteScalar());
@@ -84,6 +90,17 @@ namespace Rota_LivreWEB_API.DbContext
                 return false;
             }
         }
+
+        public static string GerarHash(string senha)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(senha);
+                byte[] hashBytes = sha256.ComputeHash(bytes);
+                return Convert.ToHexString(hashBytes); // hash em hexadecimal
+            }
+        }
+
 
         public static int BuscarIdPorEmail(string email)
         {
@@ -181,6 +198,22 @@ namespace Rota_LivreWEB_API.DbContext
                 conexao.Close();
             }
         }
+
+        public static string BuscarNomePorEmail(string email)
+        {
+            using (var conexao = new MySqlConnection(StringDeConexao))
+            {
+                conexao.Open();
+                var query = "SELECT nome_completo FROM usuario WHERE email = @Email";
+                using (var command = new MySqlCommand(query, conexao))
+                {
+                    command.Parameters.AddWithValue("@Email", email);
+                    var resultado = command.ExecuteScalar();
+                    return resultado?.ToString() ?? "";
+                }
+            }
+        }
+
 
     }
 }

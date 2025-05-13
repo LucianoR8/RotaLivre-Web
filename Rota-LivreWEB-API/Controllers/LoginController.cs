@@ -22,11 +22,13 @@ namespace Rota_LivreWEB_API.Controllers
             {
                 
                 int idUsuario = UsuarioDbContext.BuscarIdPorEmail(email);
+                string nome_completo = UsuarioDbContext.BuscarNomePorEmail(email);
 
-                
+
                 HttpContext.Session.SetInt32("IdUsuario", idUsuario);
+                HttpContext.Session.SetString("NomeUsuario", nome_completo);
 
-               
+
                 return RedirectToAction("Home", "HomeBase");
             }
             else

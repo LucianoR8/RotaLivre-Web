@@ -37,5 +37,54 @@ namespace Rota_LivreWEB_API.Controllers
                 return View();
             }
         }
+
+
+         public ViewResult SolicitarRedefinicao()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult SolicitarRedefinicaoSenha(string email)
+        {
+            var usuario = UsuarioDbContext.BuscarUsuarioPorEmail(email);
+            if (usuario == null)
+            {
+                ViewBag.Erro = "E-mail não encontrado!";
+                return View("SolicitarRedefinicao");
+            }
+
+            
+            return RedirectToAction("DefinirNovaSenha", new { id = usuario.id_usuario });
+        }
+
+        public ViewResult DefinirNovaSenha(int id)
+        {
+            ViewBag.IdUsuario = id;
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult DefinirNovaSenha(int id_usuario, string novaSenha, string confirmarSenha)
+        {
+            if (novaSenha != confirmarSenha)
+            {
+                ViewBag.Erro = "As senhas não coincidem!";
+                ViewBag.IdUsuario = id_usuario;
+                return View();
+            }
+
+            bool sucesso = UsuarioDbContext.AlterarSenha(id_usuario, novaSenha);
+
+            if (sucesso)
+                return RedirectToAction("SenhaAlteradaSucesso");
+            else
+                return StatusCode(500, "Erro ao redefinir senha.");
+        }
+
+        public ViewResult SenhaAlteradaSucesso()
+        {
+            return View(); 
+        }
     }
 }

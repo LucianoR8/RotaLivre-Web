@@ -1,4 +1,9 @@
-﻿body {
+﻿.search-box input {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+body {
     background-color: #ffefe3;
 }
 
@@ -45,11 +50,6 @@
 
 
 
-.container-categoria {
-    display: flex;
-    flex-direction: row;
-}
 
-.categoria{
-    
-}
+
+

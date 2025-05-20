@@ -214,6 +214,61 @@ namespace Rota_LivreWEB_API.DbContext
             }
         }
 
+        public static Usuario BuscarUsuarioPorEmail(string email)
+        {
+            try
+            {
+                using (var conexao = new MySqlConnection(StringDeConexao))
+                {
+                    string query = "SELECT * FROM usuario WHERE email = @Email LIMIT 1";
+                    MySqlCommand comando = new(query, conexao);
+                    comando.Parameters.AddWithValue("@Email", email);
+
+                    conexao.Open();
+                    MySqlDataReader reader = comando.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        Usuario u = new Usuario
+                        {
+                            id_usuario = reader.GetInt32("id_usuario"),
+                            nome_completo = reader.GetString("nome_completo"),
+                            data_nasc = reader.GetDateTime("data_nasc"),
+                            email = reader.GetString("email"),
+                            senha = reader.GetString("senha")
+                        };
+
+                        conexao.Close();
+                        return u;
+                    }
+
+                    conexao.Close();
+                    return null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public static bool AlterarSenha(int idUsuario, string novaSenha)
+        {
+            using (var conexao = new MySqlConnection(StringDeConexao))
+            {
+                conexao.Open();
+                var query = "UPDATE usuario SET senha = @novaSenha WHERE id_usuario = @id";
+                using (var cmd = new MySqlCommand(query, conexao))
+                {
+                    string senhaHash = GerarHash(novaSenha);
+                    cmd.Parameters.AddWithValue("@novaSenha", senhaHash);
+                    cmd.Parameters.AddWithValue("@id", idUsuario);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+
 
     }
 }

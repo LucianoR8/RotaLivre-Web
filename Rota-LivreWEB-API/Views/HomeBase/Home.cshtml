@@ -3,6 +3,7 @@
 }
 
  @model List<Rota_LivreWEB_API.Models.Categoria>
+ 
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -31,33 +32,42 @@
         </div>
 
         <div class="search-box">
-            <input type="text" placeholder="Para onde deseja ir?">
+            <input type="text" id="pesquisa" placeholder="Para onde deseja ir?">
             <button><i class="fas fa-search"></i></button>
         </div>
-        <h2 class="titulo-selecao">Categorias</h2>
-        <section class="categorias">
-           
 
-            <div class="container mt-4">
-                <div class="container-categoria">
+
+        <div id="resultado-pesquisa" class="row">
+            @* Aqui os cartões aparecerão *@
+            
+        </div>
+
+
+        <h2 class="titulo-selecao">Categorias</h2>
+        <section class="categorias py-5">
+            <div class="container">
+                <div class="row">
                     @foreach (var categoria in Model)
                     {
-                  <a href="@Url.Action("PasseiosPorCategoria", "HomeBase", new { id = categoria.id_categoria })" style="text-decoration: none; color: inherit;">
-                    
                         <div class="col-md-4 mb-4 d-flex">
-                            <div class="produto-container card shadow-sm h-100 w-100">
-                                <img src="@Url.Content(categoria.img)" class="card-img-top img-fluid" style="object-fit: cover; height: 200px;" alt="@categoria.tipo_categoria">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">@categoria.tipo_categoria</h5>
+                            <a href="@Url.Action("PasseiosPorCategoria", "HomeBase", new { id = categoria.id_categoria })"
+                               style="text-decoration: none; color: inherit; width: 100%;">
+                                <div class="card shadow-sm h-100 w-100">
+                                    <img src="@Url.Content("~/img/categorias/" + categoria.img)"
+                                         class="card-img-top img-fluid"
+                                         style="object-fit: cover; height: 200px;"
+                                         alt="@categoria.tipo_categoria">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">@categoria.tipo_categoria</h5>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
-                    
-                   </a>
                     }
                 </div>
             </div>
         </section>
+
 
         @{
             var passeiosDestaque = ViewBag.PasseiosDestaque as List<Rota_LivreWEB_API.Models.Passeio>;
@@ -65,7 +75,7 @@
 
         @if (passeiosDestaque != null && passeiosDestaque.Any())
         {
-            <h3 class="mb-3">Passeios em Destaque</h3>
+            <h3 class="titulo-selecao mb-3">Passeios em Destaque</h3>
 
             <div class="produtos-container">
                 @foreach (var passeio in passeiosDestaque)
@@ -75,7 +85,7 @@
                          onmouseout="this.style.transform='scale(1)'"
                          onclick='window.location.href="@Url.Action("Detalhes", "Passeios", new { id = passeio.id_passeio })"'>
 
-                        <img src="@Url.Content("~" + passeio.img_url)" class="imagem_produto" alt="@passeio.nome_passeio" />
+                        <img src="@Url.Content("~/img/passeios/" + passeio.img_url)" class="imagem_produto" alt="@passeio.nome_passeio" />
 
                         <div class="museu_conteudo" id="museu-@passeio.id_passeio">
                             <p class="nome">@passeio.nome_passeio</p>
@@ -92,8 +102,6 @@
     </main>
     <footer>
         <button class="tab active" id="btnTopo"><i class="fas fa-home"></i> Home</button>
-        <button><i class="fas fa-bus"></i> Meus Passeios</button>
-        <button><i class="fas fa-calendar-alt"></i> Grupos</button>
         <button type="button" onclick="window.location.href='/Perfil/Perfil'">
             <i class="fas fa-user"></i> Perfil
         </button>
@@ -107,5 +115,32 @@
             window.scrollTo({ top: 0, behavior: "smooth" });
         });
     </script>
+
+    <script>
+        document.getElementById("pesquisa").addEventListener("input", function () {
+            const termo = this.value;
+
+            if (termo.length === 0) {
+                document.getElementById("resultado-pesquisa").innerHTML = "";
+                return;
+            }
+
+            fetch(`/Passeios/Buscar?termo=${encodeURIComponent(termo)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Erro ao buscar passeios");
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    document.getElementById("resultado-pesquisa").innerHTML = html;
+                })
+                .catch(error => {
+                    console.error("Erro na pesquisa:", error);
+                });
+        });
+    </script>
+
+
 </body>
 </html>

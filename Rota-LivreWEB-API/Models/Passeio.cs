@@ -16,6 +16,11 @@
 
         public int QuantidadeCurtidas { get; set; }
 
+        
+        public bool AlternarCurtida { get; set; }
+        public bool UsuarioJaCurtiu { get; set; }
+
+
 
         public Passeio()
         {
@@ -23,14 +28,15 @@
 
         public Passeio(int? id_categoria, string nome_passeio, bool? ida_e_volta, DateTime? data_hora_ida, DateTime? data_hora_volta, string funcionamento, string descricao, string img_url)
         {
-            id_categoria = id_categoria;
-            nome_passeio = nome_passeio;
-            ida_e_volta = ida_e_volta;
-            data_hora_ida = data_hora_ida;
-            data_hora_volta = data_hora_volta;
-            funcionamento = funcionamento;
-            descricao = descricao;
-            img_url = img_url;
+            this.id_categoria = id_categoria ?? 0;
+            this.nome_passeio = nome_passeio;
+            this.ida_e_volta = ida_e_volta ?? false;
+            this.data_hora_ida = data_hora_ida ?? DateTime.Now;
+            this.data_hora_volta = data_hora_volta;
+            this.funcionamento = funcionamento;
+            this.descricao = descricao;
+            this.img_url = img_url;
         }
+
     }
 }

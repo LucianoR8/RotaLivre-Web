@@ -6,10 +6,14 @@ using Rota_LivreWEB_API.Repositories;
 using MySql.Data.MySqlClient;
 
 
+
+
+
 namespace Rota_LivreWEB_API.Controllers
 {
     public class PasseiosController : Controller
     {
+       
 
 
         public ActionResult Categoria(int id)
@@ -28,17 +32,27 @@ namespace Rota_LivreWEB_API.Controllers
                 return NotFound();
             }
 
-        
-     
+            passeio.QuantidadeCurtidas = repo.ObterTotalCurtidas(id);
+
+            
+            int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
+            ViewBag.TesteIdUsuario = idUsuario;
+            if (idUsuario != null)
+            {
+                passeio.UsuarioJaCurtiu = repo.UsuarioJaCurtiu(idUsuario.Value, id);
+            }
+
+
+
+
             return View(passeio);
         }
 
 
 
-        
 
-        
-        [HttpPost]
+
+        [HttpPost("/Passeios/Curtir/{idPasseio}")]
         public ActionResult Curtir(int idPasseio)
         {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
@@ -48,33 +62,28 @@ namespace Rota_LivreWEB_API.Controllers
                 return Json(new { sucesso = false, mensagem = "Usuário não autenticado." });
             }
 
-            string connectionString = "Server=rotalivre.c30u6uc8o0pe.us-east-2.rds.amazonaws.com;Port=3306;Database=rotalivre;Uid=admin;Pwd=$Rotalivre1;";
+           
 
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                conn.Open();
+            var repo = new PasseioRepository();
 
-                var checkCmd = new MySqlCommand("SELECT COUNT(*) FROM curtida_passeio WHERE id_passeio = @idPasseio AND id_usuario = @idUsuario", conn);
-                checkCmd.Parameters.AddWithValue("@idPasseio", idPasseio);
-                checkCmd.Parameters.AddWithValue("@idUsuario", idUsuario.Value);
+            bool curtiuAgora = repo.AlternarCurtida(idUsuario.Value, idPasseio);
 
-                int existe = Convert.ToInt32(checkCmd.ExecuteScalar());
-
-                if (existe == 0)
-                {
-                    var insertCmd = new MySqlCommand("INSERT INTO curtida_passeio (id_passeio, id_usuario) VALUES (@idPasseio, @idUsuario)", conn);
-                    insertCmd.Parameters.AddWithValue("@idPasseio", idPasseio);
-                    insertCmd.Parameters.AddWithValue("@idUsuario", idUsuario.Value);
-                    insertCmd.ExecuteNonQuery();
-                }
-
-                var countCmd = new MySqlCommand("SELECT COUNT(*) FROM curtida_passeio WHERE id_passeio = @idPasseio", conn);
-                countCmd.Parameters.AddWithValue("@idPasseio", idPasseio);
-                int totalCurtidas = Convert.ToInt32(countCmd.ExecuteScalar());
-
-                return Json(new { sucesso = true, curtidas = totalCurtidas });
-            }
+            return Json(new { sucesso = true, curtiu = curtiuAgora });
         }
+
+        public ActionResult Buscar(string termo)
+        {
+            var repo = new PasseioRepository();
+
+            var passeios = string.IsNullOrWhiteSpace(termo)
+                ? new List<Passeio>()
+                : repo.BuscarPasseioPorNome(termo);
+
+            return PartialView("_CardsPasseios", passeios);
+        }
+
+
+
 
 
     }

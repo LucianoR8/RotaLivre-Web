@@ -66,7 +66,13 @@
 
         }
 
+        .btn-action{
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
 
+        }
 
 
     </style>
@@ -77,7 +83,12 @@
             <div class="cartao card-body">
                 <img src="~/img/profilepic.png" class="rounded-circle mb-3" alt="Foto do Perfil">
                 <p class="user text">@Model.nome_completo</p>
-                <button class="btn btn-primary" type="button" onclick="window.location.href='/Perfil/Editar'">Editar Perfil</button>
+                <form asp-action="Deletar" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <div class="d-flex justify-content-center mt-3">
+                        <button class="btn btn-danger w-50">Deletar Conta</button>
+                    </div>
+                </form>               
             </div>
         </div>
 
@@ -88,14 +99,13 @@
                 <li class="list-group-item"><strong>Email:</strong> @Model.email</li>
                 <li class="list-group-item"><strong>Data de Nascimento:</strong> @Model.data_nasc.ToShortDateString()</li>
             </ul>
+            <div class="btn-action">
+            <button class="btn btn-primary" type="button" onclick="window.location.href='/Perfil/Editar'">Editar Perfil</button>
 
-            <form asp-action="Deletar" method="post" style="display:inline;">
-                @Html.AntiForgeryToken()
-                <div class="d-flex justify-content-center mt-3">
-                    <button class="btn btn-danger w-50">Deletar Conta</button>
-                </div>
+            <form asp-action="Logout" asp-controller="Login" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-outline-danger">Sair da Conta</button>
             </form>
-            
+            </div>
         </div>
     </div>
 
@@ -103,6 +113,7 @@
 
     <footer>
         <button class="tab" id="btnTopo" type="button" onclick="window.location.href='/HomeBase/Home'"><i class="fas fa-home"></i> Home</button>
+        <button class="tab" onclick="window.location.href='/MeusPasseios/MeusPasseios'"><i class="fas fa-bus"></i> Meus Passeios</button>
         <button class="tab active"><i class="fas fa-user"></i> Perfil</button>
     </footer>
 </body>

@@ -45,6 +45,12 @@
                 <span asp-validation-for="ConfirmarSenha" class="text-danger"></span>
             </div>
 
+            <div class="form-floating mb-2">
+                <input name="resposta_seg" type="text" class="form-control" placeholder="Resposta da pergunta de segurança" required />
+                <label for="resposta_seg">Qual é o nome do seu primeiro pet?</label>
+            </div>
+
+
 
             @if (ViewBag.MensagemErro != null)
                 {

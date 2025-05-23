@@ -39,9 +39,9 @@ namespace Rota_LivreWEB_API.Controllers
         }
 
         [HttpPost("Cadastrar_Usuario")]
-        public ActionResult CadastrarUsuario(string Novo_Usuario_Nome, string Novo_Usuario_Nasc, string Novo_Usuario_Email, string Novo_Usuario_Senha)
+        public ActionResult CadastrarUsuario(string Novo_Usuario_Nome, string Novo_Usuario_Nasc, string Novo_Usuario_Email, string Novo_Usuario_Senha, string Novo_Usuario_Resposta_Seg)
         {
-            Usuario NovoUsuario = new Usuario(Novo_Usuario_Nome, Convert.ToDateTime(Novo_Usuario_Nasc), Novo_Usuario_Email, Novo_Usuario_Senha);
+            Usuario NovoUsuario = new Usuario(Novo_Usuario_Nome, Convert.ToDateTime(Novo_Usuario_Nasc), Novo_Usuario_Email, Novo_Usuario_Senha, Novo_Usuario_Resposta_Seg);
 
             if (UsuarioDbContext.Cadastra_Usuario(NovoUsuario) == "Sucesso")
             {

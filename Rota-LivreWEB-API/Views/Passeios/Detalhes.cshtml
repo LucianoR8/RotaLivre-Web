@@ -29,7 +29,7 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            padding-bottm: 80px;
+            padding-bottom: 80px;
         }
         img {
             max-width: 70%;
@@ -84,8 +84,12 @@
             font-weight: bold;
        }
 
-       .rating{
-           
+
+       .passeio-action{
+           display: flex;
+           justify-content: center;
+           gap: 15px;          
+           margin-top: 10px;
        }
 
         footer {
@@ -145,15 +149,29 @@
             </div>
         }
 
+        <div class="passeio-action">
 
         <a asp-controller="Avaliacao" asp-action="Index" asp-route-id="@Model.id_passeio" class="rating btn btn-outline-primary mt-0">Avaliações</a>
+
+
+
+        <button id="btn-pendente"
+                class="btn @(Model.UsuarioJaPendente ? "btn-warning" : "btn-outline-warning")"
+                data-id="@Model.id_passeio">
+            @(Model.UsuarioJaPendente ? "Remover da minha lista" : "Adicionar em minha lista")
+        </button>
 
 
         <button id="btn-curtir"
                 class="btn @(Model.UsuarioJaCurtiu ? "btn-danger" : "btn-outline-danger")"
                 data-id="@Model.id_passeio">
-            @(Model.UsuarioJaCurtiu ? "Curtido ❤️" : "Curtir 🤍")
+            @(Model.UsuarioJaCurtiu ? "Curtido" : "Curtir")
         </button>
+
+        </div>
+   
+
+
 
 
         <script>
@@ -171,11 +189,11 @@
                         if (data.sucesso) {
                           
                             if (data.curtiu) {
-                                botaoCurtir.innerText = "Curtido ❤️";
+                                botaoCurtir.innerText = "Curtido";
                                 botaoCurtir.classList.remove("btn-outline-danger");
                                 botaoCurtir.classList.add("btn-danger");
                             } else {
-                                botaoCurtir.innerText = "Curtir 🤍";
+                                botaoCurtir.innerText = "Curtir";
                                 botaoCurtir.classList.remove("btn-danger");
                                 botaoCurtir.classList.add("btn-outline-danger");
                             }
@@ -194,11 +212,43 @@
 
 
 
-        
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const botaoPendente = document.getElementById("btn-pendente");
 
+                botaoPendente.addEventListener("click", function () {
+                    const idPasseio = botaoPendente.getAttribute("data-id");
 
-
-        
+                    fetch('/MeusPasseios/AlternarPendente', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'idPasseio=' + encodeURIComponent(idPasseio)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.sucesso) {
+                            if (data.pendente) {
+                                botaoPendente.innerText = "Remover da minha lista";
+                                botaoPendente.classList.remove("btn-outline-warning");
+                                botaoPendente.classList.add("btn-warning");
+                            } else {
+                                botaoPendente.innerText = "Adicionar em minha lista";
+                                botaoPendente.classList.remove("btn-warning");
+                                botaoPendente.classList.add("btn-outline-warning");
+                            }
+                        } else {
+                            alert(data.mensagem || "Erro ao processar.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erro:", error);
+                        alert("Erro ao processar a solicitação.");
+                    });
+                });
+            });
+        </script>
 
 
 
@@ -210,6 +260,7 @@
 
     <footer>
         <button class="tab" id="btnTopo" type="button" onclick="window.location.href='/HomeBase/Home'"><i class="fas fa-home"></i> Home</button>
+        <button class="tab" onclick="window.location.href='/MeusPasseios/MeusPasseios'"><i class="fas fa-bus"></i> Meus Passeios</button>
         <button class="tab" onclick="window.location.href='/Perfil/Perfil'"><i class="fas fa-user"></i> Perfil</button>
     </footer>
 

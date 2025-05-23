@@ -38,14 +38,20 @@ namespace Rota_LivreWEB_API.Controllers
             }
         }
 
+        public ActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login", "Login");
+        }
 
-         public ViewResult SolicitarRedefinicao()
+
+        public ViewResult SolicitarRedefinicao()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult SolicitarRedefinicaoSenha(string email)
+        public ActionResult SolicitarRedefinicaoSenha(string email)
         {
             var usuario = UsuarioDbContext.BuscarUsuarioPorEmail(email);
             if (usuario == null)
@@ -65,7 +71,7 @@ namespace Rota_LivreWEB_API.Controllers
         }
 
         [HttpPost]
-        public IActionResult DefinirNovaSenha(int id_usuario, string novaSenha, string confirmarSenha)
+        public ActionResult DefinirNovaSenha(int id_usuario, string novaSenha, string confirmarSenha)
         {
             if (novaSenha != confirmarSenha)
             {

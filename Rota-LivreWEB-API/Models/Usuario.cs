@@ -26,16 +26,21 @@ namespace Rota_LivreWEB_API.Models
         [Compare("senha", ErrorMessage = "As senhas não coincidem.")]
         public string ConfirmarSenha { get; set; }
 
+        [Required(ErrorMessage = "A resposta é obrigatória")]
+        public string resposta_seg { get; set; }
+
+
         public Usuario()
         {
         }
 
-        public Usuario(string Novo_Usuario_Nome, DateTime Novo_Usuario_Nasc, string Novo_Usuario_Email, string Novo_Usuario_Senha)
+        public Usuario(string Novo_Usuario_Nome, DateTime Novo_Usuario_Nasc, string Novo_Usuario_Email, string Novo_Usuario_Senha, string Novo_Usuario_Resposta_Seg)
         {
             nome_completo = Novo_Usuario_Nome;
             data_nasc = Novo_Usuario_Nasc;
             email = Novo_Usuario_Email;
             senha = Novo_Usuario_Senha;
+            resposta_seg = Novo_Usuario_Resposta_Seg;
         }
     }
 }

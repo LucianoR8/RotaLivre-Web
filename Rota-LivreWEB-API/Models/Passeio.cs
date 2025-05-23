@@ -19,6 +19,7 @@
         
         public bool AlternarCurtida { get; set; }
         public bool UsuarioJaCurtiu { get; set; }
+        public bool UsuarioJaPendente { get; set; }
 
 
 

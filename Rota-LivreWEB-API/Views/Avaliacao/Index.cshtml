@@ -9,6 +9,9 @@
     int idPasseio = Model.FirstOrDefault()?.id_passeio ?? 0;
 }
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 <h2>Avaliações do Passeio</h2>
 
 @if (Model.Any())
@@ -47,43 +50,120 @@ else
 }
 
 <hr />
-<h4>Deixar uma nova avaliação</h4>
+
+<div id="form-avaliacao-fixa">
+<h4 class="feedback-in">Deixar uma nova avaliação</h4>
 
 <form asp-action="Comentar" method="post">
     <input type="hidden" name="id_passeio" value="@ViewBag.IdPasseio" />
     <input type="hidden" name="id_usuario" value="@ViewBag.IdUsuario" />
     <input type="hidden" name="nome_completo" value="@ViewBag.NomeUsuario" />
 
-    <div class="form-group">
-        <label for="nota">Nota:</label>
-        <div class="star-rating-input">
-            @for (int i = 5; i >= 1; i--)
-            {
-                <input type="radio" id="star-@i" name="nota" value="@i" required />
-                <label for="star-@i">&#9733;</label>
-            }
+
+    <div class="form-avaliacao-horizontal">
+
+
+
+        <div class="campo-comentario form-group">
+            <textarea name="feedback" class="form-control" placeholder="Escreva seu comentário aqui" required></textarea>
+        </div>
+
+        <div class="campo-nota form-group">
+            <div class="star-rating-input">
+                @for (int i = 5; i >= 1; i--)
+                {
+                    <input type="radio" id="star-@i" name="nota" value="@i" required />
+                    <label for="star-@i">&#9733;</label>
+                }
+            </div>
+        </div>
+
+        
+
+        <div class="campo-botao">
+            <button type="submit" class="btn btn-success mt-2">Enviar Avaliação</button>
         </div>
     </div>
-
-    <div class="form-group">
-        <label for="feedback">Comentário:</label>
-        <textarea name="feedback" class="form-control" rows="4" required></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-success mt-2">Enviar Avaliação</button>
 </form>
+</div>
 
 <style>
+    body {
+        background-color: #FEFCFA;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    h2 {
+        color: #B54200;
+        text-align: center;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    h4 {
+        color: #B54200;
+        font-weight: bold;
+        margin-top: 10%;
+        display: block;
+        font-size: 1.2rem;
+        text-align: center;
+    }
+
+    p {
+        margin-top: 15%;
+        text-align: center;
+    }
+
+    hr {
+        margin-top: 10%;
+        margin-bottom: 40px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-avaliacao-horizontal {
+        display: flex;
+        flex-wrap: wrap; 
+        gap: 20px;
+        align-items: flex-start;
+        margin-top: 2%;
+        margin-left: 15%;
+    }
+
     .avaliacoes-list {
         display: flex;
         flex-direction: column;
         gap: 15px;
         margin-top: 20px;
+        padding: 0 10px;
+        margin-bottom: 220px;
     }
 
+    #form-avaliacao-fixa {
+        position: fixed;
+        bottom: 37px;
+        left: 0;
+        width: 100%;
+        background-color: #FEFCFA;
+        padding: 15px 30px;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        border-top: 1px solid #ddd;
+    }
+
+        #form-avaliacao-fixa h4 {
+            margin-top: 0;
+            text-align: center;
+        }
+
     .avaliacao-card {
-        border: 1px solid #ddd;
-        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        border: 2px solid #ddd;
+        border-radius: 15px;
         padding: 15px;
         background-color: #f9f9f9;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -91,8 +171,9 @@ else
 
     .avaliacao-header {
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
     }
 
     .avaliacao-data {
@@ -108,6 +189,10 @@ else
     .avaliacao-feedback {
         font-size: 1rem;
         color: #333;
+        line-height: 1.5;
+        margin-top: 5px;
+        text-align: justify;
+        text-justify: inter-word;
     }
 
     .star-rating-input {
@@ -133,4 +218,111 @@ else
             .star-rating-input label:hover ~ label {
                 color: gold;
             }
+
+    .campo-nota,
+    .campo-comentario,
+    .campo-botao {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .campo-nota {
+        min-width: 160px;
+    }
+
+
+
+    textarea.form-control {
+        border-radius: 10px;
+        max-width: 1000px;
+        min-width: 800px;
+        height: 60px;
+        padding: 1px 15px;
+        border: 2px solid #ddd;
+        transition: border-color 0.3s;
+        resize: none;
+        border-radius: 20px;
+        text-align: left; 
+        vertical-align: middle; 
+        line-height: 30px; 
+    }
+
+
+        textarea.form-control:focus {
+            border-color: #B54200;
+            box-shadow: 0 0 5px rgba(181, 66, 0, 0.5);
+        }
+
+    button.btn-success {
+        background-color: #B54200;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        color: white;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+        button.btn-success:hover {
+            background-color: #A03D00;
+            transform: scale(1.05);
+        }
+
+        button.btn-success:active {
+            transform: scale(0.95);
+        }
+
+        button.btn-success:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(181, 66, 0, 0.5);
+        }
+
+        button.btn-success:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+            button.btn-success:disabled:hover {
+                background-color: #ccc;
+                transform: none;
+            }
+
+            button.btn-success:disabled:focus {
+                box-shadow: none;
+            }
+
+            button.btn-success:disabled:active {
+                transform: none;
+            }
+
+    footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: white;
+        padding: 5px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-around;
+        z-index: 10;
+    }
+
+        footer button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #b54200;
+            cursor: pointer;
+        }
+
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<footer>
+    <button class="tab" id="btnTopo" type="button" onclick="window.location.href='/HomeBase/Home'"><i class="fas fa-home"></i> Home</button>
+    <button class="tab" onclick="window.location.href='/MeusPasseios/MeusPasseios'"><i class="fas fa-bus"></i> Meus Passeios</button>
+    <button class="tab" onclick="window.location.href='/Perfil/Perfil'"><i class="fas fa-user"></i> Perfil</button>
+</footer>

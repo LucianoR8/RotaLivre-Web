@@ -18,7 +18,7 @@ namespace Rota_LivreWEB_API.DbContext
                 MySqlConnection conexao = new();
 
                 conexao.ConnectionString = StringDeConexao;
-                string query = "INSERT INTO usuario (nome_completo, data_nasc, email, senha) VALUES (@Novo_Usuario_Nome, @Novo_Usuario_Nasc, @Novo_Usuario_Email, @Novo_Usuario_Senha);";
+                string query = "INSERT INTO usuario (nome_completo, data_nasc, email, senha) VALUES (@Novo_Usuario_Nome, @Novo_Usuario_Nasc, @Novo_Usuario_Email, @Novo_Usuario_Senha, @Novo_Usuario_Resposta_Seg);";
                 MySqlCommand comando = new(query, conexao);
 
                 comando.Parameters.AddWithValue("@Novo_Usuario_Nome", NovoUsuario.nome_completo);
@@ -26,6 +26,7 @@ namespace Rota_LivreWEB_API.DbContext
                 comando.Parameters.AddWithValue("@Novo_Usuario_Email", NovoUsuario.email);
                 string senhaHash = GerarHash(NovoUsuario.senha);
                 comando.Parameters.AddWithValue("@Novo_Usuario_Senha", senhaHash);
+                comando.Parameters.AddWithValue("@Novo_Usuario_Resposta_Seg", NovoUsuario.resposta_seg);
                 conexao.Open();
                 comando.ExecuteNonQuery();
                 conexao.Close();
@@ -97,7 +98,7 @@ namespace Rota_LivreWEB_API.DbContext
             {
                 byte[] bytes = Encoding.UTF8.GetBytes(senha);
                 byte[] hashBytes = sha256.ComputeHash(bytes);
-                return Convert.ToHexString(hashBytes); // hash em hexadecimal
+                return Convert.ToHexString(hashBytes); 
             }
         }
 
@@ -146,7 +147,8 @@ namespace Rota_LivreWEB_API.DbContext
                             nome_completo = reader.GetString("nome_completo"),
                             data_nasc = reader.GetDateTime("data_nasc"),
                             email = reader.GetString("email"),
-                            senha = reader.GetString("senha")
+                            senha = reader.GetString("senha"),
+                            resposta_seg = reader.GetString("resposta_seg")
                         };
 
                         conexao.Close();
@@ -167,22 +169,24 @@ namespace Rota_LivreWEB_API.DbContext
         {
             using (var conexao = new MySqlConnection(StringDeConexao))
             {
-                string query = @"UPDATE usuario SET nome_completo = @Nome, data_nasc = @Nasc, email = @Email, senha = @Senha
-                         WHERE id_usuario = @Id";
-
-                MySqlCommand comando = new(query, conexao);
-                comando.Parameters.AddWithValue("@Nome", usuario.nome_completo);
-                comando.Parameters.AddWithValue("@Nasc", usuario.data_nasc);
-                comando.Parameters.AddWithValue("@Email", usuario.email);
-                comando.Parameters.AddWithValue("@Senha", usuario.senha);
-                comando.Parameters.AddWithValue("@Id", usuario.id_usuario);
-
                 conexao.Open();
-                Console.WriteLine($"Atualizando usuário ID {usuario.id_usuario} - Nome: {usuario.nome_completo}");
-                comando.ExecuteNonQuery();
-                conexao.Close();
+
+                string query = @"UPDATE usuario 
+                         SET nome_completo = @nome, email = @mail, data_nasc = @data 
+                         WHERE id_usuario = @id";
+
+                using (var cmd = new MySqlCommand(query, conexao))
+                {
+                    cmd.Parameters.AddWithValue("@nome", usuario.nome_completo);
+                    cmd.Parameters.AddWithValue("@mail", usuario.email);
+                    cmd.Parameters.AddWithValue("@data", usuario.data_nasc);
+                    cmd.Parameters.AddWithValue("@id", usuario.id_usuario);
+
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
+
 
 
         public static void DeletarUsuario(int id)
@@ -235,7 +239,8 @@ namespace Rota_LivreWEB_API.DbContext
                             nome_completo = reader.GetString("nome_completo"),
                             data_nasc = reader.GetDateTime("data_nasc"),
                             email = reader.GetString("email"),
-                            senha = reader.GetString("senha")
+                            senha = reader.GetString("senha"),
+                            resposta_seg = reader.GetString("resposta_seg")
                         };
 
                         conexao.Close();

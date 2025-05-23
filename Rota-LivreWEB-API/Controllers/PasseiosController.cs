@@ -40,6 +40,7 @@ namespace Rota_LivreWEB_API.Controllers
             if (idUsuario != null)
             {
                 passeio.UsuarioJaCurtiu = repo.UsuarioJaCurtiu(idUsuario.Value, id);
+                passeio.UsuarioJaPendente = PasseioDb.VerificarPasseioPendente(idUsuario.Value, id);
             }
 
 

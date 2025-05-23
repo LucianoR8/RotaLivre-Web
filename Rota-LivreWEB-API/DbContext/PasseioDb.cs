@@ -161,6 +161,115 @@ namespace Rota_LivreWEB_API.DbContext
             return lista;
         }
 
+        public static List<Passeio> BuscarPasseiosCurtidosPorUsuario(int idUsuario)
+        {
+            var lista = new List<Passeio>();
+            using (var conexao = new MySqlConnection(StringDeConexao))
+            {
+                conexao.Open();
+                var cmd = new MySqlCommand(@"
+            SELECT p.* FROM curtida_passeio c
+            INNER JOIN passeio p ON c.id_passeio = p.id_passeio
+            WHERE c.id_usuario = @idUsuario", conexao);
+                cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new Passeio
+                        {
+                            id_passeio = Convert.ToInt32(reader["id_passeio"]),
+                            nome_passeio = reader["nome_passeio"].ToString(),
+                            img_url = reader["img_url"].ToString(),
+                        });
+                    }
+                }
+            }
+            return lista;
+        }
+
+        public static List<Passeio> BuscarPasseiosPendentesPorUsuario(int idUsuario)
+        {
+            var lista = new List<Passeio>();
+            using (var conexao = new MySqlConnection(StringDeConexao))
+            {
+                conexao.Open();
+                var cmd = new MySqlCommand(@"
+            SELECT p.* FROM passeios_pendentes pp
+            INNER JOIN passeio p ON pp.id_passeio = p.id_passeio
+            WHERE pp.id_usuario = @idUsuario", conexao);
+
+                cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new Passeio
+                        {
+                            id_passeio = Convert.ToInt32(reader["id_passeio"]),
+                            nome_passeio = reader["nome_passeio"].ToString(),
+                            img_url = reader["img_url"].ToString(),
+                        });
+                    }
+                }
+            }
+            return lista;
+        }
+
+        public static void AdicionarPasseioPendente(int idUsuario, int idPasseio)
+        {
+            using (var conexao = new MySqlConnection(StringDeConexao))
+            {
+                conexao.Open();
+                var cmd = new MySqlCommand(@"
+            INSERT INTO passeios_pendentes (id_usuario, id_passeio)
+            VALUES (@idUsuario, @idPasseio)", conexao);
+
+                cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
+                cmd.Parameters.AddWithValue("@idPasseio", idPasseio);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public static bool VerificarPasseioPendente(int idUsuario, int idPasseio)
+        {
+            using (MySqlConnection conexao = new MySqlConnection(StringDeConexao))
+            {
+                conexao.Open();
+
+                string query = "SELECT COUNT(*) FROM passeios_pendentes WHERE id_usuario = @idUsuario AND id_passeio = @idPasseio";
+
+                using (MySqlCommand comando = new MySqlCommand(query, conexao))
+                {
+                    comando.Parameters.AddWithValue("@idUsuario", idUsuario);
+                    comando.Parameters.AddWithValue("@idPasseio", idPasseio);
+                    long count = (long)comando.ExecuteScalar();
+                    return count > 0;
+                }
+            }
+        }
+
+        public static void RemoverPasseioPendente(int idUsuario, int idPasseio)
+        {
+            using (MySqlConnection conexao = new MySqlConnection(StringDeConexao))
+            {
+                conexao.Open();
+
+                string query = "DELETE FROM passeios_pendentes WHERE id_usuario = @idUsuario AND id_passeio = @idPasseio";
+
+                using (MySqlCommand comando = new MySqlCommand(query, conexao))
+                {
+                    comando.Parameters.AddWithValue("@idUsuario", idUsuario);
+                    comando.Parameters.AddWithValue("@idPasseio", idPasseio);
+                    comando.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+
+
+
 
 
     }

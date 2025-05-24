@@ -60,8 +60,8 @@ namespace Rota_LivreWEB_API.Controllers
                 return View("SolicitarRedefinicao");
             }
 
-            
-            return RedirectToAction("DefinirNovaSenha", new { id = usuario.id_usuario });
+
+            return RedirectToAction("ConfirmarResposta", new { email = email });
         }
 
         public ViewResult DefinirNovaSenha(int id)
@@ -87,6 +87,38 @@ namespace Rota_LivreWEB_API.Controllers
             else
                 return StatusCode(500, "Erro ao redefinir senha.");
         }
+
+        public ActionResult ConfirmarResposta(string email)
+        {
+            var pergunta = UsuarioDbContext.BuscarPerguntaDoUsuario(email);
+            ViewBag.Email = email;
+            ViewBag.Pergunta = pergunta;
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult VerificarResposta(string email, string RespostaInformada)
+        {
+            string respostaHash = UsuarioDbContext.GerarHash(RespostaInformada);
+            string respostaBanco = UsuarioDbContext.ObterRespostaDoBanco(email);
+
+            if (respostaHash == respostaBanco)
+            {
+                var usuario = UsuarioDbContext.BuscarUsuarioPorEmail(email);
+                return RedirectToAction("DefinirNovaSenha", new { id = usuario.id_usuario });
+            }
+            else
+            {
+                ViewBag.Erro = "Resposta incorreta.";
+                var pergunta = UsuarioDbContext.BuscarPerguntaDoUsuario(email);
+                ViewBag.Email = email;
+                ViewBag.Pergunta = pergunta;
+                return View("ConfirmarResposta");
+            }
+        }
+
+
+
 
         public ViewResult SenhaAlteradaSucesso()
         {

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Rota_LivreWEB_API.Models;
 using Rota_LivreWEB_API.DbContext;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Rota_LivreWEB_API.Controllers
 {
@@ -17,6 +18,8 @@ namespace Rota_LivreWEB_API.Controllers
         
         public ViewResult Create()
         {
+            var perguntas = UsuarioDbContext.ObterPerguntasDeSeguranca();
+            ViewBag.Perguntas = new SelectList(perguntas, "id_pergunta", "pergunta_seg");
             return View();
         }
 
@@ -35,6 +38,10 @@ namespace Rota_LivreWEB_API.Controllers
                 UsuarioDbContext.Cadastra_Usuario(usuario); 
                 return RedirectToAction("CadastroConcluido");
             }
+
+            var perguntas = UsuarioDbContext.ObterPerguntasDeSeguranca();
+            ViewBag.Perguntas = new SelectList(perguntas, "id_pergunta", "pergunta_seg");
+
             return View(usuario);
         }
 
@@ -58,7 +65,15 @@ namespace Rota_LivreWEB_API.Controllers
             return View();
         }
 
-       
+        
+
+
+
+
+
+
+
+
 
 
     }

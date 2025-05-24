@@ -19,8 +19,6 @@
             @foreach (var passeio in Model)
             {
                 <div class="produto"
-                     onmouseover="this.style.transform='scale(1.1)'"
-                     onmouseout="this.style.transform='scale(1)'"
                      onclick='window.location.href="@Url.Action("Detalhes", "Passeios", new { id = passeio.id_passeio })"'>
 
                     <img src="@Url.Content("~/img/passeios/" + passeio.img_url)" class="imagem_produto" alt="@passeio.nome_passeio" />

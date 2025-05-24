@@ -18,7 +18,7 @@ namespace Rota_LivreWEB_API.DbContext
                 MySqlConnection conexao = new();
 
                 conexao.ConnectionString = StringDeConexao;
-                string query = "INSERT INTO usuario (nome_completo, data_nasc, email, senha) VALUES (@Novo_Usuario_Nome, @Novo_Usuario_Nasc, @Novo_Usuario_Email, @Novo_Usuario_Senha, @Novo_Usuario_Resposta_Seg);";
+                string query = "INSERT INTO usuario (nome_completo, data_nasc, email, senha, resposta_seg, id_pergunta) VALUES (@Novo_Usuario_Nome, @Novo_Usuario_Nasc, @Novo_Usuario_Email, @Novo_Usuario_Senha, @Novo_Usuario_Resposta_Seg, @id_pergunta);";
                 MySqlCommand comando = new(query, conexao);
 
                 comando.Parameters.AddWithValue("@Novo_Usuario_Nome", NovoUsuario.nome_completo);
@@ -26,7 +26,9 @@ namespace Rota_LivreWEB_API.DbContext
                 comando.Parameters.AddWithValue("@Novo_Usuario_Email", NovoUsuario.email);
                 string senhaHash = GerarHash(NovoUsuario.senha);
                 comando.Parameters.AddWithValue("@Novo_Usuario_Senha", senhaHash);
-                comando.Parameters.AddWithValue("@Novo_Usuario_Resposta_Seg", NovoUsuario.resposta_seg);
+                string respostaHash = GerarHash(NovoUsuario.resposta_seg);
+                comando.Parameters.AddWithValue("@Novo_Usuario_Resposta_Seg", respostaHash);
+                comando.Parameters.AddWithValue("@id_pergunta", NovoUsuario.id_pergunta);
                 conexao.Open();
                 comando.ExecuteNonQuery();
                 conexao.Close();
@@ -272,6 +274,69 @@ namespace Rota_LivreWEB_API.DbContext
                 }
             }
         }
+
+        public static List<PerguntaSeguranca> ObterPerguntasDeSeguranca()
+        {
+            List<PerguntaSeguranca> perguntas = new();
+            MySqlConnection conexao = new();
+            conexao.ConnectionString = StringDeConexao;
+
+            string query = "SELECT id_pergunta, pergunta_seg FROM pergunta_seg";
+            MySqlCommand comando = new(query, conexao);
+            conexao.Open();
+            MySqlDataReader reader = comando.ExecuteReader();
+
+            while (reader.Read())
+            {
+                perguntas.Add(new PerguntaSeguranca
+                {
+                    id_pergunta = reader.GetInt32("id_pergunta"),
+                    pergunta_seg = reader.GetString("pergunta_seg")
+                });
+            }
+
+            conexao.Close();
+            return perguntas;
+        }
+
+        public static string BuscarPerguntaDoUsuario(string email)
+        {
+            MySqlConnection conexao = new();
+            conexao.ConnectionString = StringDeConexao;
+
+            string query = @"SELECT p.pergunta_seg 
+                     FROM usuario u 
+                     JOIN pergunta_seg p ON u.id_pergunta = p.id_pergunta 
+                     WHERE u.email = @Email";
+
+            MySqlCommand comando = new(query, conexao);
+            comando.Parameters.AddWithValue("@Email", email);
+
+            conexao.Open();
+            object resultado = comando.ExecuteScalar();
+            conexao.Close();
+
+            return resultado?.ToString();
+        }
+
+        public static string ObterRespostaDoBanco(string email)
+        {
+            MySqlConnection conexao = new();
+            conexao.ConnectionString = StringDeConexao;
+
+            string query = "SELECT resposta_seg FROM usuario WHERE email = @Email";
+            MySqlCommand comando = new(query, conexao);
+            comando.Parameters.AddWithValue("@Email", email);
+
+            conexao.Open();
+            object resultado = comando.ExecuteScalar();
+            conexao.Close();
+
+            return resultado?.ToString();
+        }
+
+
+
 
 
 

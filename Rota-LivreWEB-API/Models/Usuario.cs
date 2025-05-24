@@ -29,6 +29,8 @@ namespace Rota_LivreWEB_API.Models
         [Required(ErrorMessage = "A resposta é obrigatória")]
         public string resposta_seg { get; set; }
 
+        public int id_pergunta { get; set; }
+
 
         public Usuario()
         {
@@ -41,6 +43,7 @@ namespace Rota_LivreWEB_API.Models
             email = Novo_Usuario_Email;
             senha = Novo_Usuario_Senha;
             resposta_seg = Novo_Usuario_Resposta_Seg;
+     
         }
     }
 }

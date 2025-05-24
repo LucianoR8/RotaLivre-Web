@@ -5,6 +5,17 @@
 }
 
 
+@{
+    var perguntas = ViewBag.Perguntas as SelectList;
+}
+
+@if (perguntas == null)
+{
+    <p style="color:red">Erro: ViewBag.Perguntas está nulo</p>
+}
+
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -45,10 +56,20 @@
                 <span asp-validation-for="ConfirmarSenha" class="text-danger"></span>
             </div>
 
-            <div class="form-floating mb-2">
-                <input name="resposta_seg" type="text" class="form-control" placeholder="Resposta da pergunta de segurança" required />
-                <label for="resposta_seg">Qual é o nome do seu primeiro pet?</label>
+            
+            <div class="form-floating w-100 mb-3">
+                <select asp-for="id_pergunta" asp-items="ViewBag.Perguntas" class="form-select" id="perguntaSelect" aria-label="Pergunta de segurança">
+                    <option value="">Selecione aqui a sua pergunta de segurança</option>
+                </select>
+                <label for="perguntaSelect">Pergunta de Segurança</label>
             </div>
+
+            
+            <div class="form-floating w-100 mb-3">
+                <input asp-for="resposta_seg" class="form-control" id="resposta_seg" placeholder="Digite sua resposta para a pergunta acima" />
+                <label for="resposta_seg">Resposta</label>
+            </div>
+
 
 
 

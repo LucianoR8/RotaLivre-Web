@@ -62,7 +62,7 @@
         <button id="btn-pendente"
                 class="btn @(Model.UsuarioJaPendente ? "btn-warning" : "btn-outline-warning")"
                 data-id="@Model.id_passeio">
-            @(Model.UsuarioJaPendente ? "Salvado" : "Salvar")
+            @(Model.UsuarioJaPendente ? "Pendente" : "Adicionar")
         </button>
 
 
@@ -134,11 +134,11 @@
                     .then(data => {
                         if (data.sucesso) {
                             if (data.pendente) {
-                                botaoPendente.innerText = "Salvado";
+                                botaoPendente.innerText = "Pendente";
                                 botaoPendente.classList.remove("btn-outline-warning");
                                 botaoPendente.classList.add("btn-warning");
                             } else {
-                                botaoPendente.innerText = "Salvar";
+                                botaoPendente.innerText = "Adicionar";
                                 botaoPendente.classList.remove("btn-warning");
                                 botaoPendente.classList.add("btn-outline-warning");
                             }

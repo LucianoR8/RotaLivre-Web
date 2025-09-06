@@ -1,0 +1,59 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota Livre</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/Login.css">
+
+</head>
+
+<body>
+
+    <main class="form-signin w-50 m-auto">
+
+        <h1 class="text h3 mb-3 fw-normal">Bem vindo de Volta ao Rota Livre</h1>
+        <h2 class="subtitle">Para uma melhor experiência no turismo da cidade de São Paulo</h2>
+
+        <form asp-action="Login" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <div class="input">
+                <div class="form-floating w-100">
+                    <input type="email" name="email" class="form-control " id="floatingInput" placeholder="nome@exemplo.com" required>
+                    <label for="floatingInput">Informe seu Email</label>
+                </div>
+                <div class="form-floating w-100">
+                    <input type="password" name="senha" class="form-control " id="floatingPassword" placeholder="Senha" required>
+                    <label for="floatingPassword">Informe sua senha</label>
+                </div>
+            </div>
+
+            @if (ViewBag.MensagemErro != null)
+        {
+            <div class="alert alert-danger">@ViewBag.MensagemErro</div>
+        }
+
+            <div class="containerEntrar">
+                <button class="enter btn btn-primary w-100 py-2" type="submit">Entrar</button>
+            </div>
+
+            <div class="containerRedefinir">
+                <a class="btn btn-link w-100 py-2" href="/Login/SolicitarRedefinicao">Esqueceu a senha?</a>
+            </div>
+
+       
+        </form>
+    </main>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

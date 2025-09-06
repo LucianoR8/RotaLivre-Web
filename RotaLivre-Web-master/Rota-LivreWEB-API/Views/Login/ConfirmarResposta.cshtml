@@ -1,0 +1,43 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Confirmar Pergunta de Segurança</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #ffefe3;
+        }
+
+        .texto {
+            color: #b54200;
+        }
+    </style>
+</head>
+<body>
+    <main class="container mt-5">
+        <h2 class="texto mb-3">Pergunta de Segurança</h2>
+
+        <form asp-action="VerificarResposta" method="post">
+            <input type="hidden" name="email" value="@ViewBag.Email" />
+            <p><strong>@ViewBag.Pergunta</strong></p>
+
+            <div class="form-group">
+                <label>Sua resposta</label>
+                <input type="text" name="RespostaInformada" class="form-control" required />
+            </div>
+
+            @if (!string.IsNullOrEmpty(ViewBag.Erro))
+            {
+                    <div class="alert alert-danger mt-2">@ViewBag.Erro</div>
+            }
+
+            <button class="btn btn-primary mt-3" type="submit">Confirmar</button>
+        </form>
+    </main>
+</body>
+</html>

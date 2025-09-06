@@ -1,0 +1,38 @@
+﻿@{
+    Layout = null;
+}
+
+@model List<Rota_LivreWEB_API.Models.Passeio>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Passeios por Categoria</title>
+    <link rel="stylesheet" href="~/css/passeios.css" />
+</head>
+<body>
+    <main>
+        <div class="produtos-container">
+@foreach (var passeio in Model)
+{
+                <div class="produto"
+                     onmouseover="this.style.transform='scale(1.1)'"
+                     onmouseout="this.style.transform='scale(1)'"
+                     onclick='window.location.href="@Url.Action("Detalhes", "Passeios", new { id = passeio.id_passeio })"'>
+        <img src="@Url.Content("~/img/passeios/" + passeio.img_url)" class="imagem_produto" alt="@passeio.nome_passeio" />
+        <div class="museu_conteudo">
+            <p class="nome">@passeio.nome_passeio</p>
+            <div class="linha_nome"></div>
+            <p class="curtidas">@passeio.QuantidadeCurtidas curtidas</p>
+        </div>
+    </div>
+}
+        </div>
+    </main>
+
+    <script src="~/js/script.js"></script>
+</body>
+</html>
+

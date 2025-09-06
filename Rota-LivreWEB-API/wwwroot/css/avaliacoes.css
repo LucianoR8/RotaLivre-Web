@@ -1,0 +1,248 @@
+﻿
+body {
+    background-color: #FEFCFA;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+h2 {
+    color: #B54200;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+h4 {
+    color: #B54200;
+    font-weight: bold;
+    margin-top: 10%;
+    display: block;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+p {
+    margin-top: 15%;
+    text-align: center;
+}
+
+hr {
+    margin-top: 10%;
+    margin-bottom: 40px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-avaliacao-horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-start;
+    margin-top: 2%;
+    margin-left: 15%;
+}
+
+.avaliacoes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 0 10px;
+    margin-bottom: 220px;
+}
+
+#form-avaliacao-fixa {
+    position: fixed;
+    bottom: 37px;
+    left: 0;
+    width: 100%;
+    background-color: #FEFCFA;
+    padding: 15px 30px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    border-top: 1px solid #ddd;
+}
+
+    #form-avaliacao-fixa h4 {
+        margin-top: 0;
+        text-align: center;
+    }
+
+.avaliacao-card {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #ddd;
+    border-radius: 15px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.avaliacao-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.avaliacao-data {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.avaliacao-estrelas {
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+}
+
+.avaliacao-feedback {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.5;
+    margin-top: 5px;
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+.star-rating-input {
+    direction: rtl;
+    display: inline-flex;
+    gap: 5px;
+    font-size: 2rem;
+    margin: 10px 0;
+}
+
+    .star-rating-input input[type="radio"] {
+        display: none;
+    }
+
+    .star-rating-input label {
+        cursor: pointer;
+        color: #ccc;
+        transition: color 0.2s;
+    }
+
+        .star-rating-input input[type="radio"]:checked ~ label,
+        .star-rating-input label:hover,
+        .star-rating-input label:hover ~ label {
+            color: gold;
+        }
+
+.campo-nota,
+.campo-comentario,
+.campo-botao {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.campo-nota {
+    min-width: 160px;
+}
+
+
+
+textarea.form-control {
+    border-radius: 10px;
+    max-width: 1000px;
+    min-width: 800px;
+    height: 60px;
+    padding: 1px 15px;
+    border: 2px solid #ddd;
+    transition: border-color 0.3s;
+    resize: none;
+    border-radius: 20px;
+    text-align: left;
+    vertical-align: middle;
+    line-height: 30px;
+}
+
+
+    textarea.form-control:focus {
+        border-color: #B54200;
+        box-shadow: 0 0 5px rgba(181, 66, 0, 0.5);
+    }
+
+button.btn-success {
+    background-color: #B54200;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+    button.btn-success:hover {
+        background-color: #A03D00;
+        transform: scale(1.05);
+    }
+
+    button.btn-success:active {
+        transform: scale(0.95);
+    }
+
+    button.btn-success:focus {
+        outline: none;
+        box-shadow: 0 0 5px rgba(181, 66, 0, 0.5);
+    }
+
+    button.btn-success:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+        button.btn-success:disabled:hover {
+            background-color: #ccc;
+            transform: none;
+        }
+
+        button.btn-success:disabled:focus {
+            box-shadow: none;
+        }
+
+        button.btn-success:disabled:active {
+            transform: none;
+        }
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    padding: 5px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+    z-index: 10;
+}
+
+    footer button {
+        background: none;
+        border: none;
+        font-size: 16px;
+        color: #b54200;
+        cursor: pointer;
+    }
+
+@media (max-width: 1000px) {
+    .form-avaliacao-horizontal {
+       margin-left: 1%;
+    }
+
+    textarea.form-control {
+        width: 90vw;
+        min-width: unset;
+        max-width: unset;
+    }
+
+    .campo-nota
+     {
+       margin-left: 30%;
+
+    }
+}
+

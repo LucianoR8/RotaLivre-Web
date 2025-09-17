@@ -2,15 +2,22 @@
 using MySql.Data.MySqlClient;
 using Rota_LivreWEB_API.Repositories;
 using Rota_LivreWEB_API.Models;
-using Rota_LivreWEB_API.DbContext;
+using Rota_LivreWEB_API.Data;
 
 namespace Rota_LivreWEB_API.Controllers
 {
     public class HomeBaseController : Controller
     {
-        private readonly CategoriaRepository _repo = new CategoriaRepository();
-        private readonly string connectionString = "Server=rotalivre.c30u6uc8o0pe.us-east-2.rds.amazonaws.com;Port=3306;Database=rotalivre;Uid=admin;Pwd=$Rotalivre1;";
+        private readonly CategoriaRepository _repo;
+        private readonly PasseioDb _passeioDb;
+        private readonly Conexao _conexao;
 
+        public HomeBaseController(Conexao conexao)
+        {
+            _conexao = conexao;
+            _repo = new CategoriaRepository(_conexao);
+            _passeioDb = new PasseioDb(_conexao);
+        }
         public ViewResult Home()
         {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
@@ -35,14 +42,14 @@ namespace Rota_LivreWEB_API.Controllers
 
         public ActionResult PasseiosPorCategoria(int id)
         {
-            var passeios = PasseioDb.BuscarPasseiosPorCategoria(id);
+            var passeios = _passeioDb.BuscarPasseiosPorCategoria(id);
             ViewBag.CategoriaId = id;
             return View(passeios);
         }
 
         private Usuario BuscarUsuarioPorId(int id)
         {
-            using (var conn = new MySqlConnection(connectionString))
+            using (var conn = _conexao.Conectar())
             {
                 conn.Open();
                 var cmd = new MySqlCommand("SELECT id_usuario, nome_completo FROM usuario WHERE id_usuario = @id", conn);
@@ -67,7 +74,7 @@ namespace Rota_LivreWEB_API.Controllers
         {
             var lista = new List<Passeio>();
 
-            using (var conn = new MySqlConnection(connectionString))
+            using (var conn = _conexao.Conectar())
             {
                 conn.Open();
 

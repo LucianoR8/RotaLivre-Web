@@ -1,17 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Rota_LivreWEB_API.DbContext;
+using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.Models;
 
 namespace Rota_LivreWEB_API.Controllers
 {
     public class AvaliacaoController : Controller
     {
-        public ActionResult Avaliacoes(int idPasseio)
+        private readonly PasseioDb _passeioDb;
+        public AvaliacaoController(PasseioDb passeioDb)
         {
+            _passeioDb = passeioDb;
+        }
 
-            var avaliacoes = PasseioDb.ListarAvaliacoesPorPasseio(idPasseio); 
+        public ActionResult Avaliacoes(int idPasseio)
+        { 
 
-           
+            
+
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
             string? nomeUsuario = HttpContext.Session.GetString("NomeUsuario");
 
@@ -20,10 +25,11 @@ namespace Rota_LivreWEB_API.Controllers
                 return RedirectToAction("Login", "Login");
             }
 
-           
             ViewBag.IdUsuario = idUsuario;
             ViewBag.NomeUsuario = nomeUsuario;
             ViewBag.IdPasseio = idPasseio;
+
+            var avaliacoes = _passeioDb.ListarAvaliacoesPorPasseio(idPasseio);
 
             return View(avaliacoes);
         }
@@ -40,17 +46,18 @@ namespace Rota_LivreWEB_API.Controllers
 
             Console.WriteLine($"ID_PASSEIO recebido: {id_passeio}");
 
-            PasseioDb.InserirAvaliacao(id_passeio, idUsuario.Value, nota, feedback);
+            _passeioDb.InserirAvaliacao(id_passeio, idUsuario.Value, nota, feedback);
 
             return RedirectToAction("Index", new { id = id_passeio });
         }
 
         public ViewResult Index(int id)
         {
-            ViewBag.IdPasseio = id; 
-            var lista = PasseioDb.ListarAvaliacoesPorPasseio(id);
+            ViewBag.IdPasseio = id;
+            var lista = _passeioDb.ListarAvaliacoesPorPasseio(id);
             return View(lista);
         }
+
 
 
     }

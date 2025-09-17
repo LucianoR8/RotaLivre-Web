@@ -1,11 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Rota_LivreWEB_API.DbContext;
+using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.Models;
 
 namespace Rota_LivreWEB_API.Controllers
 {
     public class PerfilController : Controller
     {
+        private readonly UsuarioDbContext _usuarioDb;
+        public PerfilController(UsuarioDbContext usuarioDb)
+        {
+            _usuarioDb = usuarioDb;
+        }
         public ActionResult Perfil()
         {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
@@ -15,7 +20,7 @@ namespace Rota_LivreWEB_API.Controllers
                 return RedirectToAction("Login", "Login"); 
             }
 
-            Usuario usuario = UsuarioDbContext.BuscarUsuarioPorId(idUsuario.Value);
+            Usuario usuario = _usuarioDb.BuscarUsuarioPorId(idUsuario.Value);
 
             return View(usuario); 
         }
@@ -25,7 +30,7 @@ namespace Rota_LivreWEB_API.Controllers
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
             if (idUsuario == null) return RedirectToAction("Login", "Login");
 
-            var usuario = UsuarioDbContext.BuscarUsuarioPorId(idUsuario.Value);
+            var usuario = _usuarioDb.BuscarUsuarioPorId(idUsuario.Value);
             var vm = new UsuarioEdicaoViewModel
             {
                 id_usuario = usuario.id_usuario,
@@ -46,7 +51,7 @@ namespace Rota_LivreWEB_API.Controllers
 
                 if (idUsuario == null) return RedirectToAction("Login", "Login");
 
-                var usuarioExistente = UsuarioDbContext.BuscarUsuarioPorId(idUsuario.Value);
+                var usuarioExistente = _usuarioDb.BuscarUsuarioPorId(idUsuario.Value);
 
                 if (usuarioExistente != null)
                 {
@@ -55,7 +60,7 @@ namespace Rota_LivreWEB_API.Controllers
                     usuarioExistente.email = model.email;
                     usuarioExistente.data_nasc = model.data_nasc;
 
-                    UsuarioDbContext.AtualizarUsuario(usuarioExistente);
+                    _usuarioDb.AtualizarUsuario(usuarioExistente);
                 }
 
                 return RedirectToAction("Perfil");
@@ -73,7 +78,7 @@ namespace Rota_LivreWEB_API.Controllers
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
             if (idUsuario != null)
             {
-                UsuarioDbContext.DeletarUsuario(idUsuario.Value);
+                _usuarioDb.DeletarUsuario(idUsuario.Value);
                 HttpContext.Session.Clear(); 
             }
 

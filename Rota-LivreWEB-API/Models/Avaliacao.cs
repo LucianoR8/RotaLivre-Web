@@ -1,8 +1,12 @@
-﻿namespace Rota_LivreWEB_API.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Rota_LivreWEB_API.Models
 {
     public class Avaliacao
     {
+        [Key]
         public int id_avaliacao { get; set; }
+
         public int id_passeio { get; set; }
         public int id_usuario { get; set; }
         public string feedback { get; set; }

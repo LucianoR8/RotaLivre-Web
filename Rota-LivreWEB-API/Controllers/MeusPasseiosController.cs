@@ -1,11 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Rota_LivreWEB_API.Models;
-using Rota_LivreWEB_API.DbContext;
+using Rota_LivreWEB_API.Data;
 
 namespace Rota_LivreWEB_API.Controllers
 {
     public class MeusPasseiosController : Controller
     {
+        private readonly PasseioDb _passeioDb;
+        public MeusPasseiosController(PasseioDb passeioDb)
+        {
+            _passeioDb = passeioDb;
+        }
         public ActionResult MeusPasseios()
         {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
@@ -13,8 +18,8 @@ namespace Rota_LivreWEB_API.Controllers
 
             var model = new MeusPasseiosViewModel
             {
-                Curtidos = PasseioDb.BuscarPasseiosCurtidosPorUsuario(idUsuario.Value),
-                Pendentes = PasseioDb.BuscarPasseiosPendentesPorUsuario(idUsuario.Value)
+                Curtidos = _passeioDb.BuscarPasseiosCurtidosPorUsuario(idUsuario.Value),
+                Pendentes = _passeioDb.BuscarPasseiosPendentesPorUsuario(idUsuario.Value)
             };
 
             return View(model);
@@ -26,7 +31,7 @@ namespace Rota_LivreWEB_API.Controllers
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
             if (idUsuario == null) return RedirectToAction("Login", "Login");
 
-            PasseioDb.AdicionarPasseioPendente(idUsuario.Value, idPasseio);
+            _passeioDb.AdicionarPasseioPendente(idUsuario.Value, idPasseio);
             return RedirectToAction("MeusPasseios");
         }
 
@@ -38,15 +43,15 @@ namespace Rota_LivreWEB_API.Controllers
             if (idUsuario == null)
                 return Json(new { sucesso = false, mensagem = "Usuário não autenticado" });
 
-            bool jaPendente = PasseioDb.VerificarPasseioPendente(idUsuario.Value, idPasseio);
+            bool jaPendente = _passeioDb.VerificarPasseioPendente(idUsuario.Value, idPasseio);
 
             if (jaPendente)
             {
-                PasseioDb.RemoverPasseioPendente(idUsuario.Value, idPasseio);
+                _passeioDb.RemoverPasseioPendente(idUsuario.Value, idPasseio);
             }
             else
             {
-                PasseioDb.AdicionarPasseioPendente(idUsuario.Value, idPasseio);
+                _passeioDb.AdicionarPasseioPendente(idUsuario.Value, idPasseio);
             }
 
             return Json(new

@@ -5,6 +5,7 @@ namespace Rota_LivreWEB_API.Models
 {
     public class Usuario
     {
+        [Key]
         public int id_usuario { get; set; }
 
         [Required(ErrorMessage = "O nome é obrigatório.")]

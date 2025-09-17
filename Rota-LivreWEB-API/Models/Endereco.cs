@@ -1,8 +1,12 @@
-﻿namespace Rota_LivreWEB_API.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Rota_LivreWEB_API.Models
 {
     public class Endereco
     {
+        [Key]
         public int id_endereco { get; set; }
+
         public string nome_rua { get; set; }
         public int numero_rua { get; set; }
         public string complemento { get; set; }

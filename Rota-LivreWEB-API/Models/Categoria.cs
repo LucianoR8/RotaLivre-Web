@@ -1,8 +1,14 @@
-﻿namespace Rota_LivreWEB_API.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Rota_LivreWEB_API.Models
 {
     public class Categoria
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id_categoria { get; set; }
+
         public string tipo_categoria { get; set; }
         public string img { get; set; }
 

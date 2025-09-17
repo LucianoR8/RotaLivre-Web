@@ -1,17 +1,22 @@
 ﻿using MySql.Data.MySqlClient;
+using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.Models;
 
 namespace Rota_LivreWEB_API.Repositories
 {
     public class PasseioRepository
     {
-        private readonly string _connectionString = "Server=rotalivre.c30u6uc8o0pe.us-east-2.rds.amazonaws.com;Port=3306;Database=rotalivre;Uid=admin;Pwd=$Rotalivre1;";
+        private readonly Conexao _conexao;
 
+        public PasseioRepository(Conexao conexao)
+        {
+            _conexao = conexao;
+        }
         public Passeio ObterPasseioPorId(int id)
         {
             Passeio passeio = null;
 
-            using (var conexao = new MySqlConnection(_connectionString))
+            using (var conexao = _conexao.Conectar())
             {
                 conexao.Open();
 
@@ -59,7 +64,7 @@ namespace Rota_LivreWEB_API.Repositories
         {
             int total = 0;
 
-            using (var conn = new MySqlConnection(_connectionString))
+            using (var conn = _conexao.Conectar())
             {
                 conn.Open();
                 var cmd = new MySqlCommand("SELECT COUNT(*) FROM curtida_passeio WHERE id_passeio = @id", conn);
@@ -73,7 +78,7 @@ namespace Rota_LivreWEB_API.Repositories
 
         public bool PasseioExiste(int idPasseio)
         {
-            using (var conexao = new MySqlConnection(_connectionString))
+            using (var conexao = _conexao.Conectar())
             {
                 conexao.Open();
                 var query = "SELECT COUNT(*) FROM passeio WHERE id_passeio = @idPasseio";
@@ -89,7 +94,7 @@ namespace Rota_LivreWEB_API.Repositories
 
         public bool UsuarioJaCurtiu(int idUsuario, int idPasseio)
         {
-            using (var conexao = new MySqlConnection(_connectionString))
+            using (var conexao = _conexao.Conectar())
             {
                 conexao.Open();
                 var query = "SELECT COUNT(*) FROM curtida_passeio WHERE id_usuario = @idUsuario AND id_passeio = @idPasseio";
@@ -105,7 +110,7 @@ namespace Rota_LivreWEB_API.Repositories
 
         public bool AlternarCurtida(int idUsuario, int idPasseio)
         {
-            using (var conexao = new MySqlConnection(_connectionString))
+            using (var conexao = _conexao.Conectar())
             {
                 conexao.Open();
 
@@ -142,7 +147,7 @@ namespace Rota_LivreWEB_API.Repositories
         {
             var lista = new List<Passeio>();
 
-            using (var conn = new MySqlConnection(_connectionString))
+            using (var conn = _conexao.Conectar())
             {
                 conn.Open();
 

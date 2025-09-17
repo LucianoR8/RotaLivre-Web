@@ -1,4 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using Rota_LivreWEB_API.Data;
+using Rota_LivreWEB_API.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -6,9 +13,20 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSession();
+builder.Services.AddScoped<Conexao>();
+builder.Services.AddScoped<UsuarioDbContext>();
+builder.Services.AddScoped<PasseioDb>();
+builder.Services.AddScoped<PasseioRepository>();
+builder.Services.AddScoped<CategoriaRepository>();
 
-builder.WebHost.UseUrls("http://0.0.0.0:5000");
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion(new Version(8, 0, 30))
+    ));
+
+
+// builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 var app = builder.Build();
 

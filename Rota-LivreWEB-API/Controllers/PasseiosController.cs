@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Rota_LivreWEB_API.Models;
-using Rota_LivreWEB_API.DbContext;
+using Rota_LivreWEB_API.Data;
 using System.Linq;
 using Rota_LivreWEB_API.Repositories;
 using MySql.Data.MySqlClient;
@@ -13,19 +13,25 @@ namespace Rota_LivreWEB_API.Controllers
 {
     public class PasseiosController : Controller
     {
-       
 
+        private readonly PasseioDb _passeioDb;
+        private readonly PasseioRepository _passeioRp;
+        public PasseiosController(PasseioDb passeioDb, PasseioRepository passeioRp)
+        {
+            _passeioDb = passeioDb;
+            _passeioRp = passeioRp;
+        }
 
         public ActionResult Categoria(int id)
         {
-            var passeios = PasseioDb.BuscarPasseiosPorCategoria(id);
+            var passeios = _passeioDb.BuscarPasseiosPorCategoria(id);
 
             return View(passeios);
         }
 
         public ActionResult Detalhes(int id)
         {
-            var repo = new PasseioRepository();
+            var repo = _passeioRp;
             var passeio = repo.ObterPasseioPorId(id);
             if (passeio == null)
             {
@@ -40,7 +46,7 @@ namespace Rota_LivreWEB_API.Controllers
             if (idUsuario != null)
             {
                 passeio.UsuarioJaCurtiu = repo.UsuarioJaCurtiu(idUsuario.Value, id);
-                passeio.UsuarioJaPendente = PasseioDb.VerificarPasseioPendente(idUsuario.Value, id);
+                passeio.UsuarioJaPendente = _passeioDb.VerificarPasseioPendente(idUsuario.Value, id);
             }
 
 
@@ -65,7 +71,7 @@ namespace Rota_LivreWEB_API.Controllers
 
            
 
-            var repo = new PasseioRepository();
+            var repo = _passeioRp;
 
             bool curtiuAgora = repo.AlternarCurtida(idUsuario.Value, idPasseio);
 
@@ -74,7 +80,7 @@ namespace Rota_LivreWEB_API.Controllers
 
         public ActionResult Buscar(string termo)
         {
-            var repo = new PasseioRepository();
+            var repo = _passeioRp;
 
             var passeios = string.IsNullOrWhiteSpace(termo)
                 ? new List<Passeio>()

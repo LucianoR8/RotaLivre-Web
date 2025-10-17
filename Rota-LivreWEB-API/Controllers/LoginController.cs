@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Rota_LivreWEB_API.Repositories;
 using Rota_LivreWEB_API.Data;
 
 namespace Rota_LivreWEB_API.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly UsuarioDbContext _usuarioDb;
+        private readonly UsuarioRepository _usuarioRp;
 
-        public LoginController(UsuarioDbContext usuarioDb)
+        public LoginController(UsuarioRepository usuarioRp)
         {
-            _usuarioDb = usuarioDb;
+            _usuarioRp = usuarioRp;
         }
         public ViewResult Login()
         {
@@ -23,11 +24,11 @@ namespace Rota_LivreWEB_API.Controllers
         {
             Console.WriteLine($"Tentando login: {email} - {senha}"); 
 
-            if (_usuarioDb.VerificarLogin(email, senha))
+            if (_usuarioRp.VerificarLogin(email, senha))
             {
                 
-                int idUsuario = _usuarioDb.BuscarIdPorEmail(email);
-                string nome_completo = _usuarioDb.BuscarNomePorEmail(email);
+                int idUsuario = _usuarioRp.BuscarIdPorEmail(email);
+                string nome_completo = _usuarioRp.BuscarNomePorEmail(email);
 
 
                 HttpContext.Session.SetInt32("IdUsuario", idUsuario);
@@ -58,7 +59,7 @@ namespace Rota_LivreWEB_API.Controllers
         [HttpPost]
         public ActionResult SolicitarRedefinicaoSenha(string email)
         {
-            var usuario = _usuarioDb.BuscarUsuarioPorEmail(email);
+            var usuario = _usuarioRp.BuscarUsuarioPorEmail(email);
             if (usuario == null)
             {
                 ViewBag.Erro = "E-mail não encontrado!";
@@ -85,7 +86,7 @@ namespace Rota_LivreWEB_API.Controllers
                 return View();
             }
 
-            bool sucesso = _usuarioDb.AlterarSenha(id_usuario, novaSenha);
+            bool sucesso = _usuarioRp.AlterarSenha(id_usuario, novaSenha);
 
             if (sucesso)
                 return RedirectToAction("SenhaAlteradaSucesso");
@@ -95,7 +96,7 @@ namespace Rota_LivreWEB_API.Controllers
 
         public ActionResult ConfirmarResposta(string email)
         {
-            var pergunta = _usuarioDb.BuscarPerguntaDoUsuario(email);
+            var pergunta = _usuarioRp.BuscarPerguntaDoUsuario(email);
             ViewBag.Email = email;
             ViewBag.Pergunta = pergunta;
             return View();
@@ -105,17 +106,17 @@ namespace Rota_LivreWEB_API.Controllers
         public ActionResult VerificarResposta(string email, string RespostaInformada)
         {
             string respostaHash = UsuarioDbContext.GerarHash(RespostaInformada);
-            string respostaBanco = _usuarioDb.ObterRespostaDoBanco(email);
+            string respostaBanco = _usuarioRp.ObterRespostaDoBanco(email);
 
             if (respostaHash == respostaBanco)
             {
-                var usuario = _usuarioDb.BuscarUsuarioPorEmail(email);
+                var usuario = _usuarioRp.BuscarUsuarioPorEmail(email);
                 return RedirectToAction("DefinirNovaSenha", new { id = usuario.id_usuario });
             }
             else
             {
                 ViewBag.Erro = "Resposta incorreta.";
-                var pergunta = _usuarioDb.BuscarPerguntaDoUsuario(email);
+                var pergunta = _usuarioRp.BuscarPerguntaDoUsuario(email);
                 ViewBag.Email = email;
                 ViewBag.Pergunta = pergunta;
                 return View("ConfirmarResposta");

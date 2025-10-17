@@ -1,109 +1,46 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
 using Rota_LivreWEB_API.Repositories;
 using Rota_LivreWEB_API.Models;
-using Rota_LivreWEB_API.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Rota_LivreWEB_API.Controllers
 {
     public class HomeBaseController : Controller
     {
-        private readonly CategoriaRepository _repo;
-        private readonly PasseioDb _passeioDb;
-        private readonly Conexao _conexao;
+        private readonly UsuarioRepository _usuarioRp;
+        private readonly CategoriaRepository _categoriaRp;
+        private readonly PasseioRepository _passeioRp;
 
-        public HomeBaseController(Conexao conexao)
+        public HomeBaseController(UsuarioRepository usuarioRp, CategoriaRepository categoriaRp, PasseioRepository passeioRp)
         {
-            _conexao = conexao;
-            _repo = new CategoriaRepository(_conexao);
-            _passeioDb = new PasseioDb(_conexao);
+            _usuarioRp = usuarioRp;
+            _categoriaRp = categoriaRp;
+            _passeioRp = passeioRp;
         }
-        public ViewResult Home()
+
+        public async Task<ViewResult> Home()
         {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
+            ViewBag.NomeUsuario = "Visitante";
 
             if (idUsuario != null)
             {
-                var usuario = BuscarUsuarioPorId(idUsuario.Value);
+                var usuario = await _usuarioRp.BuscarPorIdAsync(idUsuario.Value);
                 ViewBag.NomeUsuario = usuario?.nome_completo ?? "Usuário";
             }
-            else
-            {
-                ViewBag.NomeUsuario = "Visitante";
-            }
 
-            var categorias = _repo.ObterCategorias();
-            var passeiosEmDestaque = BuscarPasseiosMaisCurtidos();
+            var categorias = await _categoriaRp.ObterCategoriasAsync();
+            var passeiosEmDestaque = await _passeioRp.BuscarPasseiosMaisCurtidosAsync();
 
             ViewBag.PasseiosDestaque = passeiosEmDestaque;
-
             return View(categorias);
         }
 
-        public ActionResult PasseiosPorCategoria(int id)
+        public async Task<ActionResult> PasseiosPorCategoria(int id)
         {
-            var passeios = _passeioDb.BuscarPasseiosPorCategoria(id);
+            var passeios = await _passeioRp.BuscarPasseiosPorCategoriaAsync(id);
             ViewBag.CategoriaId = id;
             return View(passeios);
-        }
-
-        private Usuario BuscarUsuarioPorId(int id)
-        {
-            using (var conn = _conexao.Conectar())
-            {
-                conn.Open();
-                var cmd = new MySqlCommand("SELECT id_usuario, nome_completo FROM usuario WHERE id_usuario = @id", conn);
-                cmd.Parameters.AddWithValue("@id", id);
-
-                using (var reader = cmd.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        return new Usuario
-                        {
-                            id_usuario = reader.GetInt32("id_usuario"),
-                            nome_completo = reader.GetString("nome_completo")
-                        };
-                    }
-                }
-            }
-            return null;
-        }
-
-        private List<Passeio> BuscarPasseiosMaisCurtidos()
-        {
-            var lista = new List<Passeio>();
-
-            using (var conn = _conexao.Conectar())
-            {
-                conn.Open();
-
-                var cmd = new MySqlCommand(@"
-            SELECT p.id_passeio, p.nome_passeio, p.descricao, p.img_url, COUNT(c.id_passeio) AS curtidas
-            FROM passeio p
-            LEFT JOIN curtida_passeio c ON p.id_passeio = c.id_passeio
-            GROUP BY p.id_passeio
-            ORDER BY curtidas DESC
-            LIMIT 5", conn);
-
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        lista.Add(new Passeio
-                        {
-                            id_passeio = !reader.IsDBNull(reader.GetOrdinal("id_passeio")) ? reader.GetInt32("id_passeio") : 0,
-                            nome_passeio = !reader.IsDBNull(reader.GetOrdinal("nome_passeio")) ? reader.GetString("nome_passeio") : "",
-                            descricao = !reader.IsDBNull(reader.GetOrdinal("descricao")) ? reader.GetString("descricao") : "",
-                            img_url = !reader.IsDBNull(reader.GetOrdinal("img_url")) ? reader.GetString("img_url") : null,
-                            QuantidadeCurtidas = !reader.IsDBNull(reader.GetOrdinal("curtidas")) ? reader.GetInt32("curtidas") : 0
-                        });
-                    }
-
-                }
-            }
-
-            return lista;
         }
     }
 }

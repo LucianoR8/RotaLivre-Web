@@ -1,200 +1,195 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.EntityFrameworkCore;
 using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.Models;
+using Rota_LivreWEB_API.Repositories; 
+
 
 namespace Rota_LivreWEB_API.Repositories
 {
     public class PasseioRepository
     {
-        private readonly Conexao _conexao;
+        private readonly AppDbContext _context;
 
-        public PasseioRepository(Conexao conexao)
+        public PasseioRepository(AppDbContext context)
         {
-            _conexao = conexao;
+            _context = context;
         }
-        public Passeio ObterPasseioPorId(int id)
+
+        public async Task<List<Passeio>> BuscarPasseiosPorCategoriaAsync(int idCategoria)
         {
-            Passeio passeio = null;
+            return await _context.Passeio
+                .Where(p => p.id_categoria == idCategoria)
+                .ToListAsync();
+        }
 
-            using (var conexao = _conexao.Conectar())
+        public async Task<Passeio?> BuscarPasseioPorIdAsync(int id)
+        {
+            return await _context.Passeio
+                .Include(p => p.Endereco)
+                .FirstOrDefaultAsync(p => p.id_passeio == id);
+        }
+
+        public async Task<List<Categoria>> BuscarCategoriasAsync()
+        {
+            return await _context.Categoria.ToListAsync();
+        }
+
+        public async Task InserirAvaliacaoAsync(int idPasseio, int idUsuario, int nota, string feedback)
+        {
+            var usuario = await _context.Usuario.FindAsync(idUsuario);
+            if (usuario == null)
+                throw new Exception("Usuário não encontrado");
+
+            var avaliacao = new Avaliacao
             {
-                conexao.Open();
+                id_passeio = idPasseio,
+                id_usuario = idUsuario,
+                nota = nota,
+                feedback = feedback,
+                data_feedback = DateTime.Now,
+                nome_completo = usuario.nome_completo,
+                Usuario = usuario
+            };
 
-                var sql = @"
-            SELECT 
-                p.id_passeio, p.nome_passeio, p.descricao, p.funcionamento, p.img_url,
-                e.id_endereco, e.nome_rua, e.numero_rua, e.complemento, e.bairro, e.cep, e.id_passeio AS endereco_id_passeio
-            FROM passeio p
-            LEFT JOIN endereco e ON p.id_passeio = e.id_passeio
-            WHERE p.id_passeio = @id";
+            await _context.Avaliacao.AddAsync(avaliacao);
+            await _context.SaveChangesAsync();
+        }
 
-                var comando = new MySqlCommand(sql, conexao);
-                comando.Parameters.AddWithValue("@id", id);
 
-                using (var reader = comando.ExecuteReader())
+
+        public async Task<List<Avaliacao>> ListarAvaliacoesPorPasseioAsync(int idPasseio)
+        {
+            return await _context.Avaliacao
+                .Include(a => a.Usuario)
+                .Where(a => a.id_passeio == idPasseio)
+                .OrderByDescending(a => a.data_feedback)
+                .ToListAsync();
+        }
+
+        public async Task<List<Passeio>> BuscarPasseiosCurtidosPorUsuarioAsync(int idUsuario)
+        {
+            return await _context.CurtidaPasseio
+                .Where(c => c.id_usuario == idUsuario)
+                .Include(c => c.Passeio)
+                .Select(c => c.Passeio)
+                .ToListAsync();
+        }
+
+        public async Task<List<Passeio>> BuscarPasseiosPendentesPorUsuarioAsync(int idUsuario)
+        {
+            return await _context.PasseioPendente
+                .Where(pp => pp.id_usuario == idUsuario)
+                .Include(pp => pp.Passeio)
+                .Select(pp => pp.Passeio)
+                .ToListAsync();
+        }
+
+        public async Task AdicionarPasseioPendenteAsync(int idUsuario, int idPasseio)
+        {
+            var existe = await _context.PasseioPendente
+                .AnyAsync(pp => pp.id_usuario == idUsuario && pp.id_passeio == idPasseio);
+
+            if (!existe)
+            {
+                var novo = new PasseioPendente
                 {
-                    if (reader.Read())
-                    {
-                        passeio = new Passeio
-                        {
-                            id_passeio = reader.GetInt32("id_passeio"),
-                            nome_passeio = reader.GetString("nome_passeio"),
-                            descricao = reader.GetString("descricao"),
-                            funcionamento = reader.GetString("funcionamento"),
-                            img_url = reader.GetString("img_url"),
-                            Endereco = reader.IsDBNull(reader.GetOrdinal("id_endereco")) ? null : new Endereco
-                            {
-                                id_endereco = reader.GetInt32("id_endereco"),
-                                nome_rua = reader.GetString("nome_rua"),
-                                numero_rua = reader.GetInt32("numero_rua"),
-                                complemento = reader.IsDBNull(reader.GetOrdinal("complemento")) ? null : reader.GetString("complemento"),
-                                bairro = reader.IsDBNull(reader.GetOrdinal("bairro")) ? null : reader.GetString("bairro"),
-                                cep = reader.GetInt32("cep"),
-                                id_passeio = reader.GetInt32("endereco_id_passeio")
-                            }
-                        };
-                    }
-                }
-            }
+                    id_usuario = idUsuario,
+                    id_passeio = idPasseio,
+                    data_adicao = DateTime.Now
+                };
 
-            return passeio;
-        }
-
-        public int ObterTotalCurtidas(int idPasseio)
-        {
-            int total = 0;
-
-            using (var conn = _conexao.Conectar())
-            {
-                conn.Open();
-                var cmd = new MySqlCommand("SELECT COUNT(*) FROM curtida_passeio WHERE id_passeio = @id", conn);
-                cmd.Parameters.AddWithValue("@id", idPasseio);
-
-                total = Convert.ToInt32(cmd.ExecuteScalar());
-            }
-
-            return total;
-        }
-
-        public bool PasseioExiste(int idPasseio)
-        {
-            using (var conexao = _conexao.Conectar())
-            {
-                conexao.Open();
-                var query = "SELECT COUNT(*) FROM passeio WHERE id_passeio = @idPasseio";
-                using (var comando = new MySqlCommand(query, conexao))
-                {
-                    comando.Parameters.AddWithValue("@idPasseio", idPasseio);
-                    var resultado = Convert.ToInt32(comando.ExecuteScalar());
-                    return resultado > 0;
-                }
-            }
-        }
-
-
-        public bool UsuarioJaCurtiu(int idUsuario, int idPasseio)
-        {
-            using (var conexao = _conexao.Conectar())
-            {
-                conexao.Open();
-                var query = "SELECT COUNT(*) FROM curtida_passeio WHERE id_usuario = @idUsuario AND id_passeio = @idPasseio";
-                using (var comando = new MySqlCommand(query, conexao))
-                {
-                    comando.Parameters.AddWithValue("@idUsuario", idUsuario);
-                    comando.Parameters.AddWithValue("@idPasseio", idPasseio);
-                    var resultado = Convert.ToInt32(comando.ExecuteScalar());
-                    return resultado > 0;
-                }
+                await _context.PasseioPendente.AddAsync(novo);
+                await _context.SaveChangesAsync();
             }
         }
 
-        public bool AlternarCurtida(int idUsuario, int idPasseio)
+        public async Task<bool> VerificarPasseioPendenteAsync(int idUsuario, int idPasseio)
         {
-            using (var conexao = _conexao.Conectar())
+            return await _context.PasseioPendente
+                .AnyAsync(pp => pp.id_usuario == idUsuario && pp.id_passeio == idPasseio);
+        }
+
+        public async Task RemoverPasseioPendenteAsync(int idUsuario, int idPasseio)
+        {
+            var item = await _context.PasseioPendente
+                .FirstOrDefaultAsync(pp => pp.id_usuario == idUsuario && pp.id_passeio == idPasseio);
+
+            if (item != null)
             {
-                conexao.Open();
-
-                
-                var existeCmd = new MySqlCommand("SELECT COUNT(*) FROM curtida_passeio WHERE id_usuario = @idUsuario AND id_passeio = @idPasseio", conexao);
-                existeCmd.Parameters.AddWithValue("@idUsuario", idUsuario);
-                existeCmd.Parameters.AddWithValue("@idPasseio", idPasseio);
-                var existe = Convert.ToInt32(existeCmd.ExecuteScalar());
-
-                if (existe > 0)
-                {
-                   
-                    var deleteCmd = new MySqlCommand("DELETE FROM curtida_passeio WHERE id_usuario = @idUsuario AND id_passeio = @idPasseio", conexao);
-                    deleteCmd.Parameters.AddWithValue("@idUsuario", idUsuario);
-                    deleteCmd.Parameters.AddWithValue("@idPasseio", idPasseio);
-                    deleteCmd.ExecuteNonQuery();
-                    return false; 
-                }
-                else
-                {
-                    
-                    var insertCmd = new MySqlCommand("INSERT INTO curtida_passeio (id_passeio, id_usuario) VALUES (@idPasseio, @idUsuario)", conexao);
-                    insertCmd.Parameters.AddWithValue("@idPasseio", idPasseio);
-                    insertCmd.Parameters.AddWithValue("@idUsuario", idUsuario);
-                    insertCmd.ExecuteNonQuery();
-                    return true; 
-                }
+                _context.PasseioPendente.Remove(item);
+                await _context.SaveChangesAsync();
             }
         }
 
-
-
-        public List<Passeio> BuscarPasseioPorNome(string termo)
+        public async Task<bool> PasseioExisteAsync(int idPasseio)
         {
-            var lista = new List<Passeio>();
+            return await _context.Passeio.AnyAsync(p => p.id_passeio == idPasseio);
+        }
 
-            using (var conn = _conexao.Conectar())
+        public async Task<int> ObterTotalCurtidasAsync(int idPasseio)
+        {
+            return await _context.CurtidaPasseio.CountAsync(c => c.id_passeio == idPasseio);
+        }
+
+        public async Task<bool> UsuarioJaCurtiuAsync(int idUsuario, int idPasseio)
+        {
+            return await _context.CurtidaPasseio
+                .AnyAsync(c => c.id_usuario == idUsuario && c.id_passeio == idPasseio);
+        }
+
+        public async Task<bool> AlternarCurtidaAsync(int idUsuario, int idPasseio)
+        {
+            var curtida = await _context.CurtidaPasseio
+                .FirstOrDefaultAsync(c => c.id_usuario == idUsuario && c.id_passeio == idPasseio);
+
+            if (curtida != null)
             {
-                conn.Open();
+                _context.CurtidaPasseio.Remove(curtida);
+                await _context.SaveChangesAsync();
+                return false; 
+            }
 
-                string query = @"SELECT id_passeio, nome_passeio, descricao, img_url 
-                         FROM passeio
-                         WHERE nome_passeio LIKE @termo";
+            var novaCurtida = new CurtidaPasseio
+            {
+                id_usuario = idUsuario,
+                id_passeio = idPasseio
+            };
 
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@termo", "%" + termo + "%");
+            await _context.CurtidaPasseio.AddAsync(novaCurtida);
+            await _context.SaveChangesAsync();
+            return true; 
+        }
 
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var passeio = new Passeio
-                            {
-                                id_passeio = reader["id_passeio"] != DBNull.Value ? Convert.ToInt32(reader["id_passeio"]) : 0,
-                                nome_passeio = reader["nome_passeio"] != DBNull.Value ? reader["nome_passeio"].ToString() : string.Empty,
-                                descricao = reader["descricao"] != DBNull.Value ? reader["descricao"].ToString() : string.Empty,
-                                img_url = reader["img_url"] != DBNull.Value ? reader["img_url"].ToString() : string.Empty,
-                                
-                            };
+        public async Task<List<Passeio>> BuscarPasseioPorNomeAsync(string termo)
+        {
+            var lista = await _context.Passeio
+                .Where(p => p.nome_passeio.Contains(termo))
+                .ToListAsync();
 
-
-                            lista.Add(passeio);
-                        }
-                    }
-                }
-
-                
-                foreach (var passeio in lista)
-                {
-                    passeio.QuantidadeCurtidas = ObterTotalCurtidas(passeio.id_passeio);
-                }
+            foreach (var p in lista)
+            {
+                p.QuantidadeCurtidas = await _context.CurtidaPasseio.CountAsync(c => c.id_passeio == p.id_passeio);
             }
 
             return lista;
         }
 
+        public async Task<List<Passeio>> BuscarPasseiosMaisCurtidosAsync()
+        {
+            return await _context.Passeio
+                .Select(p => new Passeio
+                {
+                    id_passeio = p.id_passeio,
+                    nome_passeio = p.nome_passeio,
+                    descricao = p.descricao,
+                    img_url = p.img_url,
+                    QuantidadeCurtidas = _context.CurtidaPasseio.Count(c => c.id_passeio == p.id_passeio)
+                })
+                .OrderByDescending(p => p.QuantidadeCurtidas)
+                .Take(5)
+                .ToListAsync();
+        }
+
+
     }
-
-
-
-
-
-
-
 }
-

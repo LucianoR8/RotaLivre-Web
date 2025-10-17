@@ -5,7 +5,7 @@
 namespace Rota_LivreWEB_API.Migrations
 {
     /// <inheritdoc />
-    public partial class AjusteInicial : Migration
+    public partial class AjusteRelacionamentoEndereco : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

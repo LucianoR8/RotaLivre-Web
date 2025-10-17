@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rota_LivreWEB_API.Data;
 
@@ -11,9 +12,11 @@ using Rota_LivreWEB_API.Data;
 namespace Rota_LivreWEB_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251016030535_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,10 +55,6 @@ namespace Rota_LivreWEB_API.Migrations
 
                     b.HasKey("id_avaliacao");
 
-                    b.HasIndex("id_passeio");
-
-                    b.HasIndex("id_usuario");
-
                     b.ToTable("Avaliacao");
                 });
 
@@ -66,6 +65,9 @@ namespace Rota_LivreWEB_API.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id_categoria"));
+
+                    b.Property<int>("id_funcionario")
+                        .HasColumnType("int");
 
                     b.Property<string>("img")
                         .IsRequired()
@@ -265,6 +267,12 @@ namespace Rota_LivreWEB_API.Migrations
                     b.Property<bool>("UsuarioJaPendente")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<DateTime>("data_hora_ida")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("data_hora_volta")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("descricao")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -275,6 +283,9 @@ namespace Rota_LivreWEB_API.Migrations
 
                     b.Property<int>("id_categoria")
                         .HasColumnType("int");
+
+                    b.Property<bool>("ida_e_volta")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("img_url")
                         .IsRequired()
@@ -442,25 +453,6 @@ namespace Rota_LivreWEB_API.Migrations
                     b.HasIndex("id_usuario");
 
                     b.ToTable("UsuarioLocalizacao");
-                });
-
-            modelBuilder.Entity("Rota_LivreWEB_API.Models.Avaliacao", b =>
-                {
-                    b.HasOne("Rota_LivreWEB_API.Models.Passeio", "Passeio")
-                        .WithMany()
-                        .HasForeignKey("id_passeio")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Rota_LivreWEB_API.Models.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("id_usuario")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Passeio");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Rota_LivreWEB_API.Models.CurtidaPasseio", b =>

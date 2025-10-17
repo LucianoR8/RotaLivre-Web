@@ -13,6 +13,17 @@ namespace Rota_LivreWEB_API.Data
         public DbSet<Endereco> Endereco { get; set; }
         public DbSet<Avaliacao> Avaliacao { get; set; }
         public DbSet<PerguntaSeguranca> PerguntaSeguranca { get; set; }
+        public DbSet<CurtidaPasseio> CurtidaPasseio { get; set; }
+        public DbSet<Funcionario> Funcionario { get; set; }
+        public DbSet<Grupo> Grupo { get; set; }
+        public DbSet<GrupoPasseio> GrupoPasseio { get; set; }
+        public DbSet<GrupoUsuario> GrupoUsuario { get; set; }
+        public DbSet<Localizacao> Localizacao { get; set; }
+        public DbSet<PasseioFavorito> PasseioFavorito { get; set; }
+        public DbSet<PasseioFuncionario> PasseioFuncionario { get; set; }
+        public DbSet<UsuarioLocalizacao> UsuarioLocalizacao { get; set; }
+        public DbSet<PasseioPendente> PasseioPendente { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +58,13 @@ namespace Rota_LivreWEB_API.Data
             {
                 entity.HasKey(e => e.id_passeio);
             });
+
+            modelBuilder.Entity<Passeio>()
+    .HasOne(p => p.Endereco)
+    .WithMany()
+    .HasForeignKey(p => p.Enderecoid_endereco)
+    .OnDelete(DeleteBehavior.Restrict);
+
         }
 
     }

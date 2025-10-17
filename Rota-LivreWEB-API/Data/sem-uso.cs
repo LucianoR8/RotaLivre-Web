@@ -282,7 +282,7 @@ namespace Rota_LivreWEB_API.Data
             using (var conexao = _conexao.Conectar())
             {
 
-                string query = "SELECT id_pergunta, pergunta_seg FROM pergunta_seg";
+                string query = "SELECT id_pergunta, pergunta_seg FROM perguntaseguranca";
                 MySqlCommand comando = new(query, conexao);
                 conexao.Open();
                 MySqlDataReader reader = comando.ExecuteReader();
@@ -312,7 +312,7 @@ namespace Rota_LivreWEB_API.Data
 
                 string query = @"SELECT p.pergunta_seg 
                      FROM usuario u 
-                     JOIN pergunta_seg p ON u.id_pergunta = p.id_pergunta 
+                     JOIN perguntaseguranca p ON u.id_pergunta = p.id_pergunta 
                      WHERE u.email = @Email";
 
                 MySqlCommand comando = new(query, conexao);

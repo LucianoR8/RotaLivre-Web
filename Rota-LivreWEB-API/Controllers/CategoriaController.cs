@@ -1,20 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Rota_LivreWEB_API.Data;
+using Rota_LivreWEB_API.Repositories;
 
 namespace Rota_LivreWEB_API.Controllers
 {
     public class CategoriaController : Controller
     {
-        private readonly PasseioDb _passeioDb;
-        public CategoriaController(PasseioDb passeioDb)
+        private readonly CategoriaRepository _categoriaRp;
+
+        public CategoriaController(CategoriaRepository categoriaRp)
         {
-            _passeioDb = passeioDb;
+            _categoriaRp = categoriaRp;
         }
-        public ActionResult Index()
+
+        public async Task<ActionResult> Index()
         {
-            var categorias = _passeioDb.BuscarCategorias();
+            var categorias = await _categoriaRp.ObterCategoriasAsync();
             return View(categorias);
         }
     }
-
 }

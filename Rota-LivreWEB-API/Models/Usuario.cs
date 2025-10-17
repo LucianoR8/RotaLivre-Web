@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace Rota_LivreWEB_API.Models
 {
@@ -31,6 +33,9 @@ namespace Rota_LivreWEB_API.Models
         public string resposta_seg { get; set; }
 
         public int id_pergunta { get; set; }
+
+        [ForeignKey(nameof(id_pergunta))]
+        public PerguntaSeguranca? PerguntaSeguranca { get; set; }
 
 
         public Usuario()

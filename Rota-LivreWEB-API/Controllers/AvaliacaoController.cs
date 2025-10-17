@@ -1,64 +1,49 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Rota_LivreWEB_API.Data;
+using Rota_LivreWEB_API.Repositories;
 using Rota_LivreWEB_API.Models;
 
 namespace Rota_LivreWEB_API.Controllers
 {
     public class AvaliacaoController : Controller
     {
-        private readonly PasseioDb _passeioDb;
-        public AvaliacaoController(PasseioDb passeioDb)
+        private readonly PasseioRepository _passeioRp;
+
+        public AvaliacaoController(PasseioRepository passeioRp)
         {
-            _passeioDb = passeioDb;
+            _passeioRp = passeioRp;
         }
 
-        public ActionResult Avaliacoes(int idPasseio)
-        { 
-
-            
-
+        public async Task<ActionResult> Avaliacoes(int idPasseio)
+        {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
             string? nomeUsuario = HttpContext.Session.GetString("NomeUsuario");
 
             if (idUsuario == null || string.IsNullOrEmpty(nomeUsuario))
-            {
                 return RedirectToAction("Login", "Login");
-            }
 
             ViewBag.IdUsuario = idUsuario;
             ViewBag.NomeUsuario = nomeUsuario;
             ViewBag.IdPasseio = idPasseio;
 
-            var avaliacoes = _passeioDb.ListarAvaliacoesPorPasseio(idPasseio);
-
+            var avaliacoes = await _passeioRp.ListarAvaliacoesPorPasseioAsync(idPasseio);
             return View(avaliacoes);
         }
 
         [HttpPost]
-        public ActionResult Comentar(int id_passeio, int nota, string feedback)
+        public async Task<ActionResult> Comentar(int id_passeio, int nota, string feedback)
         {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
+            if (idUsuario == null) return RedirectToAction("Login", "Login");
 
-            if (idUsuario == null)
-            {
-                return RedirectToAction("Login", "Login");
-            }
-
-            Console.WriteLine($"ID_PASSEIO recebido: {id_passeio}");
-
-            _passeioDb.InserirAvaliacao(id_passeio, idUsuario.Value, nota, feedback);
-
+            await _passeioRp.InserirAvaliacaoAsync(id_passeio, idUsuario.Value, nota, feedback);
             return RedirectToAction("Index", new { id = id_passeio });
         }
 
-        public ViewResult Index(int id)
+        public async Task<ViewResult> Index(int id)
         {
             ViewBag.IdPasseio = id;
-            var lista = _passeioDb.ListarAvaliacoesPorPasseio(id);
+            var lista = await _passeioRp.ListarAvaliacoesPorPasseioAsync(id);
             return View(lista);
         }
-
-
-
     }
 }

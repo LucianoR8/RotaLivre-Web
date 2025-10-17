@@ -62,9 +62,6 @@ namespace Rota_LivreWEB_API.Data
                             id_passeio = reader.GetInt32("id_passeio"),
                             id_categoria = reader.GetInt32("id_categoria"),
                             nome_passeio = reader.GetString("nome_passeio"),
-                            ida_e_volta = reader.GetBoolean("ida_e_volta"),
-                            data_hora_ida = reader.GetDateTime("data_hora_ida"),
-                            data_hora_volta = reader.IsDBNull("data_hora_volta") ? null : reader.GetDateTime("data_hora_volta"),
                             funcionamento = reader.GetString("funcionamento"),
                             descricao = reader.GetString("descricao"),
                             img_url = reader.GetString("img_url")
@@ -171,7 +168,7 @@ namespace Rota_LivreWEB_API.Data
             {
                 conexao.Open();
                 var cmd = new MySqlCommand(@"
-            SELECT p.* FROM curtida_passeio c
+            SELECT p.* FROM curtidapasseio c
             INNER JOIN passeio p ON c.id_passeio = p.id_passeio
             WHERE c.id_usuario = @idUsuario", conexao);
                 cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
@@ -198,7 +195,7 @@ namespace Rota_LivreWEB_API.Data
             {
                 conexao.Open();
                 var cmd = new MySqlCommand(@"
-            SELECT p.* FROM passeios_pendentes pp
+            SELECT p.* FROM passeiospendentes pp
             INNER JOIN passeio p ON pp.id_passeio = p.id_passeio
             WHERE pp.id_usuario = @idUsuario", conexao);
 
@@ -225,7 +222,7 @@ namespace Rota_LivreWEB_API.Data
             {
                 conexao.Open();
                 var cmd = new MySqlCommand(@"
-            INSERT INTO passeios_pendentes (id_usuario, id_passeio)
+            INSERT INTO passeiospendentes (id_usuario, id_passeio)
             VALUES (@idUsuario, @idPasseio)", conexao);
 
                 cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
@@ -240,7 +237,7 @@ namespace Rota_LivreWEB_API.Data
             {
                 conexao.Open();
 
-                string query = "SELECT COUNT(*) FROM passeios_pendentes WHERE id_usuario = @idUsuario AND id_passeio = @idPasseio";
+                string query = "SELECT COUNT(*) FROM passeiospendentes WHERE id_usuario = @idUsuario AND id_passeio = @idPasseio";
 
                 using (MySqlCommand comando = new MySqlCommand(query, conexao))
                 {
@@ -258,7 +255,7 @@ namespace Rota_LivreWEB_API.Data
             {
                 conexao.Open();
 
-                string query = "DELETE FROM passeios_pendentes WHERE id_usuario = @idUsuario AND id_passeio = @idPasseio";
+                string query = "DELETE FROM passeiospendentes WHERE id_usuario = @idUsuario AND id_passeio = @idPasseio";
 
                 using (MySqlCommand comando = new MySqlCommand(query, conexao))
                 {

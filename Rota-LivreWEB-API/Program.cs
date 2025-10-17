@@ -4,6 +4,15 @@ using Rota_LivreWEB_API.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+    )
+);
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
@@ -15,6 +24,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<Conexao>();
 builder.Services.AddScoped<UsuarioDbContext>();
+builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<PasseioDb>();
 builder.Services.AddScoped<PasseioRepository>();
 builder.Services.AddScoped<CategoriaRepository>();

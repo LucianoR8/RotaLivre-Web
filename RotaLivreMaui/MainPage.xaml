@@ -1,0 +1,37 @@
+﻿ using RotaLivreMaui.Services;
+
+
+namespace RotaLivreApp;
+
+public partial class MainPage : ContentPage
+{
+    private readonly ApiService _api;
+    private readonly GeofenceService _geo;
+
+    public MainPage(ApiService api, GeofenceService geo)
+    {
+        InitializeComponent();
+        _api = api;
+        _geo = geo;
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        try
+        {
+            // Testar API
+            var passeios = await _api.GetPasseiosAsync();
+            Console.WriteLine($" Recebidos {passeios.Count} passeios da API!");
+
+            // Testar Geofencing
+            await _geo.RegistrarGeofence(-23.5505, -46.6333, "Teste SP");
+            Console.WriteLine(" Geofence registrada com sucesso!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Erro: {ex.Message}");
+        }
+    }
+}

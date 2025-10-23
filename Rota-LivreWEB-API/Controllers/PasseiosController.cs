@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace Rota_LivreWEB_API.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class PasseiosController : Controller
     {
         private readonly PasseioRepository _passeioRp;
@@ -13,6 +15,13 @@ namespace Rota_LivreWEB_API.Controllers
         public PasseiosController(PasseioRepository passeioRp)
         {
             _passeioRp = passeioRp;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var passeios = await _passeioRp.ObterTodosAsync();
+            return Ok(passeios);
         }
 
         public async Task<ActionResult> Categoria(int id)

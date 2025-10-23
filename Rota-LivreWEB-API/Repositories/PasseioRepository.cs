@@ -190,6 +190,11 @@ namespace Rota_LivreWEB_API.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Passeio>> ObterTodosAsync()
+        {
+            return await _context.Passeio.ToListAsync();
+        }
+
 
     }
 }

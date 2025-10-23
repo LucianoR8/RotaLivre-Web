@@ -35,10 +35,22 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         new MySqlServerVersion(new Version(8, 0, 30))
     ));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
+
+var app = builder.Build();
+
+app.UseCors("AllowAll");
+
+
 
 // builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
-var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {

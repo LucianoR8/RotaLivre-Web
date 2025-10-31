@@ -1,4 +1,6 @@
-﻿namespace RotaLivreMaui
+﻿using Microsoft.Maui.Controls;
+
+namespace RotaLivreMaui
 {
     public partial class App : Application
     {
@@ -6,7 +8,7 @@
         {
             InitializeComponent();
 
-            MainPage = new AppShell();
+            MainPage = new MainPage();
         }
     }
 }

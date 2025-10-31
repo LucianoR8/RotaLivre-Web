@@ -4,7 +4,10 @@
     --accent-color: #ff6b6b;
     --light-color: #ffefe3;
     --dark-color: #1a535c;
+    --header-height: 80px;
 }
+
+
 
 .background-pattern {
     position: fixed;
@@ -70,7 +73,7 @@ body {
 }
 
 
-.name-title {
+.name-pj {
     color: var(--primary-color);
     font-weight: 800;
     font-size: 1.8rem;
@@ -83,7 +86,7 @@ body {
     margin-left: 20px;
 }
 
-    .name-title::after {
+    .name-pj::after {
         content: "";
         position: absolute;
         bottom: -5px;
@@ -96,11 +99,11 @@ body {
         transition: transform 0.3s ease;
     }
 
-    .name-title:hover::after {
+    .name-pj:hover::after {
         transform: scaleX(1);
     }
 
-    .name-title:hover {
+    .name-pj:hover {
         text-decoration: none;
     }
 
@@ -111,26 +114,6 @@ body {
     justify-content: flex-end;
     align-items: center;
 }
-
-.opc {
-    border-radius: 30px;
-    padding: 8px 20px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    min-width: 120px;
-}
-
-.opc1 {
-    background-color: var(--primary-color);
-    border: none;
-    color: white;
-}
-
-    .opc1:hover {
-        background-color: #d2694d;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(226, 125, 96, 0.3);
-    }
 
 .btn-outline-primary {
     border-color: var(--primary-color);
@@ -144,11 +127,39 @@ body {
         box-shadow: 0 6px 12px rgba(226, 125, 96, 0.3);
     }
 
+.opcA {
+    border-radius: 30px;
+    padding: 8px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+    .opcA:hover {
+        background-color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(226, 125, 96, 0.3);
+    }
+
+.opc1 {
+    background-color: var(--primary-color);
+    border: none;
+    color: white;
+}
+
+    .opc1:hover {
+        background-color: #d2694d;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(226, 125, 96, 0.3);
+    }
+
+
+
 
 .carousel {
     margin-top: 0;
     border-radius: 0 0 20px 20px;
     overflow: hidden;
+    margin-top: var(--header-height);
 }
 
 .carousel-item {

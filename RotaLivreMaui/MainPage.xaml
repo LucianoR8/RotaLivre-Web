@@ -1,37 +1,18 @@
-﻿ using RotaLivreMaui.Services;
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RotaLivreMaui.MainPage"
+             BackgroundColor="White">
 
-
-namespace RotaLivreApp;
-
-public partial class MainPage : ContentPage
-{
-    private readonly ApiService _api;
-    private readonly GeofenceService _geo;
-
-    public MainPage(ApiService api, GeofenceService geo)
-    {
-        InitializeComponent();
-        _api = api;
-        _geo = geo;
-    }
-
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-
-        try
-        {
-            // Testar API
-            var passeios = await _api.GetPasseiosAsync();
-            Console.WriteLine($" Recebidos {passeios.Count} passeios da API!");
-
-            // Testar Geofencing
-            await _geo.RegistrarGeofence(-23.5505, -46.6333, "Teste SP");
-            Console.WriteLine(" Geofence registrada com sucesso!");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"❌ Erro: {ex.Message}");
-        }
-    }
-}
+    <VerticalStackLayout Spacing="20" Padding="30">
+        <Label 
+            Text="✅ MAUI está funcionando!"
+            FontSize="24"
+            HorizontalOptions="Center"
+            TextColor="Green"/>
+        <Label 
+            Text="Agora podemos testar o geofencing."
+            FontSize="18"
+            HorizontalOptions="Center"/>
+    </VerticalStackLayout>
+</ContentPage>

@@ -1,22 +1,44 @@
-﻿using System.Net.Http;
-using System.Net.Http.Json;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using RotaLivreMaui.Models;
 
-namespace RotaLivreMauiServices;
-
-public class ApiService
+namespace RotaLivreMaui.Services
 {
-    private readonly HttpClient _http;
-    public ApiService(HttpClient http) => _http = http;
-
-    public async Task<List<PasseioDto>> GetPasseiosAsync()
+    public class ApiService
     {
-        var resp = await _http.GetAsync("api/passeios");
-        resp.EnsureSuccessStatusCode();
-        var text = await resp.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<List<PasseioDto>>(text, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<PasseioDto>();
+        private readonly HttpClient _httpClient;
+        private const string BaseUrl = "https://192.168.15.46:7015/api/passeios"; // <-- altere o IP do PC
+
+        public ApiService()
+        {
+            _httpClient = new HttpClient();
+        }
+
+        public async Task<List<PasseioModel>> GetPasseiosAsync()
+        {
+            var url = $"{BaseUrl}passeios";
+            var response = await _httpClient.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+                return new List<PasseioModel>();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            return JsonSerializer.Deserialize<List<PasseioModel>>(json, options) ?? new List<PasseioModel>();
+        }
+    }
+
+    // Modelo simplificado compatível com o retorno da sua API
+    public class PasseioModel
+    {
+        public int id_passeio { get; set; }
+        public string nome_passeio { get; set; }
+        public double latitude { get; set; }
+        public double longitude { get; set; }
     }
 }

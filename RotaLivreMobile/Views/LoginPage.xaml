@@ -1,0 +1,29 @@
+﻿<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="RotaLivreMobile.Views.LoginPage"
+    Title="Login">
+
+    <VerticalStackLayout Padding="30" Spacing="15">
+
+        <Entry
+            Placeholder="Email"
+            Keyboard="Email"
+            Text="{Binding Email}" />
+
+        <Entry
+            Placeholder="Senha"
+            IsPassword="True"
+            Text="{Binding Senha}" />
+
+        <Button
+            Text="Entrar"
+            Command="{Binding LoginCommand}" />
+
+        <Button
+            Text="Criar Conta"
+            Command="{Binding IrParaCadastroCommand}" />
+
+    </VerticalStackLayout>
+
+</ContentPage>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Rota_LivreWEB_API.Repositories;
 using Rota_LivreWEB_API.Data;
+using Rota_LivreWEB_API.Repositories;
+using Rota_LivreWEB_API.Utilidades.Seguranca;
 
 namespace Rota_LivreWEB_API.Controllers
 {
@@ -105,7 +106,7 @@ namespace Rota_LivreWEB_API.Controllers
         [HttpPost]
         public ActionResult VerificarResposta(string email, string RespostaInformada)
         {
-            string respostaHash = UsuarioDbContext.GerarHash(RespostaInformada);
+            string respostaHash = HashHelper.GerarHash(RespostaInformada);
             string respostaBanco = _usuarioRp.ObterRespostaDoBanco(email);
 
             if (respostaHash == respostaBanco)

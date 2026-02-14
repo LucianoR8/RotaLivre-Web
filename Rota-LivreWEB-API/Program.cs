@@ -1,56 +1,66 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// =====================
+// Controllers / MVC
+// =====================
 builder.Services.AddControllers();
+builder.Services.AddControllersWithViews();
 
+// =====================
+// DbContext - PostgreSQL (Supabase)
+// =====================
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
 
+// =====================
+// Cache / Session
+// =====================
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-
+// =====================
+// Swagger
+// =====================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<Conexao>();
-builder.Services.AddScoped<UsuarioDbContext>();
+// =====================
+// Dependency Injection
+// =====================
 builder.Services.AddScoped<UsuarioRepository>();
-builder.Services.AddScoped<PasseioDb>();
 builder.Services.AddScoped<PasseioRepository>();
 builder.Services.AddScoped<CategoriaRepository>();
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 30))
-    ));
-
+// =====================
+// CORS
+// =====================
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
+    options.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+    );
 });
 
 var app = builder.Build();
 
+// =====================
+// Middleware pipeline
+// =====================
 app.UseCors("AllowAll");
-
-
-
-// builder.WebHost.UseUrls("http://0.0.0.0:5000");
-
 
 if (app.Environment.IsDevelopment())
 {
@@ -58,29 +68,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
-// Configure the HTTP request pipeline.
-// if (!app.Environment.IsDevelopment())
-// {
-//   app.UseExceptionHandler("/Home/Error");
-// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-//  app.UseHsts();
-// }
-
-
-
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.UseSession();
-
 app.UseAuthorization();
+
+app.MapControllers(); // 🔹 importante para APIs
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
 app.Run();

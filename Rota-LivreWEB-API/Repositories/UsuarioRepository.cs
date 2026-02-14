@@ -1,6 +1,8 @@
 ﻿using Rota_LivreWEB_API.Models;
 using Rota_LivreWEB_API.Data;
 using Microsoft.EntityFrameworkCore;
+using Rota_LivreWEB_API.Utilidades.Seguranca;
+
 
 
 namespace Rota_LivreWEB_API.Repositories
@@ -18,8 +20,8 @@ namespace Rota_LivreWEB_API.Repositories
         {
             try
             {
-                novoUsuario.senha = UsuarioDbContext.GerarHash(novoUsuario.senha);
-                novoUsuario.resposta_seg = UsuarioDbContext.GerarHash(novoUsuario.resposta_seg);
+                novoUsuario.senha = HashHelper.GerarHash(novoUsuario.senha);
+                novoUsuario.resposta_seg = HashHelper.GerarHash(novoUsuario.resposta_seg);
 
                 _context.Usuario.Add(novoUsuario);
                 await _context.SaveChangesAsync();
@@ -45,7 +47,7 @@ namespace Rota_LivreWEB_API.Repositories
 
         public bool VerificarLogin(string email, string senha)
         {
-            string senhaHash = UsuarioDbContext.GerarHash(senha);
+            string senhaHash = HashHelper.GerarHash(senha);
             return _context.Usuario.Any(u => u.email == email && u.senha == senhaHash);
         }
 
@@ -66,7 +68,7 @@ namespace Rota_LivreWEB_API.Repositories
             var usuario = _context.Usuario.Find(idUsuario);
             if (usuario == null) return false;
 
-            usuario.senha = UsuarioDbContext.GerarHash(novaSenha);
+            usuario.senha = HashHelper.GerarHash(novaSenha);
             _context.Usuario.Update(usuario);
             _context.SaveChanges();
             return true;

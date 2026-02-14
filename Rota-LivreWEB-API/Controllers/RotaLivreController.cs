@@ -29,7 +29,7 @@ namespace Rota_LivreWEB_API.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(Usuario usuario)
+        public async Task<ActionResult> Create(UsuarioCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -42,16 +42,26 @@ namespace Rota_LivreWEB_API.Controllers
                         _logger.LogWarning("ModelState erro: {Key} => {Errors}", kv.Key, string.Join("; ", kv.Value.Errors.Select(e => e.ErrorMessage)));
                     }
                 }
-                return View(usuario);
+                return View(model);
             }
 
-            if (_usuarioRp.EmailExiste(usuario.email))
+            if (_usuarioRp.EmailExiste(model.email))
             {
                 ViewBag.MensagemErro = "Este e-mail já está cadastrado!";
                 var perguntas = _usuarioRp.ObterPerguntasDeSeguranca();
                 ViewBag.Perguntas = new SelectList(perguntas, "id_pergunta", "pergunta_seg");
-                return View(usuario);
+                return View(model);
             }
+
+            var usuario = new Usuario
+            {
+                nome_completo = model.nome_completo,
+                data_nasc = model.data_nasc,
+                email = model.email,
+                senha = model.senha,
+                resposta_seg = model.resposta_seg,
+                id_pergunta = model.id_pergunta
+            };
 
             var sucesso = await _usuarioRp.CadastrarAsync(usuario);
             if (sucesso)
@@ -63,7 +73,7 @@ namespace Rota_LivreWEB_API.Controllers
                 ViewBag.MensagemErro = "Ocorreu um erro ao cadastrar. Verifique os dados e tente novamente.";
                 var perguntas = _usuarioRp.ObterPerguntasDeSeguranca();
                 ViewBag.Perguntas = new SelectList(perguntas, "id_pergunta", "pergunta_seg");
-                return View(usuario);
+                return View(model);
             }
         }
 
@@ -73,7 +83,7 @@ namespace Rota_LivreWEB_API.Controllers
         {
             Usuario NovoUsuario = new Usuario(
                 Novo_Usuario_Nome,
-                Convert.ToDateTime(Novo_Usuario_Nasc),
+                DateOnly.Parse(Novo_Usuario_Nasc),
                 Novo_Usuario_Email,
                 Novo_Usuario_Senha,
                 Novo_Usuario_Resposta_Seg

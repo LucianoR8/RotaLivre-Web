@@ -46,7 +46,7 @@ namespace Rota_LivreWEB_API.Repositories
                 id_usuario = idUsuario,
                 nota = nota,
                 feedback = feedback,
-                data_feedback = DateTime.Now,
+                data_feedback = DateTime.UtcNow,
                 nome_completo = usuario.nome_completo,
                 Usuario = usuario
             };
@@ -95,7 +95,7 @@ namespace Rota_LivreWEB_API.Repositories
                 {
                     id_usuario = idUsuario,
                     id_passeio = idPasseio,
-                    data_adicao = DateTime.Now
+                    data_adicao = DateTime.UtcNow
                 };
 
                 await _context.PasseioPendente.AddAsync(novo);

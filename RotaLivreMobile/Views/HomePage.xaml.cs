@@ -2,9 +2,9 @@
 
 namespace RotaLivreMobile.Views;
 
-public partial class LoginPage : ContentPage
+public partial class HomePage : ContentPage
 {
-    public LoginPage(LoginViewModel viewModel)
+    public HomePage(HomeViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = viewModel;

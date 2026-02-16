@@ -1,4 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using RotaLivreMobile.Services;
+using RotaLivreMobile.ViewModels;
+using RotaLivreMobile.Views;
 
 namespace RotaLivreMobile
 {
@@ -16,8 +19,19 @@ namespace RotaLivreMobile
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
+
+            // 🔐 Services
+            builder.Services.AddSingleton<ApiService>();
+
+            // 🧠 ViewModels
+            builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<HomeViewModel>();
+
+            // 📱 Pages
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<HomePage>();
 
             return builder.Build();
         }

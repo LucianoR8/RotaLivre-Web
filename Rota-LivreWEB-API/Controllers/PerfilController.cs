@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Rota_LivreWEB_API.Repositories;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Rota_LivreWEB_API.Models;
+using Rota_LivreWEB_API.Repositories;
 
 namespace Rota_LivreWEB_API.Controllers
 {
@@ -13,6 +14,12 @@ namespace Rota_LivreWEB_API.Controllers
             _usuarioRp = usuarioRp;
         }
 
+        [Authorize]
+        [HttpGet("teste")]
+        public IActionResult TesteProtegido()
+        {
+            return Ok("Você está autenticado!");
+        }
         public async Task<ActionResult> Perfil()
         {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");

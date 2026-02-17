@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Rota_LivreWEB_API.Data;
+using Rota_LivreWEB_API.Interfaces;
 using Rota_LivreWEB_API.Repositories;
+using Rota_LivreWEB_API.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -104,6 +106,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<PasseioRepository>();
 builder.Services.AddScoped<CategoriaRepository>();
+builder.Services.AddScoped<IPasseioService, PasseioService>();
+builder.Services.AddScoped<IHomeService, HomeService>();
 
 // =====================
 // CORS
@@ -135,8 +139,9 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseSession();
-app.UseAuthorization();
+
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers(); // 🔹 importante para APIs
 

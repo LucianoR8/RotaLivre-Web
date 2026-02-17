@@ -1,12 +1,22 @@
 ﻿using RotaLivreMobile.ViewModels;
 
-namespace RotaLivreMobile.Views;
-
-public partial class HomePage : ContentPage
+namespace RotaLivreMobile.Views
 {
-    public HomePage(HomeViewModel viewModel)
+    public partial class HomePage : ContentPage
     {
-        InitializeComponent();
-        BindingContext = viewModel;
+        private readonly HomeViewModel _viewModel;
+
+        public HomePage(HomeViewModel viewModel)
+        {
+            InitializeComponent();
+            BindingContext = viewModel;
+            _viewModel = viewModel;
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            await _viewModel.CarregarHome();
+        }
     }
 }

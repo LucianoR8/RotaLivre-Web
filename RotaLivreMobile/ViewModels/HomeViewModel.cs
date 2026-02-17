@@ -1,34 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using RotaLivreMobile.Services;
+using RotaLivreMobile.Views;
 
-namespace RotaLivreMobile.ViewModels
+public class HomeViewModel : INotifyPropertyChanged
 {
-    public class HomeViewModel : BaseViewModel
+    private readonly ApiService _apiService;
+
+    private string _nomeUsuario;
+    public string NomeUsuario
     {
-        private readonly ApiService _apiService;
-
-        public HomeViewModel(ApiService apiService)
+        get => _nomeUsuario;
+        set
         {
-            _apiService = apiService;
+            _nomeUsuario = value;
+            OnPropertyChanged();
         }
+    }
 
-        public async Task TestarApi()
-        {
-            var response = await _apiService.GetAsync("AuthApi/teste");
+    public ObservableCollection<PasseioDto> Destaques { get; set; }
 
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(content);
-            }
-            else
-            {
-                Console.WriteLine("Erro: " + response.StatusCode);
-            }
-        }
+    public HomeViewModel(ApiService apiService)
+    {
+        _apiService = apiService;
+        Destaques = new ObservableCollection<PasseioDto>();
+    }
+
+    public async Task CarregarHome()
+    {
+        var home = await _apiService.GetHome();
+
+        if (home == null)
+            return;
+
+        NomeUsuario = home.NomeUsuario;
+
+        Destaques.Clear();
+        foreach (var item in home.Destaques)
+            Destaques.Add(item);
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected void OnPropertyChanged([CallerMemberName] string name = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

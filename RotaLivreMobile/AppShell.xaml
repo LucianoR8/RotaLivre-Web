@@ -16,4 +16,12 @@
             Route="HomePage" />
     </TabBar>
 
+    <TabBar>
+        <ShellContent
+    Route="detalhe"
+    ContentTemplate="{DataTemplate views:PasseioDetalhePage}" />
+    </TabBar>
+    
+
+
 </Shell>

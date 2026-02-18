@@ -11,7 +11,8 @@
                FontAttributes="Bold" />
 
         <!-- Lista de passeios -->
-        <CollectionView ItemsSource="{Binding Destaques}">
+        <CollectionView ItemsSource="{Binding Destaques}" SelectionMode="Single" 
+                        SelectionChanged="OnPasseioSelecionado">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame Padding="10" Margin="0,5" HasShadow="True">

@@ -3,6 +3,9 @@ using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.DTOs;
 using Rota_LivreWEB_API.Interfaces;
 using Rota_LivreWEB_API.Models;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
 
 namespace Rota_LivreWEB_API.Services
 {
@@ -66,5 +69,7 @@ namespace Rota_LivreWEB_API.Services
             dto.Id = passeio.id_passeio;
             return dto;
         }
+
+       
     }
 }

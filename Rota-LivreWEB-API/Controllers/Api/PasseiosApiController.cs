@@ -2,9 +2,11 @@
 using Rota_LivreWEB_API.Interfaces;
 using Rota_LivreWEB_API.DTOs;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Rota_LivreWEB_API.Controllers.Api
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class PasseiosApiController : ControllerBase

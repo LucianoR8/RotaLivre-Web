@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="RotaLivreMobile.Views.PasseioDetalhePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Detalhes">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="10">
+
+            <Label Text="{Binding Nome}"
+                   FontSize="24"
+                   FontAttributes="Bold" />
+
+            <Image Source="{Binding ImagemUrl}"
+                   HeightRequest="200"
+                   Aspect="AspectFill"/>
+
+            <Label Text="Descrição"
+                   FontAttributes="Bold" />
+
+            <Label Text="{Binding Descricao}" />
+
+            <Label Text="Funcionamento"
+                   FontAttributes="Bold" />
+
+            <Label Text="{Binding Funcionamento}" />
+
+            <Button Text="Curtir"
+                    Command="{Binding CurtirCommand}" />
+
+            <Button Text="Adicionar"
+                    Command="{Binding PendenteCommand}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

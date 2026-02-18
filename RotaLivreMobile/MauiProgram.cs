@@ -24,14 +24,17 @@ namespace RotaLivreMobile
 
             // 🔐 Services
             builder.Services.AddSingleton<ApiService>();
+            builder.Services.AddSingleton<PasseioApiService>();
 
             // 🧠 ViewModels
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<HomeViewModel>();
+            builder.Services.AddTransient<PasseioDetalheViewModel>();
 
             // 📱 Pages
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<HomePage>();
+            builder.Services.AddTransient<PasseioDetalhePage>();
 
             return builder.Build();
         }

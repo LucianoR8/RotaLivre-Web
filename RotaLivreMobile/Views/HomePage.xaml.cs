@@ -18,5 +18,15 @@ namespace RotaLivreMobile.Views
             base.OnAppearing();
             await _viewModel.CarregarHome();
         }
+
+        private async void OnPasseioSelecionado(object sender, SelectionChangedEventArgs e)
+        {
+            var passeio = e.CurrentSelection.FirstOrDefault() as PasseioDto;
+
+            if (passeio == null)
+                return;
+
+            await Shell.Current.GoToAsync($"detalhe?id={passeio.Id}");
+        }
     }
 }

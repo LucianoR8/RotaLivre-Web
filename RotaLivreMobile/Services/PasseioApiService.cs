@@ -12,7 +12,7 @@ public class PasseioApiService
     {
         _httpClient = new HttpClient
         {
-            BaseAddress = new Uri("https://localhost:7015/")
+            BaseAddress = new Uri("https://192.168.56.1:7015/")
         };
     }
 

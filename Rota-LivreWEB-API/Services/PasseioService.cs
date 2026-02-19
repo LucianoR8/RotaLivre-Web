@@ -27,7 +27,7 @@ namespace Rota_LivreWEB_API.Services
                     Nome = p.nome_passeio,
                     Descricao = p.descricao,
                     Funcionamento = p.funcionamento,
-                    ImagemUrl = p.img_url,
+                    ImagemUrl = $"https://192.168.56.1:7015/img/passeios/{p.img_url}",
                     QuantidadeCurtidas = p.QuantidadeCurtidas
                 })
                 .ToListAsync();
@@ -36,6 +36,7 @@ namespace Rota_LivreWEB_API.Services
         public async Task<PasseioDto> GetByIdAsync(int id)
         {
             var passeio = await _context.Passeio
+                .Include(p => p.Endereco)
                 .FirstOrDefaultAsync(p => p.id_passeio == id);
 
             if (passeio == null)
@@ -47,10 +48,19 @@ namespace Rota_LivreWEB_API.Services
                 Nome = passeio.nome_passeio,
                 Descricao = passeio.descricao,
                 Funcionamento = passeio.funcionamento,
-                ImagemUrl = passeio.img_url,
-                QuantidadeCurtidas = passeio.QuantidadeCurtidas
+                ImagemUrl = $"https://localhost:7015/img/passeios/{passeio.img_url}",
+                QuantidadeCurtidas = passeio.QuantidadeCurtidas,
+                Endereco = passeio.Endereco == null ? null : new EnderecoDto
+                {
+                    NomeRua = passeio.Endereco.nome_rua,
+                    NumeroRua = passeio.Endereco.numero_rua,
+                    Complemento = passeio.Endereco.complemento,
+                    Bairro = passeio.Endereco.bairro,
+                    Cep = passeio.Endereco.cep
+                }
             };
         }
+
 
         public async Task<PasseioDto> CreateAsync(PasseioDto dto)
         {

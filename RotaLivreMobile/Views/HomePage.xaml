@@ -17,15 +17,22 @@
                 <DataTemplate>
                     <Frame Padding="10" Margin="0,5" HasShadow="True">
                         <VerticalStackLayout>
+
+                            <Image Source="{Binding ImagemUrl}"
+                   HeightRequest="180"
+                   Aspect="AspectFill" />
+
                             <Label Text="{Binding Nome}"
-                                   FontSize="18"
-                                   FontAttributes="Bold" />
+                   FontSize="18"
+                   FontAttributes="Bold" />
 
                             <Label Text="{Binding Descricao}"
-                                   FontSize="14" />
+                   FontSize="14" />
+
                         </VerticalStackLayout>
                     </Frame>
                 </DataTemplate>
+
             </CollectionView.ItemTemplate>
         </CollectionView>
 

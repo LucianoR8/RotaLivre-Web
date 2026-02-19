@@ -9,7 +9,7 @@ public class ApiService
 {
     private readonly HttpClient _httpClient;
 
-    private const string BaseUrl = "https://localhost:7015/api/";
+    private const string BaseUrl = "https://192.168.56.1:7015/api/";
 
     public ApiService()
     {

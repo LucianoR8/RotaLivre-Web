@@ -58,4 +58,18 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    public async Task Inicializar(int id)
+    {
+        var passeio = await _service.GetByIdAsync(id);
+
+        if (passeio == null)
+            return;
+
+        Nome = passeio.Nome;
+        Descricao = passeio.Descricao;
+        Funcionamento = passeio.Funcionamento;
+        ImagemUrl = passeio.ImagemUrl;
+    }
+
 }

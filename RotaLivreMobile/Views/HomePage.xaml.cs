@@ -26,7 +26,12 @@ namespace RotaLivreMobile.Views
             if (passeio == null)
                 return;
 
-            await Shell.Current.GoToAsync($"detalhe?id={passeio.Id}");
+            await Shell.Current.GoToAsync("detalhe",
+    new Dictionary<string, object>
+    {
+        { "PasseioId", passeio.Id }
+    });
+
         }
     }
 }

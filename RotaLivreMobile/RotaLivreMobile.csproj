@@ -75,6 +75,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\CategoriaPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\PasseioDetalhePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

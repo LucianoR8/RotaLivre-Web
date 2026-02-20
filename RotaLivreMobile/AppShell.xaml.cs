@@ -9,6 +9,7 @@ namespace RotaLivreMobile
             InitializeComponent();
 
             Routing.RegisterRoute("detalhe", typeof(PasseioDetalhePage));
+            Routing.RegisterRoute(nameof(CategoriaPage), typeof(CategoriaPage));
         }
 
 

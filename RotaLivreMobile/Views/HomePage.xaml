@@ -4,37 +4,102 @@
     x:Class="RotaLivreMobile.Views.HomePage"
     Title="Home">
 
-    <Grid RowDefinitions="Auto,*" Padding="20">
+    <Grid Padding="20"
+          RowDefinitions="Auto,Auto,Auto,*"
+          RowSpacing="15">
 
+        <!-- Saudação -->
         <Label Grid.Row="0"
-           Text="{Binding NomeUsuario}"
-           FontSize="22"
-           FontAttributes="Bold" />
+               Text="{Binding NomeUsuario, StringFormat='Olá, {0}'}"
+               FontSize="18"
+               FontAttributes="Bold" />
 
-        <CollectionView
-        Grid.Row="1"
-        ItemsSource="{Binding Destaques}"
-        SelectionMode="Single"
-        ItemsUpdatingScrollMode="KeepScrollOffset"
-        SelectionChanged="OnPasseioSelecionado">
+        <!-- CAROUSEL DE CATEGORIAS -->
+        <CarouselView
+            x:Name="carouselCategorias"
+            Grid.Row="1"
+            ItemsSource="{Binding Categorias}"
+            HeightRequest="200"
+            IndicatorView="indicatorCategorias">
 
-            <CollectionView.ItemTemplate >
+            <CarouselView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Margin="0,5">
+                    <Frame CornerRadius="20"
+                           Margin="5"
+                           Padding="0"
+                           HasShadow="True">
 
-                        <VerticalStackLayout>
+                        <Grid>
 
-                            <Image InputTransparent="True"
-                                Source="{Binding ImagemUrl}"
-                                HeightRequest="180"
-                                Aspect="AspectFill" />  
+                            <!-- Imagem -->
+                            <Image Source="{Binding ImgUrl}"
+                                   Aspect="AspectFill" />
+
+                            <!-- Overlay escuro -->
+                            <BoxView BackgroundColor="#60000000" />
+
+                            <!-- Nome categoria -->
+                            <Label Text="{Binding TipoCategoria}"
+                                   TextColor="White"
+                                   FontSize="22"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+
+                            <!-- Tap -->
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Tapped="OnCategoriaClicada"
+                                    CommandParameter="{Binding .}" />
+                            </Grid.GestureRecognizers>
+
+                        </Grid>
+
+                    </Frame>
+                </DataTemplate>
+            </CarouselView.ItemTemplate>
+        </CarouselView>
+
+        <!-- Bolinhas -->
+        <IndicatorView
+            x:Name="indicatorCategorias"
+            Grid.Row="2"
+            HorizontalOptions="Center"
+            IndicatorColor="LightGray"
+            SelectedIndicatorColor="Black" />
+
+        <!-- LISTA DE DESTAQUES -->
+        <CollectionView
+            Grid.Row="3"
+            ItemsSource="{Binding Destaques}"
+            SelectionMode="Single"
+            SelectionChanged="OnPasseioSelecionado">
+
+            <CollectionView.Header>
+                <Label Text="Destaques"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       Margin="0,10,0,10" />
+            </CollectionView.Header>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="0,5"
+                           CornerRadius="15"
+                           HasShadow="True">
+
+                        <VerticalStackLayout Spacing="5">
+
+                            <Image Source="{Binding ImagemUrl}"
+                                   HeightRequest="180"
+                                   Aspect="AspectFill" />
 
                             <Label Text="{Binding Nome}"
-                               FontSize="18"
-                               FontAttributes="Bold" />
+                                   FontSize="18"
+                                   FontAttributes="Bold" />
 
                             <Label Text="{Binding Descricao}"
-                               FontSize="14" />
+                                   FontSize="14" />
 
                         </VerticalStackLayout>
 

@@ -27,7 +27,7 @@ namespace Rota_LivreWEB_API.Services
                     Nome = p.nome_passeio,
                     Descricao = p.descricao,
                     Funcionamento = p.funcionamento,
-                    ImagemUrl = $"http://192.168.15.121:7015/img/passeios/{p.img_url}",
+                    ImagemUrl = $"http://192.168.x.x:7015/img/passeios/{p.img_url}",
                     QuantidadeCurtidas = p.QuantidadeCurtidas
                 })
                 .ToListAsync();
@@ -48,7 +48,7 @@ namespace Rota_LivreWEB_API.Services
                 Nome = passeio.nome_passeio,
                 Descricao = passeio.descricao,
                 Funcionamento = passeio.funcionamento,
-                ImagemUrl = $"http://192.168.15.121:7015/img/passeios/{passeio.img_url}",
+                ImagemUrl = $"http://192.168.x.x:7015/img/passeios/{passeio.img_url}",
                 QuantidadeCurtidas = passeio.QuantidadeCurtidas,
                 Endereco = passeio.Endereco == null ? null : new EnderecoDto
                 {

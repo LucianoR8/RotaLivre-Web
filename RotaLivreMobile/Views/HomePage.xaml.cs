@@ -21,17 +21,20 @@ namespace RotaLivreMobile.Views
 
         private async void OnPasseioSelecionado(object sender, SelectionChangedEventArgs e)
         {
-            var passeio = e.CurrentSelection.FirstOrDefault() as PasseioDto;
+            var collection = sender as CollectionView;
 
+            var passeio = e.CurrentSelection.FirstOrDefault() as PasseioDto;
             if (passeio == null)
                 return;
 
             await Shell.Current.GoToAsync("detalhe",
-    new Dictionary<string, object>
-    {
-        { "PasseioId", passeio.Id }
-    });
+                new Dictionary<string, object>
+                {
+            { "PasseioId", passeio.Id }
+                });
 
+            collection.SelectedItem = null; // 🔥 IMPORTANTE
         }
+
     }
 }

@@ -1,41 +1,49 @@
-﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="RotaLivreMobile.Views.HomePage"
-             Title="Home">
+﻿<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="RotaLivreMobile.Views.HomePage"
+    Title="Home">
 
-    <VerticalStackLayout Padding="20" Spacing="15">
+    <Grid RowDefinitions="Auto,*" Padding="20">
 
-        <!-- Nome do usuário -->
-        <Label Text="{Binding NomeUsuario}"
-               FontSize="22"
-               FontAttributes="Bold" />
+        <Label Grid.Row="0"
+           Text="{Binding NomeUsuario}"
+           FontSize="22"
+           FontAttributes="Bold" />
 
-        <!-- Lista de passeios -->
-        <CollectionView ItemsSource="{Binding Destaques}" SelectionMode="Single" 
-                        SelectionChanged="OnPasseioSelecionado">
-            <CollectionView.ItemTemplate>
+        <CollectionView
+        Grid.Row="1"
+        ItemsSource="{Binding Destaques}"
+        SelectionMode="Single"
+        ItemsUpdatingScrollMode="KeepScrollOffset"
+        SelectionChanged="OnPasseioSelecionado">
+
+            <CollectionView.ItemTemplate >
                 <DataTemplate>
-                    <Frame Padding="10" Margin="0,5" HasShadow="True">
+                    <Frame Margin="0,5">
+
                         <VerticalStackLayout>
 
-                            <Image Source="{Binding ImagemUrl}"
-                   HeightRequest="180"
-                   Aspect="AspectFill" />
+                            <Image InputTransparent="True"
+                                Source="{Binding ImagemUrl}"
+                                HeightRequest="180"
+                                Aspect="AspectFill" />  
 
                             <Label Text="{Binding Nome}"
-                   FontSize="18"
-                   FontAttributes="Bold" />
+                               FontSize="18"
+                               FontAttributes="Bold" />
 
                             <Label Text="{Binding Descricao}"
-                   FontSize="14" />
+                               FontSize="14" />
 
                         </VerticalStackLayout>
+
                     </Frame>
                 </DataTemplate>
-
             </CollectionView.ItemTemplate>
+
         </CollectionView>
 
-    </VerticalStackLayout>
+    </Grid>
 
 </ContentPage>

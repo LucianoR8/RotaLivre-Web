@@ -10,4 +10,5 @@ WORKDIR /app
 COPY --from=build /app/out .
 ENV ASPNETCORE_URLS=http://+:10000
 EXPOSE 10000
-ENTRYPOINT ["dotnet", "Rota-LivreWeb-API.dll"]
+ENTRYPOINT ["dotnet", "Rota-LivreWEB-API.dll"]
+

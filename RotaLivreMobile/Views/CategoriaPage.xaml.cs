@@ -6,13 +6,24 @@ namespace RotaLivreMobile.Views;
 [QueryProperty(nameof(CategoriaNome), "categoriaNome")]
 public partial class CategoriaPage : ContentPage
 {
-    private CategoriaViewModel ViewModel => BindingContext as CategoriaViewModel;
+    private CategoriaViewModel _viewModel;
+
+    public CategoriaPage()
+    {
+        InitializeComponent();
+
+        _viewModel = new CategoriaViewModel();
+        BindingContext = _viewModel;
+    }
 
     public string CategoriaId
     {
         set
         {
-            ViewModel.CategoriaId = int.Parse(value);
+            if (int.TryParse(value, out int id))
+            {
+                _viewModel.CategoriaId = id;
+            }
         }
     }
 
@@ -24,12 +35,6 @@ public partial class CategoriaPage : ContentPage
         }
     }
 
-    public CategoriaPage()
-    {
-        InitializeComponent();
-        BindingContext = new CategoriaViewModel();
-    }
-
     private async void OnPasseioSelecionado(object sender, SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection == null || e.CurrentSelection.Count == 0)
@@ -39,6 +44,6 @@ public partial class CategoriaPage : ContentPage
 
         ((CollectionView)sender).SelectedItem = null;
 
-        await Shell.Current.GoToAsync($"DetalhePage?passeioId={passeio.Id}");
+        await Shell.Current.GoToAsync($"detalhe?passeioId={passeio.Id}");
     }
 }

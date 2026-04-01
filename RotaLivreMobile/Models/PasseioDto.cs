@@ -6,4 +6,15 @@
     public string Funcionamento { get; set; }
     public string ImagemUrl { get; set; }
     public int QuantidadeCurtidas { get; set; }
+
+    public ImageSource ImgSource
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(ImagemUrl))
+                return null;
+
+            return ImageSource.FromUri(new Uri(ImagemUrl));
+        }
+    }
 }

@@ -39,6 +39,7 @@ namespace RotaLivreMobile.Views
 
             if (_viewModel.Categorias?.Any() == true)
                 _timer.Start();
+
         }
 
         protected override void OnDisappearing()

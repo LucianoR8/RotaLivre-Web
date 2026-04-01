@@ -79,7 +79,7 @@ builder.Services.AddSwaggerGen(options =>
 // JWT
 // =====================
 
-var key = Encoding.ASCII.GetBytes("SUA_CHAVE_SUPER_SECRETA_AQUI_123456");
+var key = Encoding.ASCII.GetBytes("chave");
 
 builder.Services.AddAuthentication(options =>
 {

@@ -26,7 +26,7 @@ namespace Rota_LivreWEB_API.Services
              {
                  IdCategoria = c.id_categoria,
                  TipoCategoria = c.tipo_categoria,
-                 ImgUrl = $"http://192.168.15.121:7015/img/categorias/{c.img}"
+                 ImgUrl = $"https://rotalivre-web.onrender.com/img/categorias/{c.img}"
              })
              .ToListAsync();
 
@@ -39,7 +39,7 @@ namespace Rota_LivreWEB_API.Services
                     Nome = p.nome_passeio,
                     Descricao = p.descricao,
                     Funcionamento = p.funcionamento,
-                    ImagemUrl = $"http://192.168.15.121:7015/img/passeios/{p.img_url}",
+                    ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{p.img_url}",
                     QuantidadeCurtidas = p.QuantidadeCurtidas
                 })
                 .ToListAsync();

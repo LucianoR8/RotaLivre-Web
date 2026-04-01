@@ -37,7 +37,7 @@ namespace RotaLivreMobile.ViewModels
                     new AuthenticationHeaderValue("Bearer", token);
 
                 var response = await client.GetAsync(
-                    $"http://192.168.15.121:7015/api/passeios/categoria/{_categoriaId}");
+                    $"https://rotalivre-web.onrender.com/api/passeios/categoria/{_categoriaId}");
 
                 if (!response.IsSuccessStatusCode)
                     return;

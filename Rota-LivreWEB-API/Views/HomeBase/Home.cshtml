@@ -2,122 +2,1021 @@
     Layout = null;
 }
 
- @model List<Rota_LivreWEB_API.Models.Categoria>
- 
+@model List<Rota_LivreWEB_API.Models.Categoria>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RotaLivre</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="~/css/Home.css">
-    <link rel="stylesheet" href="~/css/passeios.css" />
+    <title>RotaLivre - Sua jornada começa aqui</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
 
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <style>
+        /* ===== VARIÁVEIS ===== */
+        :root {
+            --primary-color: #1a535c;
+            --secondary-color: #4ecdc4;
+            --accent-color: #ff6b6b;
+            --light-color: #fff9f5;
+            --dark-color: #1a535c;
+            --header-height: 80px;
+        }
 
+        /* ===== FUNDO ALEGRE E VIBRANTE ===== */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9f2f5 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            position: relative;
+        }
 
+        /* Efeito de ondas suaves no fundo */
+        .background-waves {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(78, 205, 196, 0.08) 0%, transparent 20%), radial-gradient(circle at 80% 70%, rgba(255, 107, 107, 0.05) 0%, transparent 25%), radial-gradient(circle at 40% 80%, rgba(26, 83, 92, 0.06) 0%, transparent 30%), repeating-linear-gradient(45deg, transparent 0px, transparent 20px, rgba(78, 205, 196, 0.02) 20px, rgba(78, 205, 196, 0.02) 40px);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* Bolhas flutuantes */
+        .bubbles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(78, 205, 196, 0.1);
+            border-radius: 50%;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        .bubble1 {
+            width: 300px;
+            height: 300px;
+            top: -50px;
+            right: -50px;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.15) 0%, transparent 70%);
+            animation: float 12s infinite;
+        }
+
+        .bubble2 {
+            width: 400px;
+            height: 400px;
+            bottom: -100px;
+            left: -100px;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.08) 0%, transparent 70%);
+            animation: float 15s infinite reverse;
+        }
+
+        .bubble3 {
+            width: 200px;
+            height: 200px;
+            top: 40%;
+            left: 20%;
+            background: radial-gradient(circle, rgba(26, 83, 92, 0.1) 0%, transparent 70%);
+            animation: float 10s infinite 2s;
+        }
+
+        .bubble4 {
+            width: 150px;
+            height: 150px;
+            bottom: 30%;
+            right: 15%;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.12) 0%, transparent 70%);
+            animation: float 9s infinite 1s;
+        }
+
+        @@keyframes float {
+            0%, 100%
+
+        {
+            transform: translateY(0) scale(1);
+        }
+
+        50% {
+            transform: translateY(-30px) scale(1.05);
+        }
+
+        }
+
+        /* Linhas de contorno suaves */
+        .background-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(rgba(78, 205, 196, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(78, 205, 196, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 20px 80px;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== HEADER ===== */
+        .cabecalho {
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.15);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1050;
+            padding: 15px 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border-bottom: 3px solid var(--secondary-color);
+        }
+
+        .name-pj {
+            color: var(--primary-color);
+            font-weight: 800;
+            font-size: 1.8rem;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            position: relative;
+            margin-left: 20px;
+        }
+
+            .name-pj::after {
+                content: "✦";
+                position: absolute;
+                right: -25px;
+                top: -5px;
+                color: var(--accent-color);
+                font-size: 20px;
+                -webkit-text-fill-color: initial;
+                animation: spin 4s linear infinite;
+            }
+
+        @@keyframes spin {
+            from
+
+        {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+
+        }
+
+        .cabecalho .text-end {
+            z-index: 1100;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .opcA {
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .opc1 {
+            background: linear-gradient(135deg, var(--primary-color), #236c78);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 83, 92, 0.3);
+        }
+
+            .opc1:hover {
+                background: linear-gradient(135deg, #236c78, var(--primary-color));
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(26, 83, 92, 0.4);
+            }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+        }
+
+            .btn-outline-primary:hover {
+                background: linear-gradient(135deg, var(--primary-color), #236c78);
+                color: white;
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(26, 83, 92, 0.3);
+                border-color: transparent;
+            }
+
+        /* ===== SAUDAÇÃO ===== */
+        .saudacao {
+            text-align: left;
+            padding: 20px 0 10px;
+            margin-top: 100px;
+            animation: fadeInDown 0.8s ease;
+            position: relative;
+        }
+
+            .saudacao h1 {
+                font-size: 18px;
+                color: var(--primary-color);
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                margin: 0 0 5px;
+                opacity: 0.9;
+            }
+
+        .princ-saudacao {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin: 0;
+            position: relative;
+            display: inline-block;
+            text-shadow: 3px 3px 0 rgba(78, 205, 196, 0.2);
+        }
+
+            .princ-saudacao::before {
+                content: "🌍";
+                position: absolute;
+                left: -50px;
+                top: 10px;
+                font-size: 40px;
+                animation: bounce 2s infinite;
+            }
+
+            .princ-saudacao::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 0;
+                width: 150px;
+                height: 4px;
+                background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+                border-radius: 2px;
+                animation: expandWidth 1s ease forwards;
+            }
+
+        @@keyframes bounce {
+            0%, 100%
+
+        {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+
+        }
+
+        /* ===== SEARCH BOX ===== */
+        .search-box {
+            display: flex;
+            justify-content: center;
+            margin: 40px 0 30px;
+            position: relative;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+            .search-box input {
+                width: 100%;
+                max-width: 600px;
+                padding: 20px 35px;
+                border-radius: 60px;
+                border: 2px solid transparent;
+                background: white;
+                box-shadow: 0 10px 30px rgba(78, 205, 196, 0.2);
+                font-size: 16px;
+                transition: all 0.3s ease;
+                padding-right: 80px;
+            }
+
+                .search-box input:focus {
+                    outline: none;
+                    border-color: var(--secondary-color);
+                    box-shadow: 0 15px 40px rgba(78, 205, 196, 0.3);
+                    transform: scale(1.02);
+                }
+
+                .search-box input::placeholder {
+                    color: var(--primary-color);
+                    font-weight: 400;
+                    opacity: 0.6;
+                }
+
+            .search-box button {
+                position: absolute;
+                right: calc(50% - 280px);
+                top: 50%;
+                transform: translateY(-50%);
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                color: white;
+                border: none;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 5px 20px rgba(78, 205, 196, 0.4);
+            }
+
+                .search-box button:hover {
+                    transform: translateY(-50%) scale(1.1) rotate(5deg);
+                    box-shadow: 0 8px 30px rgba(78, 205, 196, 0.5);
+                }
+
+        /* ===== TÍTULO DAS SEÇÕES ===== */
+        .titulo-selecao {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 60px 0 30px;
+            position: relative;
+            padding-left: 20px;
+            color: var(--primary-color);
+            animation: fadeInRight 0.8s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .titulo-selecao i {
+                color: var(--accent-color);
+                font-size: 30px;
+                animation: bounce 2s infinite;
+            }
+
+        /* ===== CATEGORIAS COM BOTÃO EXPLORAR ===== */
+        .categorias {
+            padding: 0 0 20px;
+        }
+
+            .categorias .row {
+                margin: -15px;
+            }
+
+            .categorias .col-md-4 {
+                padding: 15px;
+                animation: fadeInUp 0.6s ease forwards;
+                animation-delay: calc(var(--delay) * 0.1s);
+            }
+
+            .categorias .card {
+                border: none;
+                border-radius: 30px;
+                overflow: hidden;
+                background: white;
+                transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                position: relative;
+                box-shadow: 0 15px 35px rgba(78, 205, 196, 0.15);
+                height: 320px;
+                cursor: pointer;
+                width: 100%;
+            }
+
+                .categorias .card:hover {
+                    transform: translateY(-15px) scale(1.02);
+                    box-shadow: 0 25px 45px rgba(78, 205, 196, 0.25);
+                }
+
+            .categorias .card-img-top {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.8s ease;
+            }
+
+            .categorias .card:hover .card-img-top {
+                transform: scale(1.15);
+            }
+
+            /* Overlay escuro que aparece no hover */
+            .categorias .card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(to top, rgba(26, 83, 92, 0.9) 0%, rgba(26, 83, 92, 0.4) 50%, rgba(0, 0, 0, 0.3) 100%);
+                z-index: 1;
+                transition: all 0.5s ease;
+            }
+
+            /* Título da categoria */
+            .categorias .card-body {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                padding: 30px 25px;
+                z-index: 2;
+                text-align: left;
+                transform: translateY(0);
+                transition: transform 0.5s ease;
+            }
+
+            .categorias .card-title {
+                color: white;
+                font-size: 28px;
+                font-weight: 700;
+                margin: 0;
+                text-shadow: 2px 4px 15px rgba(0,0,0,0.5);
+                position: relative;
+                padding-bottom: 15px;
+            }
+
+                .categorias .card-title i {
+                    margin-right: 10px;
+                    color: var(--secondary-color);
+                }
+
+                .categorias .card-title::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 60px;
+                    height: 4px;
+                    background: var(--secondary-color);
+                    border-radius: 2px;
+                    transition: width 0.4s ease;
+                    box-shadow: 0 0 15px rgba(78, 205, 196, 0.5);
+                }
+
+            .categorias .card:hover .card-title::after {
+                width: 100px;
+            }
+
+        /* Botão EXPLORAR */
+        .explorar-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            z-index: 3;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .categorias .card:hover .explorar-btn {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .explorar-btn:hover {
+            transform: translate(-50%, -50%) scale(1.1) !important;
+            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.6);
+        }
+
+        .explorar-btn i {
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .explorar-btn:hover i {
+            transform: translateX(5px);
+        }
+
+        /* Animação de pulso no hover */
+        @@keyframes pulse {
+            0%
+
+        {
+            box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 15px rgba(255, 107, 107, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+        }
+
+        }
+
+        .categorias .card:hover .explorar-btn {
+            animation: pulse 2s infinite;
+        }
+
+        /* ===== PASSEIOS EM DESTAQUE ===== */
+        .produtos-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            padding: 0 0 30px;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .produto {
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(78, 205, 196, 0.15);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+            .produto:hover {
+                transform: translateY(-12px) scale(1.02);
+                box-shadow: 0 25px 45px rgba(78, 205, 196, 0.25);
+            }
+
+        .imagem_produto {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .produto:hover .imagem_produto {
+            transform: scale(1.1);
+        }
+
+        .museu_conteudo {
+            padding: 25px;
+            background: white;
+            position: relative;
+        }
+
+        .nome {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .nome i {
+                color: var(--accent-color);
+                font-size: 18px;
+            }
+
+        /* ===== BARRA DE CURTIDAS PROPORCIONAL ===== */
+        .curtidas-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .curtidas-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+            .curtidas-info i {
+                color: var(--accent-color);
+                font-size: 18px;
+                transition: transform 0.3s ease;
+            }
+
+        .produto:hover .curtidas-info i {
+            transform: scale(1.2);
+        }
+
+        .progresso-curtidas {
+            width: 100%;
+            height: 8px;
+            background: rgba(78, 205, 196, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .barra-curtidas {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .barra-curtidas::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+                animation: shimmer 2s infinite;
+            }
+
+        @@keyframes shimmer {
+            0%
+
+        {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+
+        }
+
+        .curtidas-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--primary-color);
+            margin-top: 5px;
+        }
+
+            .curtidas-stats span {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .curtidas-stats i {
+                color: var(--secondary-color);
+                font-size: 12px;
+            }
+
+        /* ===== FOOTER ===== */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            box-shadow: 0 -5px 25px rgba(78, 205, 196, 0.15);
+            display: flex;
+            justify-content: space-around;
+            z-index: 1000;
+            border-top: 3px solid var(--secondary-color);
+            animation: fadeInUp 0.5s ease;
+        }
+
+            footer button {
+                background: none;
+                border: none;
+                font-size: 16px;
+                font-weight: 600;
+                color: var(--primary-color);
+                cursor: pointer;
+                padding: 12px 30px;
+                border-radius: 40px;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                position: relative;
+            }
+
+                footer button i {
+                    font-size: 20px;
+                    transition: all 0.3s ease;
+                }
+
+                footer button:hover {
+                    color: var(--secondary-color);
+                    background: rgba(78, 205, 196, 0.1);
+                    transform: translateY(-3px);
+                }
+
+                footer button.active {
+                    color: white;
+                    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                    box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+                }
+
+                    footer button.active i {
+                        color: white;
+                    }
+
+        /* ===== ANIMAÇÕES ===== */
+        @@keyframes fadeInUp {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        @@keyframes fadeInDown {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        @@keyframes fadeInRight {
+            from
+
+        {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        }
+
+        @@keyframes expandWidth {
+            from
+
+        {
+            width: 0;
+        }
+
+        to {
+            width: 150px;
+        }
+
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @@media (max-width: 768px) {
+            .princ-saudacao
+
+        {
+            font-size: 36px;
+        }
+
+        .princ-saudacao::before {
+            left: -30px;
+            font-size: 30px;
+        }
+
+        .search-box button {
+            right: 20px;
+        }
+
+        .explorar-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+        }
+
+        }
+
+        @@media (max-width: 576px) {
+            .explorar-btn
+
+        {
+            padding: 10px 25px;
+            font-size: 14px;
+        }
+
+        }</style>
 </head>
 <body>
+    <!-- Elementos de fundo alegres -->
+    <div class="background-waves"></div>
+    <div class="background-lines"></div>
+    <div class="bubbles">
+        <div class="bubble bubble1"></div>
+        <div class="bubble bubble2"></div>
+        <div class="bubble bubble3"></div>
+        <div class="bubble bubble4"></div>
+    </div>
 
-   
+    <!-- Header -->
+    <header class="cabecalho">
+        <div class="d-flex flex-wrap align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <h1 class="name-pj">Rota Livre</h1>
+            </div>
+            <div class="text-end">
+                <button class="opc1 opcA btn btn-primary" type="button" onclick="window.location.href='/Login/Login'">Entrar</button>
+                <button class="opcA btn btn-outline-primary" type="button" onclick="window.location.href='/RotaLivre/Create'">Cadastrar</button>
+            </div>
+        </div>
+    </header>
+
     <main>
+        <!-- Saudação -->
         <div class="saudacao">
             <h1>Olá @ViewBag.NomeUsuario,</h1>
             <p class="princ-saudacao">Pra onde iremos hoje?</p>
         </div>
 
+        <!-- Search box -->
         <div class="search-box">
-            <input type="text" id="pesquisa" placeholder="Para onde deseja ir?">
+            <input type="text" id="pesquisa" placeholder="🔍 Para onde deseja ir? Digite um destino...">
             <button><i class="fas fa-search"></i></button>
         </div>
 
+        <!-- Resultado da pesquisa -->
+        <div id="resultado-pesquisa" class="row"></div>
 
-        <div id="resultado-pesquisa" class="row">
-            @* Aqui os cartões aparecerão *@
-            
-        </div>
-
-
-        <h2 class="titulo-selecao">Categorias</h2>
-        <section class="categorias py-5">
-            <div class="container">
+        <!-- Categorias -->
+        <h2 class="titulo-selecao">
+            <i class="fas fa-compass"></i> Categorias
+        </h2>
+        <section class="categorias">
+            <div class="container-fluid px-0">
                 <div class="row">
-                    @foreach (var categoria in Model)
+                    @if (Model != null && Model.Any())
                     {
-                        <div class="col-md-4 mb-4 d-flex">
-                            <a href="@Url.Action("PasseiosPorCategoria", "HomeBase", new { id = categoria.id_categoria })"
-                               style="text-decoration: none; color: inherit; width: 100%;">
-                                <div class="card shadow-sm h-100 w-100">
-                                    <img src="@Url.Content("~/img/categorias/" + categoria.img)"
-                                         class="card-img-top img-fluid"
-                                         style="object-fit: cover; height: 200px;"
-                                         alt="@categoria.tipo_categoria">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title">@categoria.tipo_categoria</h5>
+                        var delay = 1;
+                        foreach (var categoria in Model)
+                        {
+                            <div class="col-md-4" style="--delay: @delay">
+                                <a href="@Url.Action("PasseiosPorCategoria", "HomeBase", new { id = categoria.id_categoria })"
+                                   style="text-decoration: none; display: block; height: 100%;">
+                                    <div class="card">
+                                        <img src="@Url.Content("~/img/categorias/" + categoria.img)"
+                                             class="card-img-top"
+                                             alt="@categoria.tipo_categoria">
+
+                                        <!-- Botão EXPLORAR que aparece no hover -->
+                                        <div class="explorar-btn">
+                                            <span>EXPLORAR</span>
+                                            <i class="fas fa-arrow-right"></i>
+                                        </div>
+
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <i class="fas fa-tag"></i> @categoria.tipo_categoria
+                                            </h5>
+                                        </div>
                                     </div>
-                                </div>
-                            </a>
+                                </a>
+                            </div>
+                            delay++;
+                        }
+                    }
+                    else
+                    {
+                        <div class="col-12 text-center py-5">
+                            <p class="text-muted">Nenhuma categoria disponível no momento.</p>
                         </div>
                     }
                 </div>
             </div>
         </section>
 
-
+        <!-- Passeios em Destaque -->
         @{
             var passeiosDestaque = ViewBag.PasseiosDestaque as List<Rota_LivreWEB_API.Models.Passeio>;
+
+            // Encontrar o número máximo de curtidas para escala proporcional
+            int maxCurtidas = 0;
+            if (passeiosDestaque != null && passeiosDestaque.Any())
+            {
+                maxCurtidas = passeiosDestaque.Max(p => p.QuantidadeCurtidas);
+            }
         }
 
         @if (passeiosDestaque != null && passeiosDestaque.Any())
         {
-            <h3 class="titulo-selecao mb-3">Passeios em Destaque</h3>
-
+            <h2 class="titulo-selecao">
+                <i class="fas fa-star"></i> Passeios em Destaque
+            </h2>
             <div class="produtos-container">
                 @foreach (var passeio in passeiosDestaque)
                 {
+                    // Calcula a porcentagem baseada no máximo de curtidas
+                    var porcentagem = maxCurtidas > 0 ? (passeio.QuantidadeCurtidas * 100) / maxCurtidas : 0;
+
                     <div class="produto"
-                         onmouseover="this.style.transform='scale(1.1)'"
-                         onmouseout="this.style.transform='scale(1)'"
-                         onclick='window.location.href="@Url.Action("Detalhes", "Passeios", new { id = passeio.id_passeio })"'>
+                         onclick="window.location.href='@Url.Action("Detalhes", "Passeios", new { id = passeio.id_passeio })'">
+                        <img src="@Url.Content("~/img/passeios/" + passeio.img_url)"
+                             class="imagem_produto"
+                             alt="@passeio.nome_passeio" />
+                        <div class="museu_conteudo">
+                            <p class="nome">
+                                <i class="fas fa-map-pin"></i> @passeio.nome_passeio
+                            </p>
 
-                        <img src="@Url.Content("~/img/passeios/" + passeio.img_url)" class="imagem_produto" alt="@passeio.nome_passeio" />
+                            <!-- BARRA DE CURTIDAS PROPORCIONAL -->
+                            <div class="curtidas-container">
+                                <div class="curtidas-info">
+                                    <i class="fas fa-heart"></i>
+                                    <span>@passeio.QuantidadeCurtidas curtidas</span>
+                                </div>
 
-                        <div class="museu_conteudo" id="museu-@passeio.id_passeio">
-                            <p class="nome">@passeio.nome_passeio</p>
-                            <div class="linha_nome"></div>
-                            <p class="curtidas">@passeio.QuantidadeCurtidas curtidas</p>
+                                <div class="progresso-curtidas">
+                                    <div class="barra-curtidas" style="width: @porcentagem%;"></div>
+                                </div>
+
+                                <div class="curtidas-stats">
+                                    <span>
+                                        <i class="fas fa-chart-line"></i>
+                                        @porcentagem% do topo
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-trophy"></i>
+                                        Meta: @maxCurtidas
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 }
             </div>
         }
-
-        </section>
-
     </main>
+
+    <!-- Footer -->
     <footer>
-        <button class="tab active" id="btnTopo"><i class="fas fa-home"></i> Home</button>
-        <button class="tab" onclick="window.location.href='/MeusPasseios/MeusPasseios'"><i class="fas fa-bus"></i> Meus Passeios</button>
-        <button type="button" onclick="window.location.href='/Perfil/Perfil'">
+        <button class="active" id="btnTopo">
+            <i class="fas fa-home"></i> Home
+        </button>
+        <button onclick="window.location.href='/MeusPasseios/MeusPasseios'">
+            <i class="fas fa-bus"></i> Meus Passeios
+        </button>
+        <button onclick="window.location.href='/Perfil/Perfil'">
             <i class="fas fa-user"></i> Perfil
         </button>
-
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-            document.getElementById("btnTopo").addEventListener("click", function () {
+        // Scroll suave para o topo
+        document.getElementById("btnTopo").addEventListener("click", function (e) {
+            e.preventDefault();
             window.scrollTo({ top: 0, behavior: "smooth" });
         });
-    </script>
 
-    <script>
+        // Pesquisa em tempo real
         document.getElementById("pesquisa").addEventListener("input", function () {
             const termo = this.value;
 
@@ -141,7 +1040,5 @@
                 });
         });
     </script>
-
-
 </body>
 </html>

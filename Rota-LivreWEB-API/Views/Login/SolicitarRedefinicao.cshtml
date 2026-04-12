@@ -5,38 +5,688 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <title>Redefinir Senha</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota Livre - Redefinir Senha</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        body {
-            background-color: #ffefe3;
+        /* ===== VARIÁVEIS ===== */
+        :root {
+            --primary-color: #1a535c;
+            --secondary-color: #4ecdc4;
+            --accent-color: #ff6b6b;
+            --light-color: #fff9f5;
+            --dark-color: #1a535c;
+            --success-color: #2ecc71;
         }
 
-        .texto {
-            color: #b54200;
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9f2f5 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+
+        /* ===== FUNDO DECORATIVO ===== */
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(78, 205, 196, 0.08) 0%, transparent 20%), radial-gradient(circle at 80% 70%, rgba(255, 107, 107, 0.05) 0%, transparent 25%), radial-gradient(circle at 40% 80%, rgba(26, 83, 92, 0.06) 0%, transparent 30%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .brand-compass {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 150px;
+            height: 150px;
+            opacity: 0.04;
+            z-index: -1;
+            background: radial-gradient(circle, var(--secondary-color) 3px, transparent 3px), conic-gradient(from 0deg, var(--primary-color) 0deg 90deg, var(--secondary-color) 90deg 180deg, var(--accent-color) 180deg 270deg, var(--dark-color) 270deg 360deg);
+            background-size: 100% 100%;
+            border-radius: 50%;
+            filter: blur(1px);
+            pointer-events: none;
+        }
+
+        .route-dots {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 20% 30%, var(--secondary-color) 2px, transparent 2px), radial-gradient(circle at 40% 70%, var(--primary-color) 2px, transparent 2px), radial-gradient(circle at 60% 20%, var(--accent-color) 2px, transparent 2px), radial-gradient(circle at 80% 50%, var(--dark-color) 2px, transparent 2px);
+            background-size: 200px 200px;
+            opacity: 0.03;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ===== HEADER ===== */
+        .cabecalho {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.15);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1050;
+            padding: 15px 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border-bottom: 3px solid var(--secondary-color);
+        }
+
+        .name-pj {
+            font-weight: 800;
+            font-size: 1.8rem;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            position: relative;
+            margin-left: 20px;
+        }
+
+            .name-pj::after {
+                content: "✦";
+                position: absolute;
+                right: -25px;
+                top: -5px;
+                color: var(--accent-color);
+                font-size: 20px;
+                -webkit-text-fill-color: initial;
+                animation: spin 4s linear infinite;
+            }
+
+        @@keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .cabecalho .text-end {
+            z-index: 1100;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .opcA {
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .opc1 {
+            background: linear-gradient(135deg, var(--primary-color), #236c78);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 83, 92, 0.3);
+        }
+
+            .opc1:hover {
+                background: linear-gradient(135deg, #236c78, var(--primary-color));
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(26, 83, 92, 0.4);
+            }
+
+        /* ===== MAIN CONTAINER ===== */
+        .reset-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 20px 60px;
+        }
+
+        .reset-card {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(26, 83, 92, 0.15);
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease;
+            position: relative;
+        }
+
+            .reset-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 5px;
+                background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            }
+
+        .reset-header {
+            padding: 40px 40px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(26, 83, 92, 0.05), rgba(78, 205, 196, 0.05));
+        }
+
+        .reset-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.3);
+        }
+
+            .reset-icon i {
+                font-size: 40px;
+                color: white;
+            }
+
+        .reset-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .reset-header p {
+            color: #666;
+            font-size: 14px;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+
+        .reset-body {
+            padding: 30px 40px 40px;
+        }
+
+        /* ===== FORMULÁRIO ===== */
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+            .form-group i {
+                position: absolute;
+                left: 18px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--secondary-color);
+                font-size: 18px;
+                z-index: 1;
+            }
+
+        .floating-label {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+            .floating-label i {
+                position: absolute;
+                left: 18px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--secondary-color);
+                font-size: 18px;
+                z-index: 2;
+            }
+
+            .floating-label input {
+                width: 100%;
+                padding: 18px 20px 8px 50px;
+                border: 2px solid #e0e0e0;
+                border-radius: 15px;
+                font-size: 15px;
+                transition: all 0.3s ease;
+                background: white;
+            }
+
+                .floating-label input:focus {
+                    outline: none;
+                    border-color: var(--secondary-color);
+                    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+                }
+
+            .floating-label label {
+                position: absolute;
+                left: 50px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #999;
+                transition: all 0.3s ease;
+                pointer-events: none;
+                font-size: 15px;
+                z-index: 1;
+            }
+
+            .floating-label input:focus ~ label,
+            .floating-label input:not(:placeholder-shown) ~ label {
+                top: 8px;
+                font-size: 11px;
+                color: var(--secondary-color);
+            }
+
+            /* Placeholder invisível para funcionar o floating label */
+            .floating-label input::placeholder {
+                opacity: 0;
+            }
+
+        /* ===== BOTÃO ===== */
+        .btn-reset {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn-reset::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                transition: left 0.5s ease;
+            }
+
+            .btn-reset:hover::before {
+                left: 100%;
+            }
+
+            .btn-reset:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px rgba(78, 205, 196, 0.4);
+            }
+
+            .btn-reset i {
+                margin-right: 8px;
+            }
+
+        /* ===== MENSAGEM DE ERRO ===== */
+        .alert-custom {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 107, 107, 0.05));
+            border-left: 4px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: shake 0.5s ease;
+        }
+
+            .alert-custom i {
+                font-size: 20px;
+                color: var(--accent-color);
+            }
+
+            .alert-custom span {
+                color: #c0392b;
+                font-size: 14px;
+            }
+
+        @@keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        /* Mensagem de sucesso */
+        .alert-success-custom {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.05));
+            border-left: 4px solid var(--success-color);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+            .alert-success-custom i {
+                font-size: 20px;
+                color: var(--success-color);
+            }
+
+            .alert-success-custom span {
+                color: #27ae60;
+                font-size: 14px;
+            }
+
+        /* ===== LINK DE VOLTAR ===== */
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+            .back-link a {
+                color: var(--primary-color);
+                text-decoration: none;
+                font-size: 14px;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+                .back-link a:hover {
+                    color: var(--secondary-color);
+                    transform: translateX(-3px);
+                }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 60px;
+            position: relative;
+        }
+
+            .footer h5 {
+                margin-bottom: 20px;
+                font-weight: 600;
+            }
+
+            .footer ul {
+                list-style: none;
+                padding: 0;
+            }
+
+                .footer ul li {
+                    margin-bottom: 10px;
+                }
+
+                    .footer ul li a {
+                        color: rgba(255, 255, 255, 0.8);
+                        text-decoration: none;
+                        transition: color 0.3s ease;
+                    }
+
+                        .footer ul li a:hover {
+                            color: white;
+                            padding-left: 5px;
+                        }
+
+        .social-icons a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+            .social-icons a:hover {
+                background-color: var(--secondary-color);
+                transform: translateY(-3px);
+            }
+
+        .copyright {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            margin-top: 40px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* ===== ANIMAÇÕES ===== */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @@media (max-width: 768px) {
+            .reset-header {
+                padding: 30px 25px 15px;
+            }
+
+            .reset-body {
+                padding: 25px 25px 35px;
+            }
+
+            .reset-header h1 {
+                font-size: 24px;
+            }
+
+            .reset-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+                .reset-icon i {
+                    font-size: 30px;
+                }
+
+            .floating-label input {
+                padding: 14px 20px 12px 45px;
+                font-size: 14px;
+            }
+
+            .floating-label label {
+                left: 45px;
+                font-size: 14px;
+            }
+
+            .brand-compass {
+                width: 80px;
+                height: 80px;
+                bottom: 20px;
+                right: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <main class="container mt-5">
-        <h2 class="texto mb-3">Redefinir Senha</h2>
+    <!-- Elementos decorativos -->
+    <div class="background-pattern"></div>
+    <div class="brand-compass"></div>
+    <div class="route-dots"></div>
 
-        <form asp-action="SolicitarRedefinicaoSenha" method="post">
-            <div class="form-floating mb-3">
-                <input name="email" type="email" class="form-control" placeholder="E-mail" required />
-                <label for="email">Digite seu e-mail</label>
+    <!-- Header -->
+    <header class="cabecalho">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-between">
+                <a href="/" class="d-flex align-items-center text-decoration-none">
+                    <h1 class="name-pj">Rota Livre</h1>
+                </a>
+                <div class="text-end">
+                    <button class="opc1 opcA btn btn-primary" type="button" onclick="window.location.href='/Login/Login'">Entrar</button>
+                    <button class="opc1 opcA btn btn-primary" type="button" onclick="window.location.href='/RotaLivre/Create'">Cadastrar</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Reset Password Container -->
+    <div class="reset-container">
+        <div class="reset-card">
+            <div class="reset-header">
+                <div class="reset-icon">
+                    <i class="fas fa-key"></i>
+                </div>
+                <h1>Redefinir Senha</h1>
+                <p>Digite seu e-mail para receber as instruções de redefinição de senha</p>
             </div>
 
-          
+            <div class="reset-body">
+                <form asp-action="SolicitarRedefinicaoSenha" method="post">
+                    @Html.AntiForgeryToken()
 
-            @if (ViewBag.Erro != null)
-            {
-                <div class="alert alert-danger">@ViewBag.Erro</div>
+                    <!-- E-mail -->
+                    <div class="floating-label">
+                        <i class="fas fa-envelope"></i>
+                        <input name="email" type="email" placeholder=" " required />
+                        <label for="email">Seu e-mail</label>
+                    </div>
+
+                    <!-- Mensagem de erro -->
+                    @if (ViewBag.Erro != null)
+                    {
+                        <div class="alert-custom">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>@ViewBag.Erro</span>
+                        </div>
+                    }
+
+                    <!-- Mensagem de sucesso -->
+                    @if (ViewBag.Sucesso != null)
+                    {
+                        <div class="alert-success-custom">
+                            <i class="fas fa-check-circle"></i>
+                            <span>@ViewBag.Sucesso</span>
+                        </div>
+                    }
+
+                    <!-- Botão Continuar -->
+                    <button type="submit" class="btn-reset">
+                        <i class="fas fa-paper-plane"></i> Enviar instruções
+                    </button>
+
+                    <!-- Link para voltar ao login -->
+                    <div class="back-link">
+                        <a href="/Login/Login">
+                            <i class="fas fa-arrow-left"></i> Voltar para o login
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5>Rota Livre</h5>
+                    <p>Sua plataforma para descobrir e explorar os melhores destinos turísticos.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5>Links</h5>
+                    <ul>
+                        <li><a href="#">Início</a></li>
+                        <li><a href="#">Sobre</a></li>
+                        <li><a href="#">Destinos</a></li>
+                        <li><a href="#">Contato</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Recursos</h5>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Guias</a></li>
+                        <li><a href="#">Aplicativo</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Contato</h5>
+                    <ul>
+                        <li><i class="fas fa-envelope me-2"></i> contato@rotalivre.com</li>
+                        <li><i class="fas fa-phone me-2"></i> (11) 99999-9999</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> São Paulo, Brasil</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 Rota Livre. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Efeito de scroll no header
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.cabecalho');
+            if (window.scrollY > 50) {
+                header.style.padding = '10px 0';
+                header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                header.style.padding = '15px 0';
+                header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
             }
+        });
 
-            <button class="btn btn-primary" type="submit">Continuar</button>
-        </form>
-    </main>
+        // Inicializar placeholders para floating labels
+        document.querySelectorAll('.floating-label input').forEach(input => {
+            input.setAttribute('placeholder', ' ');
+        });
+    </script>
 </body>
 </html>

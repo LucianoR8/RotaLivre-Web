@@ -1,6 +1,8 @@
 # Rota Livre
 Plataforma web e mobile, para gerenciamento de passeios turísticos na cidade de São  Paulo.
 
+Site disponivel em: [Rota Livre](https://rotalivre-web.onrender.com/)
+
 ## Sobre o projeto
 O Rota Livre é um aplicação composta por uma API desenvolvida em ASP.NET e um aplicativo mobile em .NET MAUI, criada para que os usuários possam explorar, gerenciar, realizar e avaliar passeios turísticos. 
 

@@ -12,6 +12,7 @@ namespace Rota_LivreWEB_API.Controllers.Api;
 public class AuthApiController : ControllerBase
 {
     private readonly UsuarioRepository _usuarioRp;
+    private readonly IConfiguration _config;
 
     public AuthApiController(UsuarioRepository usuarioRp)
     {
@@ -28,7 +29,7 @@ public class AuthApiController : ControllerBase
         var nome = _usuarioRp.BuscarNomePorEmail(request.Email);
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes("SUA_CHAVE_SUPER_SECRETA_AQUI_123456");
+        var key = Encoding.ASCII.GetBytes(_config["JwtSettings:Key"]);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

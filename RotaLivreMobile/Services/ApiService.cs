@@ -63,11 +63,17 @@ public class ApiService
     {
         var token = await SecureStorage.GetAsync("auth_token");
 
-        if (!string.IsNullOrEmpty(token))
+        if (string.IsNullOrEmpty(token))
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+            throw new Exception("TOKEN NÃO ENCONTRADO NO SECURE STORAGE");
         }
+
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+
+        var tokenDebug = _httpClient.DefaultRequestHeaders.Authorization?.Parameter;
+
+        await Application.Current.MainPage.DisplayAlert("Token enviado", tokenDebug ?? "NULL", "OK");
     }
 
     // 🔐 Exemplo de GET autenticado
@@ -95,7 +101,11 @@ public class ApiService
         var response = await _httpClient.GetAsync("HomeApi");
 
         if (!response.IsSuccessStatusCode)
-            return null;
+        {
+            var erro = await response.Content.ReadAsStringAsync();
+
+            throw new Exception($"Erro API: {response.StatusCode} - {erro}");
+        }
 
         var json = await response.Content.ReadAsStringAsync();
 

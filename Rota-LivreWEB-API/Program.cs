@@ -79,7 +79,7 @@ builder.Services.AddSwaggerGen(options =>
 // JWT
 // =====================
 
-var key = Encoding.ASCII.GetBytes("chave");
+var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:Key"]);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -90,6 +90,21 @@ builder.Services.AddAuthentication(options =>
 {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
+
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine("❌ JWT ERROR: " + context.Exception.Message);
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("✅ TOKEN VALIDADO");
+            return Task.CompletedTask;
+        }
+    };
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,

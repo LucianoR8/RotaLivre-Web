@@ -22,7 +22,14 @@ public class AuthApiController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        if (!_usuarioRp.VerificarLogin(request.Email, request.Senha))
+        Console.WriteLine($"EMAIL: {request.Email}");
+        Console.WriteLine($"SENHA: {request.Senha}");
+
+        var resultado = _usuarioRp.VerificarLogin(request.Email, request.Senha);
+
+        Console.WriteLine($"LOGIN OK? {resultado}");
+
+        if (!resultado)
             return Unauthorized(new { mensagem = "Email ou senha inválidos" });
 
         var id = _usuarioRp.BuscarIdPorEmail(request.Email);

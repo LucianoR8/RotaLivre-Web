@@ -32,4 +32,4 @@ O Rota Livre é um aplicação composta por uma API desenvolvida em ASP.NET e um
 
 
 ##### Autores
-[Breno Estevo](https://github.com/Bxnog), Cauã Macedo, Giovanna Alves, [Iara Laeber](https://github.com/iaralae), [Luciano Ribeiro](https://github.com/LucianoR8), [Samira Camargo](https://github.com/SamiraCamargo)
+[Breno Estevo](https://github.com/Bxnog), [Cauã Macedo](https://github.com/cauamacedo497), Giovanna Alves, [Iara Laeber](https://github.com/iaralae), [Luciano Ribeiro](https://github.com/LucianoR8), [Samira Camargo](https://github.com/SamiraCamargo)

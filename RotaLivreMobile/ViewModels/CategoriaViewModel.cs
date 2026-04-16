@@ -31,7 +31,6 @@ namespace RotaLivreMobile.ViewModels
             {
                 using var client = new HttpClient();
 
-                // Se você usa JWT salvo em Preferences:
                 var token = Preferences.Get("jwt_token", string.Empty);
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", token);

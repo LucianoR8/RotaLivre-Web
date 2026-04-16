@@ -8,13 +8,11 @@
           RowDefinitions="Auto,Auto,Auto,*"
           RowSpacing="15">
 
-        <!-- Saudação -->
         <Label Grid.Row="0"
                Text="{Binding NomeUsuario, StringFormat='Olá, {0}'}"
                FontSize="18"
                FontAttributes="Bold" />
 
-        <!-- CAROUSEL DE CATEGORIAS -->
         <CarouselView
             x:Name="carouselCategorias"
             Grid.Row="1"
@@ -31,14 +29,11 @@
 
                         <Grid>
 
-                            <!-- Imagem -->
                             <Image Source="{Binding ImgSource}"
                                    Aspect="AspectFill" />
 
-                            <!-- Overlay escuro -->
                             <BoxView BackgroundColor="#60000000" />
 
-                            <!-- Nome categoria -->
                             <Label Text="{Binding TipoCategoria}"
                                    TextColor="White"
                                    FontSize="22"
@@ -46,7 +41,6 @@
                                    HorizontalOptions="Center"
                                    VerticalOptions="Center" />
 
-                            <!-- Tap -->
                             <Grid.GestureRecognizers>
                                 <TapGestureRecognizer
                                     Tapped="OnCategoriaClicada"
@@ -60,7 +54,6 @@
             </CarouselView.ItemTemplate>
         </CarouselView>
 
-        <!-- Bolinhas -->
         <IndicatorView
             x:Name="indicatorCategorias"
             Grid.Row="2"
@@ -68,7 +61,6 @@
             IndicatorColor="LightGray"
             SelectedIndicatorColor="Black" />
 
-        <!-- LISTA DE DESTAQUES -->
         <CollectionView
             Grid.Row="3"
             ItemsSource="{Binding Destaques}"

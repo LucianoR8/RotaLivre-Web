@@ -19,14 +19,14 @@ namespace Rota_LivreWEB_API.Controllers.Api
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<ActionResult> Get()
         {
             var passeios = await _service.GetAllAsync();
             return Ok(passeios);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
             var passeio = await _service.GetByIdAsync(id);
 
@@ -37,7 +37,7 @@ namespace Rota_LivreWEB_API.Controllers.Api
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] PasseioDto dto)
+        public async Task<ActionResult> Post([FromBody] PasseioDto dto)
         {
             var novo = await _service.CreateAsync(dto);
             return CreatedAtAction(nameof(Get), new { id = novo.Id }, novo);

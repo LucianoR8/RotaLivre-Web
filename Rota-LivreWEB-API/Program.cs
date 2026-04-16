@@ -10,24 +10,18 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// =====================
 // Controllers / MVC
-// =====================
 builder.Services.AddControllers();
 builder.Services.AddControllersWithViews();
 
-// =====================
 // DbContext - PostgreSQL (Supabase)
-// =====================
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
 
-// =====================
 // Cache / Session
-// =====================
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -36,9 +30,8 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// =====================
+
 // Swagger
-// =====================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -48,7 +41,7 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1"
     });
 
-    // 🔐 Configuração do JWT no Swagger
+    // JWT no Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -75,9 +68,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// =====================
 // JWT
-// =====================
 
 var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:Key"]);
 
@@ -95,12 +86,12 @@ builder.Services.AddAuthentication(options =>
     {
         OnAuthenticationFailed = context =>
         {
-            Console.WriteLine("❌ JWT ERROR: " + context.Exception.Message);
+            Console.WriteLine("JWT ERROR: " + context.Exception.Message);
             return Task.CompletedTask;
         },
         OnTokenValidated = context =>
         {
-            Console.WriteLine("✅ TOKEN VALIDADO");
+            Console.WriteLine("TOKEN VALIDADO");
             return Task.CompletedTask;
         }
     };
@@ -115,18 +106,15 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
-// =====================
+
 // Dependency Injection
-// =====================
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<PasseioRepository>();
 builder.Services.AddScoped<CategoriaRepository>();
 builder.Services.AddScoped<IPasseioService, PasseioService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 
-// =====================
 // CORS
-// =====================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -138,9 +126,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// =====================
 // Middleware pipeline
-// =====================
 app.UseCors("AllowAll");
 
 if (app.Environment.IsDevelopment())
@@ -158,7 +144,7 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers(); // 🔹 importante para APIs
+app.MapControllers(); // APIs
 
 app.MapControllerRoute(
     name: "default",

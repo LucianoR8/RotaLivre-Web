@@ -32,6 +32,9 @@
             <Button Text="Adicionar"
                     Command="{Binding PendenteCommand}" />
 
+            <Button Text="Realizar Passeio"
+                    Clicked="OnRealizarPasseioClicked"/>
+
         </VerticalStackLayout>
     </ScrollView>
 

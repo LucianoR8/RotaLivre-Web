@@ -7,7 +7,7 @@
     public string ImagemUrl { get; set; }
     public int QuantidadeCurtidas { get; set; }
 
-    public ImageSource ImgSource
+    public ImageSource ImagemSource
     {
         get
         {

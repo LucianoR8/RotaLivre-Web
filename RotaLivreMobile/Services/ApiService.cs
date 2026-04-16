@@ -76,7 +76,6 @@ public class ApiService
         await Application.Current.MainPage.DisplayAlert("Token enviado", tokenDebug ?? "NULL", "OK");
     }
 
-    // 🔐 Exemplo de GET autenticado
     public async Task<HttpResponseMessage> GetAsync(string endpoint)
     {
         await AddAuthorizationHeader();

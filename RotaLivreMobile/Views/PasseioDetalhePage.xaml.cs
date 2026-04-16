@@ -20,4 +20,11 @@ public partial class PasseioDetalhePage : ContentPage, IQueryAttributable
             await _viewModel.Inicializar(id);
         }
     }
+
+    private async void OnRealizarPasseioClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(nameof(RealizarPasseioPage));
+    }
+
+
 }

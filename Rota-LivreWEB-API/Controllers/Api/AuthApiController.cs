@@ -14,13 +14,14 @@ public class AuthApiController : ControllerBase
     private readonly UsuarioRepository _usuarioRp;
     private readonly IConfiguration _config;
 
-    public AuthApiController(UsuarioRepository usuarioRp)
+    public AuthApiController(UsuarioRepository usuarioRp, IConfiguration config)
     {
         _usuarioRp = usuarioRp;
+        _config = config;
     }
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
+    public ActionResult Login([FromBody] LoginRequest request)
     {
         Console.WriteLine($"EMAIL: {request.Email}");
         Console.WriteLine($"SENHA: {request.Senha}");
@@ -35,8 +36,12 @@ public class AuthApiController : ControllerBase
         var id = _usuarioRp.BuscarIdPorEmail(request.Email);
         var nome = _usuarioRp.BuscarNomePorEmail(request.Email);
 
+        Console.WriteLine($"ID: {id}");
+        Console.WriteLine($"NOME: {nome}");
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_config["JwtSettings:Key"]);
+        Console.WriteLine($"KEY: {_config["JwtSettings:Key"]}");
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

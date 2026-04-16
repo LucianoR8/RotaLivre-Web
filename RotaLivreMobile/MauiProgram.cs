@@ -2,6 +2,10 @@
 using RotaLivreMobile.Services;
 using RotaLivreMobile.ViewModels;
 using RotaLivreMobile.Views;
+using Mapsui;
+using Mapsui.Tiling;
+using Mapsui.UI.Maui;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace RotaLivreMobile
 {
@@ -12,6 +16,7 @@ namespace RotaLivreMobile
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseSkiaSharp(true)
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -22,16 +27,16 @@ namespace RotaLivreMobile
             builder.Logging.AddDebug();
 #endif
 
-            // 🔐 Services
+            // Services
             builder.Services.AddSingleton<ApiService>();
             builder.Services.AddSingleton<PasseioApiService>();
 
-            // 🧠 ViewModels
+            // ViewModels
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<HomeViewModel>();
             builder.Services.AddTransient<PasseioDetalheViewModel>();
 
-            // 📱 Pages
+            // Pages
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<HomePage>();
             builder.Services.AddTransient<PasseioDetalhePage>();

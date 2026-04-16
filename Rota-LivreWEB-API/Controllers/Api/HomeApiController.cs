@@ -18,7 +18,7 @@ namespace Rota_LivreWEB_API.Controllers.Api
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<ActionResult> Get()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 

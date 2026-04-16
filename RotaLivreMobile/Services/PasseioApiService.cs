@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using Microsoft.Maui.Storage;
+using RotaLivreMobile.Helpers;
 
 namespace RotaLivreMobile.Services;
 
@@ -12,7 +13,7 @@ public class PasseioApiService
     {
         _httpClient = new HttpClient
         {
-            BaseAddress = new Uri("https://rotalivre-web.onrender.com/")
+            BaseAddress = new Uri(AppConfig.BaseUrl)
         };
     }
 
@@ -22,8 +23,8 @@ public class PasseioApiService
 
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
-
-        var response = await _httpClient.GetAsync($"api/PasseiosApi/{id}");
+        // tirei o /api pq já tem no BaseUrl
+        var response = await _httpClient.GetAsync($"PasseiosApi/{id}");
 
         if (!response.IsSuccessStatusCode)
             return null;

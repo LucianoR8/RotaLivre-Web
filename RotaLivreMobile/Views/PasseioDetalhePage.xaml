@@ -12,7 +12,7 @@
                    FontSize="24"
                    FontAttributes="Bold" />
 
-            <Image Source="{Binding ImagemUrl}"
+            <Image Source="{Binding ImagemCompleta}"
                    HeightRequest="200"
                    Aspect="AspectFill"/>
 

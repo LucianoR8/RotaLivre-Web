@@ -1,5 +1,7 @@
 ﻿using System.Windows.Input;
 using RotaLivreMobile.Services;
+using RotaLivreMobile.Models;
+using RotaLivreMobile.Helpers;
 
 namespace RotaLivreMobile.ViewModels;
 

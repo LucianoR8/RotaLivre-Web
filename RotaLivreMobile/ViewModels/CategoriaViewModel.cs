@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using RotaLivreMobile.Helpers;
 
 namespace RotaLivreMobile.ViewModels
 {
@@ -37,7 +38,7 @@ namespace RotaLivreMobile.ViewModels
                     new AuthenticationHeaderValue("Bearer", token);
 
                 var response = await client.GetAsync(
-                    $"https://rotalivre-web.onrender.com/api/passeios/categoria/{_categoriaId}");
+                    $" {AppConfig.BaseUrl}passeios/categoria/{_categoriaId}");
 
                 if (!response.IsSuccessStatusCode)
                     return;

@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Net.Http.Headers;
 using Microsoft.Maui.Storage;
+using RotaLivreMobile.Helpers;
 
 namespace RotaLivreMobile.Services;
 
@@ -9,13 +10,11 @@ public class ApiService
 {
     private readonly HttpClient _httpClient;
 
-    private const string BaseUrl = "https://rotalivre-web.onrender.com/api/";
-
     public ApiService()
     {
         _httpClient = new HttpClient
         {
-            BaseAddress = new Uri(BaseUrl)
+            BaseAddress = new Uri(AppConfig.BaseUrl)
         };
     }
 
@@ -63,17 +62,11 @@ public class ApiService
     {
         var token = await SecureStorage.GetAsync("auth_token");
 
-        if (string.IsNullOrEmpty(token))
+        if (!string.IsNullOrEmpty(token))
         {
-            throw new Exception("TOKEN NÃO ENCONTRADO NO SECURE STORAGE");
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
         }
-
-        _httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", token);
-
-        var tokenDebug = _httpClient.DefaultRequestHeaders.Authorization?.Parameter;
-
-        await Application.Current.MainPage.DisplayAlert("Token enviado", tokenDebug ?? "NULL", "OK");
     }
 
     // 🔐 Exemplo de GET autenticado
@@ -101,11 +94,7 @@ public class ApiService
         var response = await _httpClient.GetAsync("HomeApi");
 
         if (!response.IsSuccessStatusCode)
-        {
-            var erro = await response.Content.ReadAsStringAsync();
-
-            throw new Exception($"Erro API: {response.StatusCode} - {erro}");
-        }
+            return null;
 
         var json = await response.Content.ReadAsStringAsync();
 

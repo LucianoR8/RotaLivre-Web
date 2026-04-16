@@ -64,6 +64,30 @@ namespace Rota_LivreWEB_API.Data
     .WithMany()
     .HasForeignKey(p => p.Enderecoid_endereco)
     .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Localizacao>(entity =>
+            {
+                entity.HasKey(e => e.id_localizacao);
+
+                entity.Property(e => e.data_registro)
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            modelBuilder.Entity<UsuarioLocalizacao>(entity =>
+            {
+                entity.HasKey(e => e.id_usuario_localizacao);
+
+                // id_usuario aponta para a tabela Usuario
+                entity.HasOne(d => d.Usuario)
+                      .WithMany()
+                      .HasForeignKey(d => d.id_usuario)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // id_localizacao aponta para a tabela Localizacao
+                entity.HasOne(d => d.Localizacao)
+                      .WithMany()
+                      .HasForeignKey(d => d.id_localizacao)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
 
         }
 

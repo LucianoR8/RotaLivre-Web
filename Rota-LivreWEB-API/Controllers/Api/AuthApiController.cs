@@ -12,7 +12,6 @@ namespace Rota_LivreWEB_API.Controllers.Api;
 public class AuthApiController : ControllerBase
 {
     private readonly UsuarioRepository _usuarioRp;
-    private readonly IConfiguration _config;
 
     public AuthApiController(UsuarioRepository usuarioRp)
     {
@@ -22,21 +21,14 @@ public class AuthApiController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        Console.WriteLine($"EMAIL: {request.Email}");
-        Console.WriteLine($"SENHA: {request.Senha}");
-
-        var resultado = _usuarioRp.VerificarLogin(request.Email, request.Senha);
-
-        Console.WriteLine($"LOGIN OK? {resultado}");
-
-        if (!resultado)
+        if (!_usuarioRp.VerificarLogin(request.Email, request.Senha))
             return Unauthorized(new { mensagem = "Email ou senha inválidos" });
 
         var id = _usuarioRp.BuscarIdPorEmail(request.Email);
         var nome = _usuarioRp.BuscarNomePorEmail(request.Email);
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_config["JwtSettings:Key"]);
+        var key = Encoding.ASCII.GetBytes("SUA_CHAVE_SUPER_SECRETA_AQUI_123456");
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

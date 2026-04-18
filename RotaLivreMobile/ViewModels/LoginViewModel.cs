@@ -27,7 +27,7 @@ public class LoginViewModel : BaseViewModel
 
         if (sucesso)
         {
-            await Shell.Current.GoToAsync("//HomePage");
+            Application.Current.MainPage = new AppShell();
         }
         else
         {

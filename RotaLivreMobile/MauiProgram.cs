@@ -30,6 +30,7 @@ namespace RotaLivreMobile
             // Services
             builder.Services.AddSingleton<ApiService>();
             builder.Services.AddSingleton<PasseioApiService>();
+            builder.Services.AddSingleton<AuthService>();
 
             // ViewModels
             builder.Services.AddTransient<LoginViewModel>();

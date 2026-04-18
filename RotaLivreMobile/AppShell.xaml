@@ -4,16 +4,19 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:RotaLivreMobile.Views">
 
-    <ShellContent
-        Title="Login"
-        ContentTemplate="{DataTemplate views:LoginPage}"
-        Route="LoginPage" />
-
     <TabBar>
         <ShellContent
             Title="Home"
             ContentTemplate="{DataTemplate views:HomePage}"
             Route="HomePage" />
+        <ShellContent
+            Title="Grupo"
+            ContentTemplate="{DataTemplate views:GrupoPage}"
+            Route="GrupoPage" />
+        <ShellContent
+            Title="Perfil"
+            ContentTemplate="{DataTemplate views:PerfilPage}"
+            Route="PerfilPage" />
     </TabBar>
 
 </Shell>

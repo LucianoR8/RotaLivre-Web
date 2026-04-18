@@ -23,8 +23,8 @@ public class RealizarPasseioViewModel : INotifyPropertyChanged
     private bool estavaDentro = false;
 
     // Coordenadas do passeio (exemplo)
-    private double latPasseio = -23.5505;
-    private double lngPasseio = -46.6333;
+    private double latPasseio = -23.560641321968212;
+    private double lngPasseio = -46.65665775416409;
     private double raio = 100; // metros
 
     public async Task IniciarMonitoramento()

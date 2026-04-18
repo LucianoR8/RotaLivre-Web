@@ -6,6 +6,7 @@ using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.Interfaces;
 using Rota_LivreWEB_API.Repositories;
 using Rota_LivreWEB_API.Services;
+using Rota_LivreWEB_API.Hubs;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -113,6 +114,7 @@ builder.Services.AddScoped<PasseioRepository>();
 builder.Services.AddScoped<CategoriaRepository>();
 builder.Services.AddScoped<IPasseioService, PasseioService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddSignalR();
 
 // CORS
 builder.Services.AddCors(options =>
@@ -149,6 +151,9 @@ app.MapControllers(); // APIs
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+app.MapHub<GrupoHub>("/grupohub");
 
 
 app.Run();

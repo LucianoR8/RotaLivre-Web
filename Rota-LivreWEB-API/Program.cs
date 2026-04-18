@@ -120,9 +120,11 @@ builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin()
+        policy
               .AllowAnyMethod()
               .AllowAnyHeader()
+              .SetIsOriginAllowed(_ => true) 
+              .AllowCredentials()
     );
 });
 
@@ -154,6 +156,7 @@ app.MapControllerRoute(
 
 
 app.MapHub<GrupoHub>("/grupohub");
+
 
 
 app.Run();

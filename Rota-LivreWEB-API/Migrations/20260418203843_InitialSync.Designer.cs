@@ -12,8 +12,8 @@ using Rota_LivreWEB_API.Data;
 namespace Rota_LivreWEB_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260209211425_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260418203843_InitialSync")]
+    partial class InitialSync
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -114,12 +114,19 @@ namespace Rota_LivreWEB_API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id_endereco"));
 
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision");
+
                     b.Property<string>("bairro")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("cep")
-                        .HasColumnType("integer");
+                    b.Property<string>("cep")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("complemento")
                         .IsRequired()
@@ -132,8 +139,9 @@ namespace Rota_LivreWEB_API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("numero_rua")
-                        .HasColumnType("integer");
+                    b.Property<string>("numero_rua")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("id_endereco");
 
@@ -165,36 +173,74 @@ namespace Rota_LivreWEB_API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id_grupo"));
 
-                    b.Property<string>("link_grupo")
+                    b.Property<bool>("ativo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("codigo_convite")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("id_grupo");
+                    b.Property<DateTime>("data_criacao")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.ToTable("Grupo");
-                });
+                    b.Property<DateTime?>("data_fim")
+                        .HasColumnType("timestamp with time zone");
 
-            modelBuilder.Entity("Rota_LivreWEB_API.Models.GrupoPasseio", b =>
-                {
-                    b.Property<int>("id_grupo_passeio")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                    b.Property<DateTime?>("data_inicio")
+                        .HasColumnType("timestamp with time zone");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id_grupo_passeio"));
+                    b.Property<bool>("em_andamento")
+                        .HasColumnType("boolean");
 
-                    b.Property<int>("id_grupo")
+                    b.Property<int>("id_criador")
                         .HasColumnType("integer");
 
                     b.Property<int>("id_passeio")
                         .HasColumnType("integer");
 
-                    b.HasKey("id_grupo_passeio");
+                    b.Property<string>("nome")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.HasIndex("id_grupo");
+                    b.HasKey("id_grupo");
+
+                    b.HasIndex("id_criador");
 
                     b.HasIndex("id_passeio");
 
-                    b.ToTable("GrupoPasseio");
+                    b.ToTable("Grupo");
+                });
+
+            modelBuilder.Entity("Rota_LivreWEB_API.Models.GrupoLocalizacao", b =>
+                {
+                    b.Property<int>("id_localizacao")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id_localizacao"));
+
+                    b.Property<DateTime>("data_envio")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("id_grupo")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("id_usuario")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("latitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("longitude")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("id_localizacao");
+
+                    b.HasIndex("id_grupo");
+
+                    b.HasIndex("id_usuario");
+
+                    b.ToTable("grupolocalizacao");
                 });
 
             modelBuilder.Entity("Rota_LivreWEB_API.Models.GrupoUsuario", b =>
@@ -204,6 +250,12 @@ namespace Rota_LivreWEB_API.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id_grupo_usuario"));
+
+                    b.Property<bool>("ativo")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("data_entrada")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("id_grupo")
                         .HasColumnType("integer");
@@ -391,12 +443,8 @@ namespace Rota_LivreWEB_API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id_usuario"));
 
-                    b.Property<string>("ConfirmarSenha")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("data_nasc")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("data_nasc")
+                        .HasColumnType("date");
 
                     b.Property<string>("email")
                         .IsRequired()
@@ -485,11 +533,11 @@ namespace Rota_LivreWEB_API.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("Rota_LivreWEB_API.Models.GrupoPasseio", b =>
+            modelBuilder.Entity("Rota_LivreWEB_API.Models.Grupo", b =>
                 {
-                    b.HasOne("Rota_LivreWEB_API.Models.Grupo", "Grupo")
+                    b.HasOne("Rota_LivreWEB_API.Models.Usuario", "Criador")
                         .WithMany()
-                        .HasForeignKey("id_grupo")
+                        .HasForeignKey("id_criador")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -499,15 +547,34 @@ namespace Rota_LivreWEB_API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Grupo");
+                    b.Navigation("Criador");
 
                     b.Navigation("Passeio");
+                });
+
+            modelBuilder.Entity("Rota_LivreWEB_API.Models.GrupoLocalizacao", b =>
+                {
+                    b.HasOne("Rota_LivreWEB_API.Models.Grupo", "Grupo")
+                        .WithMany()
+                        .HasForeignKey("id_grupo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Rota_LivreWEB_API.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("id_usuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Grupo");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Rota_LivreWEB_API.Models.GrupoUsuario", b =>
                 {
                     b.HasOne("Rota_LivreWEB_API.Models.Grupo", "Grupo")
-                        .WithMany()
+                        .WithMany("Usuarios")
                         .HasForeignKey("id_grupo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -618,6 +685,11 @@ namespace Rota_LivreWEB_API.Migrations
                     b.Navigation("Localizacao");
 
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("Rota_LivreWEB_API.Models.Grupo", b =>
+                {
+                    b.Navigation("Usuarios");
                 });
 #pragma warning restore 612, 618
         }

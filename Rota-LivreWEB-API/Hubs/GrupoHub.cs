@@ -1,35 +1,30 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Rota_LivreWEB_API.DTOs.Grupo;
 
 namespace Rota_LivreWEB_API.Hubs
 {
     public class GrupoHub : Hub
     {
-        public async Task EntrarGrupo(string grupoId)
+        public async Task EntrarGrupo(string grupoId, string usuarioNome)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, grupoId);
+
+            await Clients.Group(grupoId)
+                .SendAsync("UsuarioEntrou", usuarioNome);
         }
 
-        public async Task SairGrupo(string grupoId)
+        public async Task SairGrupo(string grupoId, string usuarioNome)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, grupoId);
+
+            await Clients.Group(grupoId)
+                .SendAsync("UsuarioSaiu", usuarioNome);
         }
 
-        public async Task EnviarLocalizacao(string grupoId, object localizacao)
+        public async Task EnviarLocalizacao(string grupoId, LocalizacaoDto localizacao)
         {
             await Clients.Group(grupoId)
                 .SendAsync("ReceberLocalizacao", localizacao);
-        }
-
-        public async Task NotificarEntrada(string grupoId, string usuario)
-        {
-            await Clients.Group(grupoId)
-                .SendAsync("UsuarioEntrou", usuario);
-        }
-
-        public async Task NotificarSaida(string grupoId, string usuario)
-        {
-            await Clients.Group(grupoId)
-                .SendAsync("UsuarioSaiu", usuario);
         }
     }
 }

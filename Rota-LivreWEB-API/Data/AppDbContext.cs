@@ -16,7 +16,7 @@ namespace Rota_LivreWEB_API.Data
         public DbSet<CurtidaPasseio> CurtidaPasseio { get; set; }
         public DbSet<Funcionario> Funcionario { get; set; }
         public DbSet<Grupo> Grupo { get; set; }
-        public DbSet<GrupoPasseio> GrupoPasseio { get; set; }
+        public DbSet<GrupoLocalizacao> GrupoLocalizacao { get; set; }
         public DbSet<GrupoUsuario> GrupoUsuario { get; set; }
         public DbSet<Localizacao> Localizacao { get; set; }
         public DbSet<PasseioFavorito> PasseioFavorito { get; set; }
@@ -60,11 +60,20 @@ namespace Rota_LivreWEB_API.Data
             });
 
             modelBuilder.Entity<Passeio>()
-    .HasOne(p => p.Endereco)
-    .WithMany()
-    .HasForeignKey(p => p.Enderecoid_endereco)
-    .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(p => p.Endereco)
+                .WithMany()
+                .HasForeignKey(p => p.Enderecoid_endereco)
+                .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<GrupoLocalizacao>()
+                .HasOne(gl => gl.Grupo)
+                .WithMany()
+                .HasForeignKey(gl => gl.id_grupo);
+
+            modelBuilder.Entity<GrupoLocalizacao>()
+                .HasOne(gl => gl.Usuario)
+                .WithMany()
+                .HasForeignKey(gl => gl.id_usuario);
         }
 
     }

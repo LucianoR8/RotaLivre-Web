@@ -31,16 +31,20 @@ namespace RotaLivreMobile
             builder.Services.AddSingleton<ApiService>();
             builder.Services.AddSingleton<PasseioApiService>();
             builder.Services.AddSingleton<AuthService>();
+            builder.Services.AddSingleton<GrupoSignalRService>();
 
             // ViewModels
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<HomeViewModel>();
             builder.Services.AddTransient<PasseioDetalheViewModel>();
+            builder.Services.AddTransient<GrupoViewModel>();
 
             // Pages
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<HomePage>();
             builder.Services.AddTransient<PasseioDetalhePage>();
+            builder.Services.AddTransient<GrupoPage>();
+
 
             return builder.Build();
         }

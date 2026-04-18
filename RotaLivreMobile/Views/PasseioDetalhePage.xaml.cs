@@ -25,6 +25,10 @@ public partial class PasseioDetalhePage : ContentPage, IQueryAttributable
     {
         await Shell.Current.GoToAsync(nameof(RealizarPasseioPage));
     }
+    private async void OnCriarPasseioClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("GrupoPage");
+    }
 
 
 }

@@ -35,6 +35,9 @@
             <Button Text="Realizar Passeio"
                     Clicked="OnRealizarPasseioClicked"/>
 
+            <Button Text="Criar Passeio"
+                    Clicked="OnCriarPasseioClicked"/>
+
         </VerticalStackLayout>
     </ScrollView>
 

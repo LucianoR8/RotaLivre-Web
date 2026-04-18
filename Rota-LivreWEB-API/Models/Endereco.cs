@@ -12,6 +12,8 @@ namespace Rota_LivreWEB_API.Models
         public string complemento { get; set; }
         public string bairro { get; set; }
         public string cep { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
         public int id_passeio { get; set; }
     }
 

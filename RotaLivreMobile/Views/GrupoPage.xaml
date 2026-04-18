@@ -1,12 +1,30 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="RotaLivreMobile.Views.GrupoPage"
-             Title="GrupoPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Pagina em construção"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="RotaLivreMobile.Views.GrupoPage"
+    Title="Grupo">
+
+    <VerticalStackLayout Padding="20" Spacing="15">
+
+        <!-- Código do grupo -->
+        <Label Text="Código do Grupo" FontAttributes="Bold"/>
+
+        <Entry Text="{Binding CodigoGrupo}" Placeholder="Digite ou compartilhe o código"/>
+
+        <Button Text="Entrar no Grupo"
+                Command="{Binding EntrarCommand}" />
+
+        <!-- Lista -->
+        <Label Text="Participantes" FontAttributes="Bold"/>
+
+        <CollectionView ItemsSource="{Binding Usuarios}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Label Text="{Binding .}" FontSize="16"/>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
     </VerticalStackLayout>
+
 </ContentPage>

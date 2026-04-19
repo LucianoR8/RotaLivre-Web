@@ -120,9 +120,9 @@ builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
+        policy
               .AllowAnyHeader()
+              .AllowAnyMethod()
               .SetIsOriginAllowed(_ => true) 
               .AllowCredentials()
     );

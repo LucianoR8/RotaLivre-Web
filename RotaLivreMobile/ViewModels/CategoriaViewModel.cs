@@ -1,63 +1,48 @@
 ﻿using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using RotaLivreMobile.Services;
 
 namespace RotaLivreMobile.ViewModels
 {
     public class CategoriaViewModel : BaseViewModel
     {
-        private int _categoriaId;
+        private readonly BaseApiService _api;
+
+        public ObservableCollection<PasseioDto> Passeios { get; set; } = new();
 
         public int CategoriaId
         {
-            get => _categoriaId;
             set
             {
-                _categoriaId = value;
-                CarregarPasseios();
+                _ = CarregarPasseios(value);
             }
         }
 
-        public ObservableCollection<PasseioDto> Passeios { get; set; }
-
-        public CategoriaViewModel()
+        public CategoriaViewModel(BaseApiService api)
         {
-            Passeios = new ObservableCollection<PasseioDto>();
+            _api = api;
         }
 
-        private async void CarregarPasseios()
+        private async Task CarregarPasseios(int categoriaId)
         {
-            try
-            {
-                using var client = new HttpClient();
+            var response = await _api.GetAsync($"passeios/categoria/{categoriaId}");
 
-                var token = Preferences.Get("jwt_token", string.Empty);
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
+            if (response == null || !response.IsSuccessStatusCode)
+                return;
 
-                var response = await client.GetAsync(
-                    $"https://rotalivre-web.onrender.com/api/passeios/categoria/{_categoriaId}");
+            var json = await response.Content.ReadAsStringAsync();
 
-                if (!response.IsSuccessStatusCode)
-                    return;
+            var lista = JsonSerializer.Deserialize<List<PasseioDto>>(json,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
 
-                var json = await response.Content.ReadAsStringAsync();
+            Passeios.Clear();
 
-                var lista = JsonSerializer.Deserialize<List<PasseioDto>>(json,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-                Passeios.Clear();
-
-                foreach (var item in lista)
-                    Passeios.Add(item);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            foreach (var item in lista)
+                Passeios.Add(item);
         }
     }
 }

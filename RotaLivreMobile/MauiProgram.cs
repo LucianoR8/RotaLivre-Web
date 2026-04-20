@@ -6,6 +6,7 @@ using Mapsui;
 using Mapsui.Tiling;
 using Mapsui.UI.Maui;
 using SkiaSharp.Views.Maui.Controls.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace RotaLivreMobile
 {
@@ -28,8 +29,22 @@ namespace RotaLivreMobile
 #endif
 
             // Services
-            builder.Services.AddSingleton<ApiService>();
-            builder.Services.AddSingleton<PasseioApiService>();
+
+            builder.Services.AddHttpClient<BaseApiService>(client =>
+            {
+                client.BaseAddress = new Uri("https://rotalivre-web.onrender.com/api/");
+            });
+
+            builder.Services.AddHttpClient<ApiService>(client =>
+            {
+                client.BaseAddress = new Uri("https://rotalivre-web.onrender.com/api/");
+            });
+
+            builder.Services.AddHttpClient<PasseioApiService>(client =>
+            {
+                client.BaseAddress = new Uri("https://rotalivre-web.onrender.com/api/");
+            });
+
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddSingleton<GrupoSignalRService>();
 
@@ -38,12 +53,14 @@ namespace RotaLivreMobile
             builder.Services.AddTransient<HomeViewModel>();
             builder.Services.AddTransient<PasseioDetalheViewModel>();
             builder.Services.AddTransient<GrupoViewModel>();
+            builder.Services.AddTransient<CategoriaViewModel>();
 
             // Pages
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<HomePage>();
             builder.Services.AddTransient<PasseioDetalhePage>();
             builder.Services.AddTransient<GrupoPage>();
+            builder.Services.AddTransient<CategoriaPage>();
 
 
             return builder.Build();

@@ -1,31 +1,18 @@
-﻿using System.Net.Http.Headers;
-using System.Text.Json;
-using Microsoft.Maui.Storage;
+﻿using System.Text.Json;
 
 namespace RotaLivreMobile.Services;
 
-public class PasseioApiService
+public class PasseioApiService : BaseApiService
 {
-    private readonly HttpClient _httpClient;
-
-    public PasseioApiService()
+    public PasseioApiService(HttpClient httpClient) : base(httpClient)
     {
-        _httpClient = new HttpClient
-        {
-            BaseAddress = new Uri("https://rotalivre-web.onrender.com/")
-        };
     }
 
-    public async Task<PasseioDto> GetByIdAsync(int id)
+    public async Task<PasseioDto?> GetByIdAsync(int id)
     {
-        var token = await SecureStorage.GetAsync("auth_token");
+        var response = await GetAsync($"PasseiosApi/{id}");
 
-        _httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", token);
-
-        var response = await _httpClient.GetAsync($"api/PasseiosApi/{id}");
-
-        if (!response.IsSuccessStatusCode)
+        if (response == null || !response.IsSuccessStatusCode)
             return null;
 
         var json = await response.Content.ReadAsStringAsync();

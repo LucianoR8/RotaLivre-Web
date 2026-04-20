@@ -1,4 +1,5 @@
 using RotaLivreMobile.ViewModels;
+using RotaLivreMobile.Services;
 
 namespace RotaLivreMobile.Views;
 
@@ -8,11 +9,11 @@ public partial class CategoriaPage : ContentPage
 {
     private CategoriaViewModel _viewModel;
 
-    public CategoriaPage()
+    public CategoriaPage(CategoriaViewModel viewModel)
     {
         InitializeComponent();
 
-        _viewModel = new CategoriaViewModel();
+        _viewModel = viewModel;
         BindingContext = _viewModel;
     }
 

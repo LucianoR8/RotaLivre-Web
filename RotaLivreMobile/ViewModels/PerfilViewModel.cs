@@ -30,8 +30,12 @@ public class PerfilViewModel : BaseViewModel
         SecureStorage.Remove("usuario_id");
         SecureStorage.Remove("usuario_nome");
 
-        Application.Current.MainPage = new NavigationPage(
-            new LoginPage(new LoginViewModel(new ApiService()))
-        );
+        var loginPage = Application.Current
+            .Handler
+            .MauiContext
+            .Services
+            .GetService<LoginPage>();
+
+        Application.Current.MainPage = new NavigationPage(loginPage);
     }
 }

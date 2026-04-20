@@ -9,16 +9,10 @@ public class ApiService
 {
     private readonly HttpClient _httpClient;
 
-    private const string BaseUrl = "https://rotalivre-web.onrender.com/api/";
-
-    public ApiService()
+    public ApiService(HttpClient httpClient)
     {
-        _httpClient = new HttpClient
-        {
-            BaseAddress = new Uri(BaseUrl)
-        };
+        _httpClient = httpClient;
     }
-
     public class LoginResponse
     {
         public string Token { get; set; }

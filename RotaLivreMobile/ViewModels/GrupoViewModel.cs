@@ -12,13 +12,18 @@ public class GrupoViewModel : BaseViewModel
 
     public string CodigoGrupo { get; set; }
 
-    public ICommand EntrarCommand { get; }
+    public string NomePasseio { get; set; }
+    public int IdPasseio { get; set; }
+
+    public bool TemGrupoAtivo => !string.IsNullOrEmpty(CodigoGrupo);
+
+    public ICommand CriarGrupoCommand { get; }
 
     public GrupoViewModel(GrupoSignalRService signalR)
     {
         _signalR = signalR;
 
-        EntrarCommand = new Command(async () => await EntrarGrupo());
+        CriarGrupoCommand = new Command(async () => await CriarGrupo());
 
         _signalR.OnUsuarioEntrou += usuario =>
         {
@@ -29,9 +34,17 @@ public class GrupoViewModel : BaseViewModel
         };
     }
 
-    private async Task EntrarGrupo()
+    private async Task CriarGrupo()
     {
+        CodigoGrupo = Guid.NewGuid().ToString().Substring(0, 6);
+
+        OnPropertyChanged(nameof(CodigoGrupo));
+        OnPropertyChanged(nameof(TemGrupoAtivo));
+
         await _signalR.ConectarAsync();
         await _signalR.EntrarGrupo(CodigoGrupo);
+
+        Usuarios.Clear();
+        Usuarios.Add("Você");
     }
 }

@@ -10,6 +10,13 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler PropertyChanged;
 
+    private int _id;
+    public int Id
+    {
+        get => _id;
+        set { _id = value; OnPropertyChanged(); }
+    }
+
     private string _nome;
     public string Nome
     {
@@ -50,6 +57,7 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
         if (passeio == null)
             return;
 
+        Id = passeio.Id;
         Nome = passeio.Nome;
         Descricao = passeio.Descricao;
         Funcionamento = passeio.Funcionamento;

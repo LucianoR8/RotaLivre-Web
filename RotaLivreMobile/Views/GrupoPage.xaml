@@ -4,26 +4,38 @@
     x:Class="RotaLivreMobile.Views.GrupoPage"
     Title="Grupo">
 
-    <VerticalStackLayout Padding="20" Spacing="15">
+    <VerticalStackLayout Padding="20">
 
-        <!-- Código do grupo -->
-        <Label Text="Código do Grupo" FontAttributes="Bold"/>
+        <Label 
+        Text="{Binding NomePasseio}" 
+        FontSize="22"
+        FontAttributes="Bold"
+        HorizontalOptions="Center" />
 
-        <Entry Text="{Binding CodigoGrupo}" Placeholder="Digite ou compartilhe o código"/>
+        <Label 
+        Text="Você não possui grupo ativo. Escolha um passeio para começar."
+        IsVisible="{Binding TemGrupoAtivo, Converter={StaticResource InverseBoolConverter}}" />
 
-        <Button Text="Entrar no Grupo"
-                Command="{Binding EntrarCommand}" />
+        <VerticalStackLayout IsVisible="{Binding TemGrupoAtivo}">
 
-        <!-- Lista -->
-        <Label Text="Participantes" FontAttributes="Bold"/>
+            <Label Text="Código do Grupo:" />
+            <Label Text="{Binding CodigoGrupo}" FontSize="20" />
 
-        <CollectionView ItemsSource="{Binding Usuarios}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Label Text="{Binding .}" FontSize="16"/>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+            <Label Text="Participantes:" />
+
+            <CollectionView ItemsSource="{Binding Usuarios}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Label Text="{Binding}" />
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+
+        <Button 
+        Text="Criar Grupo"
+        Command="{Binding CriarGrupoCommand}" />
 
     </VerticalStackLayout>
 

@@ -17,7 +17,7 @@ public partial class PasseioDetalhePage : ContentPage, IQueryAttributable
         if (query.TryGetValue("PasseioId", out var value))
         {
             int id = (int)value;
-            await _viewModel.Inicializar(id);
+            await _viewModel.Carregar(id);
         }
     }
 
@@ -25,9 +25,11 @@ public partial class PasseioDetalhePage : ContentPage, IQueryAttributable
     {
         await Shell.Current.GoToAsync(nameof(RealizarPasseioPage));
     }
-    private async void OnCriarPasseioClicked(object sender, EventArgs e)
+    private async void OnCriarGrupoClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("GrupoPage");
+        await Shell.Current.GoToAsync(
+            $"grupo?nomePasseio={Uri.EscapeDataString(_viewModel.Nome)}&idPasseio={_viewModel.Id}"
+        );
     }
 
 

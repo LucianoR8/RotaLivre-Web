@@ -11,6 +11,10 @@ public class GrupoSignalRService
 
     public async Task ConectarAsync()
     {
+        if (_connection != null &&
+            _connection.State == HubConnectionState.Connected)
+            return;
+
         _connection = new HubConnectionBuilder()
             .WithUrl("https://rotalivre-web.onrender.com/grupoHub")
             .WithAutomaticReconnect()
@@ -21,16 +25,16 @@ public class GrupoSignalRService
             OnUsuarioEntrou?.Invoke(usuario);
         });
 
-        _connection.On<string>("UsuarioSaiu", usuario =>
-        {
-            OnUsuarioSaiu?.Invoke(usuario);
-        });
-
         await _connection.StartAsync();
     }
 
     public async Task EntrarGrupo(string grupoId)
     {
+        if (_connection.State != HubConnectionState.Connected)
+        {
+            await _connection.StartAsync();
+        }
+
         await _connection.InvokeAsync("EntrarGrupo", grupoId);
     }
 

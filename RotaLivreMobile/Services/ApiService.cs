@@ -1,7 +1,8 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using Microsoft.Maui.Storage;
+using System.Net;
 using System.Net.Http.Headers;
-using Microsoft.Maui.Storage;
+using System.Text;
+using System.Text.Json;
 
 namespace RotaLivreMobile.Services;
 
@@ -93,12 +94,15 @@ public class ApiService
 
         var response = await _httpClient.GetAsync("HomeApi");
 
-        if (!response.IsSuccessStatusCode)
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            var erro = await response.Content.ReadAsStringAsync();
-
-            throw new Exception($"Erro API: {response.StatusCode} - {erro}");
+            SecureStorage.Remove("auth_token");
+            await Shell.Current.GoToAsync("//LoginPage");
+            return null;
         }
+
+        if (!response.IsSuccessStatusCode)
+            return null;
 
         var json = await response.Content.ReadAsStringAsync();
 

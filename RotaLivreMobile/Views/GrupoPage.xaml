@@ -1,42 +1,74 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:RotaLivreMobile.Converters"
     x:Class="RotaLivreMobile.Views.GrupoPage"
-    Title="Grupo">
+    Title="{Binding NomePasseio}">
 
-    <VerticalStackLayout Padding="20">
+    <ContentPage.Resources>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </ContentPage.Resources>
 
-        <Label 
-        Text="{Binding NomePasseio}" 
-        FontSize="22"
-        FontAttributes="Bold"
-        HorizontalOptions="Center" />
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
 
-        <Label 
-        Text="Você não possui grupo ativo. Escolha um passeio para começar."
-        IsVisible="{Binding TemGrupoAtivo, Converter={StaticResource InverseBoolConverter}}" />
+            <VerticalStackLayout
+                IsVisible="{Binding TemGrupoAtivo, Converter={StaticResource InverseBoolConverter}}"
+                Spacing="15">
 
-        <VerticalStackLayout IsVisible="{Binding TemGrupoAtivo}">
+                <Label Text="Você não possui grupo ativo"
+                       FontSize="18"
+                       HorizontalOptions="Center" />
 
-            <Label Text="Código do Grupo:" />
-            <Label Text="{Binding CodigoGrupo}" FontSize="20" />
+                <Button Text="Criar Grupo"
+                        Command="{Binding CriarGrupoCommand}" 
+                        IsVisible="{Binding TemGrupoAtivo, Converter={StaticResource InverseBoolConverter}}"/>
 
-            <Label Text="Participantes:" />
+                <Label Text="Ou entrar com código:" />
 
-            <CollectionView ItemsSource="{Binding Usuarios}">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Label Text="{Binding}" />
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                <Entry Placeholder="Digite o código"
+                       Text="{Binding CodigoDigitado}" />
+
+                <Button Text="Entrar no Grupo"
+                        Command="{Binding EntrarGrupoCommand}" />
+
+            </VerticalStackLayout>
+
+            <VerticalStackLayout
+                IsVisible="{Binding TemGrupoAtivo}"
+                Spacing="15">
+
+                <Label Text="Código do Grupo:"
+                       FontAttributes="Bold" />
+
+                <HorizontalStackLayout Spacing="10">
+                    <Label Text="{Binding CodigoGrupo}"
+                           FontSize="20"
+                           TextColor="Green" />
+
+                    <Button Text="Copiar"
+                            Clicked="OnCopiarCodigoClicked"/>
+                </HorizontalStackLayout>
+
+                <Button 
+                    Text="Compartilhar Grupo"
+                    Clicked="OnCompartilharGrupoClicked"
+                    IsVisible="{Binding TemGrupoAtivo}" />  
+
+                <Label Text="Participantes:"
+                       FontAttributes="Bold" />
+
+                <CollectionView ItemsSource="{Binding Usuarios}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Label Text="{Binding .}"
+                                   FontSize="16"/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
 
         </VerticalStackLayout>
-
-        <Button 
-        Text="Criar Grupo"
-        Command="{Binding CriarGrupoCommand}" />
-
-    </VerticalStackLayout>
-
+    </ScrollView>
 </ContentPage>

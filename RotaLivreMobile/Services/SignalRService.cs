@@ -28,14 +28,12 @@ public class GrupoSignalRService
         await _connection.StartAsync();
     }
 
-    public async Task EntrarGrupo(string grupoId)
+    public async Task EntrarGrupo(string grupoId, string nomeUsuario)
     {
-        if (_connection.State != HubConnectionState.Connected)
-        {
-            await _connection.StartAsync();
-        }
+        if (_connection == null || _connection.State != HubConnectionState.Connected)
+            await ConectarAsync();
 
-        await _connection.InvokeAsync("EntrarGrupo", grupoId);
+        await _connection.InvokeAsync("EntrarGrupo", grupoId, nomeUsuario);
     }
 
     public async Task SairGrupo(string grupoId)

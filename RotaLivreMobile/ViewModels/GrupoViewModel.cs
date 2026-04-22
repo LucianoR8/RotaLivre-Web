@@ -1,12 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using RotaLivreMobile.Services;
+using RotaLivreMobile.ViewModels;
 
 namespace RotaLivreMobile.ViewModels;
 
 public class GrupoViewModel : BaseViewModel
 {
     private readonly GrupoSignalRService _signalR;
+    private readonly ApiService _apiService;
 
     public ObservableCollection<string> Usuarios { get; set; } = new();
 
@@ -17,34 +19,76 @@ public class GrupoViewModel : BaseViewModel
 
     public bool TemGrupoAtivo => !string.IsNullOrEmpty(CodigoGrupo);
 
+    private string _codigoDigitado;
+    public string CodigoDigitado
+    {
+        get => _codigoDigitado;
+        set
+        {
+            _codigoDigitado = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string LinkGrupo => $"rotalivre://grupo?codigo={CodigoGrupo}";
+    public ICommand EntrarGrupoCommand { get; }
+
     public ICommand CriarGrupoCommand { get; }
 
-    public GrupoViewModel(GrupoSignalRService signalR)
+    public GrupoViewModel(GrupoSignalRService signalR, ApiService apiService)
     {
         _signalR = signalR;
+        _apiService = apiService;
 
         CriarGrupoCommand = new Command(async () => await CriarGrupo());
+        EntrarGrupoCommand = new Command(async () => await EntrarGrupo());
 
         _signalR.OnUsuarioEntrou += usuario =>
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                Usuarios.Add(usuario);
+                if (!Usuarios.Contains(usuario))
+                    Usuarios.Add(usuario);
             });
         };
     }
-
     private async Task CriarGrupo()
     {
+        if (TemGrupoAtivo)
+            return;
+
         CodigoGrupo = Guid.NewGuid().ToString().Substring(0, 6);
 
         OnPropertyChanged(nameof(CodigoGrupo));
         OnPropertyChanged(nameof(TemGrupoAtivo));
+        OnPropertyChanged(nameof(LinkGrupo));
 
-        await _signalR.ConectarAsync();
-        await _signalR.EntrarGrupo(CodigoGrupo);
+        var nomeUsuario = await _apiService.GetNomeUsuario();
 
         Usuarios.Clear();
-        Usuarios.Add("Você");
+
+        Usuarios.Add(nomeUsuario);
+
+        await _signalR.ConectarAsync();
+        await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
+    }
+
+    private async Task EntrarGrupo()
+    {
+        if (string.IsNullOrWhiteSpace(CodigoDigitado))
+            return;
+
+        CodigoGrupo = CodigoDigitado;
+
+        OnPropertyChanged(nameof(CodigoGrupo));
+        OnPropertyChanged(nameof(TemGrupoAtivo));
+
+        var nomeUsuario = await _apiService.GetNomeUsuario();
+
+        Usuarios.Clear();
+        Usuarios.Add(nomeUsuario);
+
+        await _signalR.ConectarAsync();
+        await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
     }
 }

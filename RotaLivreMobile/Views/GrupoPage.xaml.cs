@@ -1,9 +1,11 @@
 using RotaLivreMobile.ViewModels;
+using Microsoft.Maui.ApplicationModel.DataTransfer;
 
 namespace RotaLivreMobile.Views;
 
 [QueryProperty(nameof(NomePasseio), "nomePasseio")]
 [QueryProperty(nameof(IdPasseio), "idPasseio")]
+[QueryProperty(nameof(Codigo), "codigo")]
 public partial class GrupoPage : ContentPage
 {
     private readonly GrupoViewModel _viewModel;
@@ -12,6 +14,32 @@ public partial class GrupoPage : ContentPage
     {
         InitializeComponent();
         BindingContext = _viewModel = viewModel;
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        Title = _viewModel.NomePasseio ?? "Grupo";
+    }
+
+    private async void OnCopiarCodigoClicked(object sender, EventArgs e)
+    {
+        await Clipboard.SetTextAsync(_viewModel.LinkGrupo);
+
+        await DisplayAlert("Copiado", "Link do grupo copiado!", "OK");
+    }
+
+    private async void OnCompartilharGrupoClicked(object sender, EventArgs e)
+    {
+        if (BindingContext is GrupoViewModel vm && !string.IsNullOrEmpty(vm.CodigoGrupo))
+        {
+            await Share.Default.RequestAsync(new ShareTextRequest
+            {
+                Text = vm.LinkGrupo,
+                Title = "Entrar no grupo de passeio"
+            });
+        }
     }
 
     public string NomePasseio
@@ -30,4 +58,17 @@ public partial class GrupoPage : ContentPage
                 _viewModel.IdPasseio = id;
         }
     }
+
+    public string Codigo
+    {
+        set
+        {
+            if (BindingContext is GrupoViewModel vm)
+            {
+                vm.CodigoDigitado = value;
+                vm.EntrarGrupoCommand.Execute(null);
+            }
+        }
+    }
+
 }

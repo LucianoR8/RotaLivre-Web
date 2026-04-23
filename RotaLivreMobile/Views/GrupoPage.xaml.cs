@@ -63,10 +63,10 @@ public partial class GrupoPage : ContentPage
     {
         set
         {
-            if (BindingContext is GrupoViewModel vm)
+            if (!string.IsNullOrEmpty(value))
             {
-                vm.CodigoDigitado = value;
-                vm.EntrarGrupoCommand.Execute(null);
+                _viewModel.CodigoDigitado = value;
+                _viewModel.EntrarGrupoCommand.Execute(null);
             }
         }
     }

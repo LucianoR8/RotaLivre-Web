@@ -31,5 +31,8 @@ O Rota Livre é um aplicação composta por uma API desenvolvida em ASP.NET e um
 ## Objetivo
 
 
+### Contato
+[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](https://mail.google.com/mail/?view=cm&fs=1&to=rotalivrefam@gmail.com)
+
 ##### Autores
 [Breno Estevo](https://github.com/Bxnog), [Cauã Macedo](https://github.com/cauamacedo497), Giovanna Alves, [Iara Laeber](https://github.com/iaralae), [Luciano Ribeiro](https://github.com/LucianoR8), [Samira Camargo](https://github.com/SamiraCamargo)

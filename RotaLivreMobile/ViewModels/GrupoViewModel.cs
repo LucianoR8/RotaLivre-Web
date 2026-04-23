@@ -109,8 +109,8 @@ public class GrupoViewModel : BaseViewModel
 
         var nomeUsuario = await _apiService.GetNomeUsuario();
 
-        Usuarios.Clear();
-        Usuarios.Add(nomeUsuario);
+        // Usuarios.Clear();
+        // Usuarios.Add(nomeUsuario);
 
         await _signalR.ConectarAsync();
         await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);

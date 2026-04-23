@@ -17,10 +17,8 @@ namespace Rota_LivreWEB_API.Hubs
             if (!GruposUsuarios[grupoId].Contains(nomeUsuario))
                 GruposUsuarios[grupoId].Add(nomeUsuario);
 
-            await Clients.Caller.SendAsync("ListaUsuarios", GruposUsuarios[grupoId]);
-
-            await Clients.OthersInGroup(grupoId)
-                .SendAsync("UsuarioEntrou", nomeUsuario);
+            await Clients.Group(grupoId)
+                .SendAsync("ListaUsuarios", GruposUsuarios[grupoId]);
         }
 
         public async Task SairGrupo(string grupoId, string usuarioNome)

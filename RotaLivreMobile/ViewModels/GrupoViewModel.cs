@@ -17,6 +17,8 @@ public class GrupoViewModel : BaseViewModel
     public string NomePasseio { get; set; }
     public int IdPasseio { get; set; }
 
+    public bool PodeCriarGrupo => IdPasseio > 0;
+
     public bool TemGrupoAtivo => !string.IsNullOrEmpty(CodigoGrupo);
 
     private string _codigoDigitado;
@@ -30,7 +32,10 @@ public class GrupoViewModel : BaseViewModel
         }
     }
 
-    public string LinkGrupo => $"rotalivre://grupo?codigo={CodigoGrupo}";
+
+
+    public string LinkGrupo =>
+        $"https://rotalivre-web.onrender.com/grupo?codigo={CodigoGrupo}";
     public ICommand EntrarGrupoCommand { get; }
 
     public ICommand CriarGrupoCommand { get; }
@@ -51,11 +56,30 @@ public class GrupoViewModel : BaseViewModel
                     Usuarios.Add(usuario);
             });
         };
+
+        _signalR.OnListaUsuarios += lista =>
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Usuarios.Clear();
+                foreach (var u in lista)
+                    Usuarios.Add(u);
+            });
+        };
     }
     private async Task CriarGrupo()
     {
         if (TemGrupoAtivo)
             return;
+
+        if (IdPasseio <= 0)
+        {
+            await Application.Current.MainPage.DisplayAlert(
+                "Erro",
+                "Escolha um passeio antes de criar um grupo",
+                "OK");
+            return;
+        }
 
         CodigoGrupo = Guid.NewGuid().ToString().Substring(0, 6);
 
@@ -65,9 +89,9 @@ public class GrupoViewModel : BaseViewModel
 
         var nomeUsuario = await _apiService.GetNomeUsuario();
 
-        Usuarios.Clear();
+        // Usuarios.Clear(); remove isso aqui?
 
-        Usuarios.Add(nomeUsuario);
+        // Usuarios.Add(nomeUsuario); remove isso aqui?
 
         await _signalR.ConectarAsync();
         await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);

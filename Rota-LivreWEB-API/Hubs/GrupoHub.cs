@@ -5,15 +5,22 @@ namespace Rota_LivreWEB_API.Hubs
 {
     public class GrupoHub : Hub
     {
-        public async Task EntrarGrupo(string grupoId, string usuario)
-        {
-            if (string.IsNullOrEmpty(grupoId))
-                throw new Exception("grupoId inválido");
+        private static Dictionary<string, List<string>> GruposUsuarios = new();
 
+        public async Task EntrarGrupo(string grupoId, string nomeUsuario)
+        {
             await Groups.AddToGroupAsync(Context.ConnectionId, grupoId);
 
-            await Clients.Group(grupoId)
-                .SendAsync("UsuarioEntrou", usuario);
+            if (!GruposUsuarios.ContainsKey(grupoId))
+                GruposUsuarios[grupoId] = new List<string>();
+
+            if (!GruposUsuarios[grupoId].Contains(nomeUsuario))
+                GruposUsuarios[grupoId].Add(nomeUsuario);
+
+            await Clients.Caller.SendAsync("ListaUsuarios", GruposUsuarios[grupoId]);
+
+            await Clients.OthersInGroup(grupoId)
+                .SendAsync("UsuarioEntrou", nomeUsuario);
         }
 
         public async Task SairGrupo(string grupoId, string usuarioNome)

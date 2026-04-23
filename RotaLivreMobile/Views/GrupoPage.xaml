@@ -22,6 +22,7 @@
 
                 <Button Text="Criar Grupo"
                         Command="{Binding CriarGrupoCommand}" 
+                        IsEnabled="{Binding PodeCriarGrupo}"
                         IsVisible="{Binding TemGrupoAtivo, Converter={StaticResource InverseBoolConverter}}"/>
 
                 <Label Text="Ou entrar com código:" />

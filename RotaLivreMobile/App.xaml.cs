@@ -32,5 +32,25 @@ namespace RotaLivreMobile
                 MainPage = new AppShell();
             }
         }
+
+        protected override void OnAppLinkRequestReceived(Uri uri)
+        {
+            base.OnAppLinkRequestReceived(uri);
+
+            if (uri.Host == "grupo")
+            {
+                var codigo = System.Web.HttpUtility.ParseQueryString(uri.Query)
+                    .Get("codigo");
+
+                if (!string.IsNullOrEmpty(codigo))
+                {
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        await Shell.Current.GoToAsync($"grupo?codigo={codigo}");
+                    });
+                }
+            }
+        }
+
     }
 }

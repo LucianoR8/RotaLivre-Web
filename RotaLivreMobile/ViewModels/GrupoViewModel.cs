@@ -66,6 +66,21 @@ public class GrupoViewModel : BaseViewModel
                     Usuarios.Add(u);
             });
         };
+
+        _signalR.OnGrupoAtualizado += grupo =>
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                NomePasseio = grupo.NomePasseio;
+                IdPasseio = grupo.PasseioId;
+
+                Usuarios.Clear();
+                foreach (var u in grupo.Usuarios)
+                    Usuarios.Add(u);
+
+                OnPropertyChanged(nameof(NomePasseio));
+            });
+        };
     }
     private async Task CriarGrupo()
     {
@@ -94,7 +109,11 @@ public class GrupoViewModel : BaseViewModel
         // Usuarios.Add(nomeUsuario); remove isso aqui?
 
         await _signalR.ConectarAsync();
-        await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
+        await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario, IdPasseio, NomePasseio);
+
+        await SecureStorage.SetAsync("grupo_codigo", CodigoGrupo);
+        await SecureStorage.SetAsync("grupo_nome", NomePasseio);
+        await SecureStorage.SetAsync("grupo_id", IdPasseio.ToString());
     }
 
     private async Task EntrarGrupo()
@@ -113,6 +132,59 @@ public class GrupoViewModel : BaseViewModel
         // Usuarios.Add(nomeUsuario);
 
         await _signalR.ConectarAsync();
-        await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
+
+        try
+        {
+            await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario, 0, "");
+        }
+        catch (Exception)
+        {
+            await Application.Current.MainPage.DisplayAlert(
+                "Erro",
+                "Grupo não encontrado",
+                "OK");
+        }
+
+        await SecureStorage.SetAsync("grupo_codigo", CodigoGrupo);
     }
+
+    public async Task EntrarGrupoDireto()
+    {
+        if (string.IsNullOrWhiteSpace(CodigoDigitado))
+            return;
+
+        CodigoGrupo = CodigoDigitado;
+
+        OnPropertyChanged(nameof(CodigoGrupo));
+        OnPropertyChanged(nameof(TemGrupoAtivo));
+
+        var nomeUsuario = await _apiService.GetNomeUsuario();
+
+        await _signalR.ConectarAsync();
+        await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario, 0, "");
+    }
+
+    public async Task RestaurarGrupo()
+    {
+        var codigo = await SecureStorage.GetAsync("grupo_codigo");
+
+        if (!string.IsNullOrEmpty(codigo))
+        {
+            CodigoDigitado = codigo;
+            await EntrarGrupoDireto();
+        }
+    }
+
+    public async Task SairGrupo()
+    {
+        var nome = await _apiService.GetNomeUsuario();
+
+        await _signalR.SairGrupo(CodigoGrupo, nome);
+
+        CodigoGrupo = null;
+        Usuarios.Clear();
+
+        SecureStorage.Remove("grupo_codigo");
+    }
+
 }

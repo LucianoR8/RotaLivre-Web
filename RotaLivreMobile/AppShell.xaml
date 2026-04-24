@@ -7,14 +7,17 @@
     <TabBar>
         <ShellContent
             Title="Home"
+            Icon="bootstrap_house.svg"
             ContentTemplate="{DataTemplate views:HomePage}"
             Route="HomePage" />
         <ShellContent
             Title="Grupo"
+            Icon="bootstrap_people.svg"
             ContentTemplate="{DataTemplate views:GrupoPage}"
             Route="GrupoPage" />
         <ShellContent
             Title="Perfil"
+            Icon="user_icon.svg"
             ContentTemplate="{DataTemplate views:PerfilPage}"
             Route="PerfilPage" />
     </TabBar>

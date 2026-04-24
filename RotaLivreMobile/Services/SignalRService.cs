@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using RotaLivreMobile.Models;
 
 namespace RotaLivreMobile.Services;
 
@@ -9,6 +10,7 @@ public class GrupoSignalRService
     public event Action<string>? OnUsuarioEntrou;
     public event Action<string>? OnUsuarioSaiu;
     public event Action<List<string>>? OnListaUsuarios;
+    public event Action<GrupoDto>? OnGrupoAtualizado;
 
     public async Task ConectarAsync()
     {
@@ -27,6 +29,11 @@ public class GrupoSignalRService
             OnUsuarioEntrou?.Invoke(usuario);
         });
 
+        _connection.On<GrupoDto>("GrupoAtualizado", grupo =>
+        {
+            OnGrupoAtualizado?.Invoke(grupo);
+        });
+
         _connection.On<List<string>>("ListaUsuarios", usuarios =>
         {
             OnListaUsuarios?.Invoke(usuarios);
@@ -35,17 +42,16 @@ public class GrupoSignalRService
         await _connection.StartAsync();
     }
 
-    public async Task EntrarGrupo(string grupoId, string nomeUsuario)
+    public async Task EntrarGrupo(string grupoId, string nomeUsuario, int passeioId, string nomePasseio)
     {
         if (_connection == null || _connection.State != HubConnectionState.Connected)
             await ConectarAsync();
 
-        await _connection.InvokeAsync("EntrarGrupo", grupoId, nomeUsuario);
-
+        await _connection.InvokeAsync("EntrarGrupo", grupoId, nomeUsuario, passeioId, nomePasseio);
     }
 
-    public async Task SairGrupo(string grupoId)
+    public async Task SairGrupo(string grupoId, string nomeUsuario)
     {
-        await _connection.InvokeAsync("SairGrupo", grupoId);
+        await _connection.InvokeAsync("SairGrupo", grupoId, nomeUsuario);
     }
 }

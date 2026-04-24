@@ -65,8 +65,11 @@ public partial class GrupoPage : ContentPage
         {
             if (!string.IsNullOrEmpty(value))
             {
-                _viewModel.CodigoDigitado = value;
-                _viewModel.EntrarGrupoCommand.Execute(null);
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _viewModel.CodigoDigitado = value;
+                    await _viewModel.EntrarGrupoDireto(); 
+                });
             }
         }
     }

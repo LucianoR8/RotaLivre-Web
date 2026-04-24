@@ -19,9 +19,7 @@ namespace Rota_LivreWEB_API.Models
 
         public DateTime data_criacao { get; set; } = DateTime.UtcNow;
 
-        public bool ativo { get; set; } = true;
-
-        public bool em_andamento { get; set; }
+        public string status { get; set; } = "CRIADO"; 
 
         public DateTime? data_inicio { get; set; }
         public DateTime? data_fim { get; set; }

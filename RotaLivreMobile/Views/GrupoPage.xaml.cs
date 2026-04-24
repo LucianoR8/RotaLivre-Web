@@ -42,6 +42,14 @@ public partial class GrupoPage : ContentPage
         }
     }
 
+    private async void OnSairGrupoClicked(object sender, EventArgs e)
+    {
+        if (BindingContext is GrupoViewModel vm)
+        {
+            await vm.SairGrupo();
+        }
+    }
+
     public string NomePasseio
     {
         set

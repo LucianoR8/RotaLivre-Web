@@ -1,13 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Rota_LivreWEB_API.Data;
+using Rota_LivreWEB_API.Models;
 
 namespace Rota_LivreWEB_API.Controllers
 {
     [ApiController]
-    [Route("")]
-    public class GrupoController : Controller
+    [Route("api/grupo")]
+    public class GrupoController : ControllerBase
     {
+        private readonly AppDbContext _context;
+
         [HttpGet("grupo")]
-        public IActionResult AbrirGrupo(string codigo)
+        public ActionResult AbrirGrupo(string codigo)
         {
             var deepLink = $"rotalivre://grupo?codigo={codigo}";
 
@@ -28,5 +32,30 @@ namespace Rota_LivreWEB_API.Controllers
 
             return Content(html, "text/html");
         }
+
+
+        public GrupoController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpPost("criar")]
+        public async Task<ActionResult> CriarGrupo(int passeioId)
+        {
+            var codigo = Guid.NewGuid().ToString().Substring(0, 6);
+
+            var grupo = new Grupo
+            {
+                codigo_convite = codigo,
+                id_passeio = passeioId,
+                status = "CRIADO"
+            };
+
+            _context.Grupo.Add(grupo);
+            await _context.SaveChangesAsync();
+
+            return Ok(grupo);
+        }
+
     }
 }

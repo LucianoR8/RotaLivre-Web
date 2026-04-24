@@ -68,6 +68,11 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
+                <Button 
+                    Text="Sair do Grupo"
+                    Clicked="OnSairGrupoClicked"
+                    IsVisible="{Binding TemGrupoAtivo}" />  
+
             </VerticalStackLayout>
 
         </VerticalStackLayout>

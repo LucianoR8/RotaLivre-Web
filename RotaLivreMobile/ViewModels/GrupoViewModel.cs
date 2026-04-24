@@ -96,7 +96,9 @@ public class GrupoViewModel : BaseViewModel
             return;
         }
 
-        CodigoGrupo = Guid.NewGuid().ToString().Substring(0, 6);
+        var grupo = await _apiService.CriarGrupo(IdPasseio);
+
+        CodigoGrupo = grupo.codigo_convite;
 
         OnPropertyChanged(nameof(CodigoGrupo));
         OnPropertyChanged(nameof(TemGrupoAtivo));
@@ -109,7 +111,7 @@ public class GrupoViewModel : BaseViewModel
         // Usuarios.Add(nomeUsuario); remove isso aqui?
 
         await _signalR.ConectarAsync();
-        await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario, IdPasseio, NomePasseio);
+        await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
 
         await SecureStorage.SetAsync("grupo_codigo", CodigoGrupo);
         await SecureStorage.SetAsync("grupo_nome", NomePasseio);
@@ -135,7 +137,7 @@ public class GrupoViewModel : BaseViewModel
 
         try
         {
-            await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario, 0, "");
+            await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
         }
         catch (Exception)
         {
@@ -161,7 +163,7 @@ public class GrupoViewModel : BaseViewModel
         var nomeUsuario = await _apiService.GetNomeUsuario();
 
         await _signalR.ConectarAsync();
-        await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario, 0, "");
+        await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
     }
 
     public async Task RestaurarGrupo()

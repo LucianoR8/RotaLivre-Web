@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using RotaLivreMobile.Models;
 
 namespace RotaLivreMobile.Services;
 
@@ -110,4 +111,19 @@ public class ApiService
             json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
+
+    public async Task<GrupoResponseDto> CriarGrupo(int passeioId)
+    {
+        var response = await _httpClient.PostAsync($"grupo/criar?passeioId={passeioId}", null);
+
+        response.EnsureSuccessStatusCode();
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        return JsonSerializer.Deserialize<GrupoResponseDto>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+    }
+
 }

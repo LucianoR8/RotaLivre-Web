@@ -123,11 +123,6 @@ public class GrupoViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(CodigoDigitado))
             return;
 
-        CodigoGrupo = CodigoDigitado;
-
-        OnPropertyChanged(nameof(CodigoGrupo));
-        OnPropertyChanged(nameof(TemGrupoAtivo));
-
         var nomeUsuario = await _apiService.GetNomeUsuario();
 
         // Usuarios.Clear();
@@ -138,6 +133,12 @@ public class GrupoViewModel : BaseViewModel
         try
         {
             await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
+
+            CodigoGrupo = CodigoDigitado;
+
+            OnPropertyChanged(nameof(CodigoGrupo));
+            OnPropertyChanged(nameof(TemGrupoAtivo));
+
         }
         catch (Exception)
         {
@@ -187,6 +188,8 @@ public class GrupoViewModel : BaseViewModel
         Usuarios.Clear();
 
         SecureStorage.Remove("grupo_codigo");
+
+        await Shell.Current.GoToAsync($"//PasseioDetalhePage?PasseioId={IdPasseio}");
     }
 
 }

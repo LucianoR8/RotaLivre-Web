@@ -12,7 +12,6 @@ namespace Rota_LivreWEB_API.Models
         public string funcionamento { get; set; }
         public string descricao { get; set; }
         public string img_url { get; set; }
-        public int? Enderecoid_endereco { get; set; }  
         public Endereco? Endereco { get; set; }         
 
 

@@ -43,27 +43,29 @@ namespace Rota_LivreWEB_API.Controllers
         [HttpPost("criar")]
         public async Task<ActionResult> CriarGrupo(int passeioId)
         {
-            var codigo = Guid.NewGuid().ToString().Substring(0, 6);
-
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (userIdClaim == null)
-                return Unauthorized("Usuário não autenticado");
-
-            var userId = int.Parse(userIdClaim.Value);
-
-            var grupo = new Grupo
+            try
             {
-                codigo_convite = codigo,
-                id_passeio = passeioId,
-                id_criador = userId,
-                status = "CRIADO"
-            };
+                var codigo = Guid.NewGuid().ToString().Substring(0, 6);
 
-            _context.Grupo.Add(grupo);
-            await _context.SaveChangesAsync();
+                var userId = 1; 
 
-            return Ok(grupo);
+                var grupo = new Grupo
+                {
+                    codigo_convite = codigo,
+                    id_passeio = passeioId,
+                    id_criador = userId,
+                    status = "CRIADO"
+                };
+
+                _context.Grupo.Add(grupo);
+                await _context.SaveChangesAsync();
+
+                return Ok(grupo);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.ToString()); 
+            }
         }
 
     }

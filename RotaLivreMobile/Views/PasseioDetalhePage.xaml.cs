@@ -19,6 +19,8 @@ public partial class PasseioDetalhePage : ContentPage, IQueryAttributable
             int id = (int)value;
             await _viewModel.Carregar(id);
         }
+
+        Console.WriteLine($"ID recebido: {value}");
     }
 
     private async void OnRealizarPasseioClicked(object sender, EventArgs e)

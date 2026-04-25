@@ -54,6 +54,14 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
     {
         var passeio = await _service.GetByIdAsync(id);
 
+        Console.WriteLine($"Buscando passeio ID: {id}");
+
+        if (passeio == null)
+        {
+            Console.WriteLine("Passeio veio NULL");
+            return;
+        }
+
         if (passeio == null)
             return;
 
@@ -62,6 +70,8 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
         Descricao = passeio.Descricao;
         Funcionamento = passeio.Funcionamento;
         ImagemUrl = passeio.ImagemUrl;
+
+       
     }
 
     private void OnPropertyChanged([CallerMemberName] string name = null)

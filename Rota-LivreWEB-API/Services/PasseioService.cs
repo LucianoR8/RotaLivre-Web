@@ -36,9 +36,9 @@ namespace Rota_LivreWEB_API.Services
         public async Task<PasseioDto> GetByIdAsync(int id)
         {
             var passeio = await _context.Passeio
-                .Include(p => p.Endereco)
+                //.Include(p => p.Endereco)
                 .FirstOrDefaultAsync(p => p.id_passeio == id);
-
+            
             if (passeio == null)
                 return null;
 

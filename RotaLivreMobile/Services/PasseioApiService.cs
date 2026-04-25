@@ -12,10 +12,24 @@ public class PasseioApiService : BaseApiService
     {
         var response = await GetAsync($"PasseiosApi/{id}");
 
-        if (response == null || !response.IsSuccessStatusCode)
+        if (response == null)
+        {
+            Console.WriteLine("Response NULL ❌ (provavelmente token expirado)");
             return null;
+        }
+
+        Console.WriteLine($"Status: {response.StatusCode}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var erro = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Erro API: {erro}");
+            return null;
+        }
 
         var json = await response.Content.ReadAsStringAsync();
+
+        Console.WriteLine($"JSON: {json}");
 
         return JsonSerializer.Deserialize<PasseioDto>(json,
             new JsonSerializerOptions

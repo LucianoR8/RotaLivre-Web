@@ -28,12 +28,19 @@ namespace Rota_LivreWEB_API.Controllers.Api
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(int id)
         {
-            var passeio = await _service.GetByIdAsync(id);
+            try
+            {
+                var passeio = await _service.GetByIdAsync(id);
 
-            if (passeio == null)
-                return NotFound();
+                if (passeio == null)
+                    return NotFound();
 
-            return Ok(passeio);
+                return Ok(passeio);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.ToString()); 
+            }
         }
 
         [HttpPost]

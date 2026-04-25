@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Rota_LivreWEB_API.Controllers.Api
 {
-    [Authorize]
+    // [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class PasseiosApiController : ControllerBase

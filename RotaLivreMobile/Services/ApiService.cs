@@ -114,6 +114,8 @@ public class ApiService
 
     public async Task<GrupoResponseDto> CriarGrupo(int passeioId)
     {
+        await AddAuthorizationHeader();
+
         var response = await _httpClient.PostAsync($"grupo/criar?passeioId={passeioId}", null);
 
         response.EnsureSuccessStatusCode();

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.Models;
+using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
 namespace Rota_LivreWEB_API.Controllers
@@ -40,6 +41,7 @@ namespace Rota_LivreWEB_API.Controllers
             _context = context;
         }
 
+        [Authorize]
         [HttpPost("criar")]
         public async Task<ActionResult> CriarGrupo(int passeioId)
         {
@@ -47,13 +49,19 @@ namespace Rota_LivreWEB_API.Controllers
             {
                 var codigo = Guid.NewGuid().ToString().Substring(0, 6);
 
-                var userId = 1; 
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (userIdClaim == null)
+                    return Unauthorized("Usuário não autenticado");
+
+                var userId = int.Parse(userIdClaim);
 
                 var grupo = new Grupo
                 {
                     codigo_convite = codigo,
                     id_passeio = passeioId,
                     id_criador = userId,
+                    nome = "Grupo do passeio",
                     status = "CRIADO"
                 };
 
@@ -64,7 +72,7 @@ namespace Rota_LivreWEB_API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.ToString()); 
+                return StatusCode(500, ex.ToString());
             }
         }
 

@@ -28,22 +28,34 @@ namespace Rota_LivreWEB_API.Hubs
                 .FirstOrDefaultAsync(g => g.codigo_convite == codigo);
 
             if (grupo == null)
-                throw new Exception("Grupo não existe");
+            {
+                await Clients.Caller.SendAsync("ErroGrupo", "Grupo não existe");
+                return;
+            }
 
             if (grupo.status == "FINALIZADO")
-                throw new Exception("Grupo encerrado");
+            {
+                await Clients.Caller.SendAsync("ErroGrupo", "Grupo encerrado");
+                return;
+            }
 
             var usuario = await _context.Usuario
                 .FirstOrDefaultAsync(u => u.nome_completo == nomeUsuario);
 
             if (usuario == null)
-                throw new Exception("Usuário não encontrado");
+            {
+                await Clients.Caller.SendAsync("Usuário não encontrado");
+                return;
+            }
 
             var totalUsuarios = await _context.GrupoUsuario
                 .CountAsync(x => x.id_grupo == grupo.id_grupo && x.ativo);
 
             if (totalUsuarios >= 10)
-                throw new Exception("Grupo cheio");
+            {
+                await Clients.Caller.SendAsync("Grupo cheio");
+                return;
+            }
 
             var relacao = await _context.GrupoUsuario
                 .FirstOrDefaultAsync(x => x.id_grupo == grupo.id_grupo && x.id_usuario == usuario.id_usuario);

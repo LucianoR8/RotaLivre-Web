@@ -16,11 +16,16 @@ public partial class GrupoPage : ContentPage
         BindingContext = _viewModel = viewModel;
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
 
         Title = _viewModel.NomePasseio ?? "Grupo";
+
+        if (BindingContext is GrupoViewModel vm)
+        {
+            await vm.CarregarGrupoSalvo();
+        }
     }
 
     private async void OnCopiarCodigoClicked(object sender, EventArgs e)

@@ -14,7 +14,7 @@ public class PasseioApiService : BaseApiService
 
         if (response == null)
         {
-            Console.WriteLine("Response NULL ❌ (provavelmente token expirado)");
+            Console.WriteLine("Response NULL");
             return null;
         }
 

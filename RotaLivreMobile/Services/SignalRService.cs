@@ -39,6 +39,14 @@ public class GrupoSignalRService
             OnListaUsuarios?.Invoke(usuarios);
         });
 
+        _connection.On<string>("ErroGrupo", mensagem =>
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await Application.Current.MainPage.DisplayAlert("Erro", mensagem, "OK");
+            });
+        });
+
         await _connection.StartAsync();
     }
 

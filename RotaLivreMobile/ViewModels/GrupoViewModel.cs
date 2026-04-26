@@ -32,8 +32,9 @@ public class GrupoViewModel : BaseViewModel
         }
     }
 
-
-
+    public string GrupoNomeSalvo { get; set; }
+    public string GrupoCodigoSalvo { get; set; }
+    public bool TemGrupoSalvo => !string.IsNullOrEmpty(GrupoCodigoSalvo);
     public string LinkGrupo =>
         $"https://rotalivre-web.onrender.com/grupo?codigo={CodigoGrupo}";
     public ICommand EntrarGrupoCommand { get; }
@@ -127,17 +128,19 @@ public class GrupoViewModel : BaseViewModel
 
         // Usuarios.Clear();
         // Usuarios.Add(nomeUsuario);
-
-        await _signalR.ConectarAsync();
+        IsLoading = true;
 
         try
         {
-            await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
-
             CodigoGrupo = CodigoDigitado;
 
             OnPropertyChanged(nameof(CodigoGrupo));
             OnPropertyChanged(nameof(TemGrupoAtivo));
+
+            await _signalR.ConectarAsync();
+            await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
+
+            await SecureStorage.SetAsync("grupo_codigo", CodigoGrupo);
 
         }
         catch (Exception)
@@ -146,9 +149,20 @@ public class GrupoViewModel : BaseViewModel
                 "Erro",
                 "Grupo não encontrado",
                 "OK");
+
+            CodigoGrupo = null;
+            CodigoDigitado = null;
+
+            OnPropertyChanged(nameof(CodigoGrupo));
+            OnPropertyChanged(nameof(TemGrupoAtivo));
+            OnPropertyChanged(nameof(CodigoDigitado));
+        }
+        finally
+        {
+            IsLoading = false;
         }
 
-        await SecureStorage.SetAsync("grupo_codigo", CodigoGrupo);
+        
     }
 
     public async Task EntrarGrupoDireto()
@@ -178,6 +192,16 @@ public class GrupoViewModel : BaseViewModel
         }
     }
 
+    public async Task CarregarGrupoSalvo()
+    {
+        GrupoCodigoSalvo = await SecureStorage.GetAsync("grupo_codigo");
+        GrupoNomeSalvo = await SecureStorage.GetAsync("grupo_nome");
+
+        OnPropertyChanged(nameof(GrupoCodigoSalvo));
+        OnPropertyChanged(nameof(GrupoNomeSalvo));
+        OnPropertyChanged(nameof(TemGrupoSalvo));
+    }
+
     public async Task SairGrupo()
     {
         var nome = await _apiService.GetNomeUsuario();
@@ -188,8 +212,12 @@ public class GrupoViewModel : BaseViewModel
         Usuarios.Clear();
 
         SecureStorage.Remove("grupo_codigo");
+        SecureStorage.Remove("grupo_nome");
+        SecureStorage.Remove("grupo_id");
 
-        await Shell.Current.GoToAsync($"//PasseioDetalhePage?PasseioId={IdPasseio}");
+        await Shell.Current.GoToAsync("//HomePage");
+
+        OnPropertyChanged(nameof(TemGrupoAtivo));
     }
 
 }

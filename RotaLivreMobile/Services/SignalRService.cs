@@ -11,6 +11,7 @@ public class GrupoSignalRService
     public event Action<string>? OnUsuarioSaiu;
     public event Action<List<string>>? OnListaUsuarios;
     public event Action<GrupoDto>? OnGrupoAtualizado;
+    public event Action<string>? OnErroGrupo;
 
     public async Task ConectarAsync()
     {
@@ -41,10 +42,7 @@ public class GrupoSignalRService
 
         _connection.On<string>("ErroGrupo", mensagem =>
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                await Application.Current.MainPage.DisplayAlert("Erro", mensagem, "OK");
-            });
+            OnErroGrupo?.Invoke(mensagem);
         });
 
         await _connection.StartAsync();

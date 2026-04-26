@@ -128,4 +128,16 @@ public class ApiService
         });
     }
 
+    public async Task<bool> GrupoExisteEAtivo(string codigo)
+    {
+        var response = await _httpClient.GetAsync($"grupo/validar?codigo={codigo}");
+
+        if (!response.IsSuccessStatusCode)
+            return false;
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        return bool.Parse(json);
+    }
+
 }

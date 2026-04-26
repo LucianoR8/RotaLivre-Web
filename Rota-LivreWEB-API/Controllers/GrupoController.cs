@@ -3,6 +3,7 @@ using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace Rota_LivreWEB_API.Controllers
 {
@@ -74,6 +75,18 @@ namespace Rota_LivreWEB_API.Controllers
             {
                 return StatusCode(500, ex.ToString());
             }
+        }
+
+        [HttpGet("validar")]
+        public async Task<ActionResult<bool>> ValidarGrupo(string codigo)
+        {
+            var grupo = await _context.Grupo
+                .FirstOrDefaultAsync(g => g.codigo_convite == codigo);
+
+            if (grupo == null)
+                return false;
+
+            return grupo.status != "FINALIZADO";
         }
 
     }

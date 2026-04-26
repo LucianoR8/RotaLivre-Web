@@ -15,7 +15,7 @@
             <VerticalStackLayout Padding="20" Spacing="20">
 
                 <Frame 
-                    IsVisible="{Binding TemGrupoSalvo}"
+                    IsVisible="{Binding MostrarCardGrupoSalvo}"
                     BorderColor="Green"
                     CornerRadius="10"
                     Padding="10">
@@ -25,13 +25,13 @@
                         <Label Text="{Binding GrupoNomeSalvo}" />
                         <Label Text="{Binding GrupoCodigoSalvo}" />
 
-                        <Button Text="Entrar no grupo"
-                                Command="{Binding EntrarGrupoCommand}" />
+                        <Button Text="Voltar para grupo"
+                                Command="{Binding EntrarGrupoSalvoCommand}" />
                     </VerticalStackLayout>
                 </Frame>
 
                 <VerticalStackLayout
-                    IsVisible="{Binding TemGrupoAtivo, Converter={StaticResource InverseBoolConverter}}"
+                    IsVisible="{Binding MostrarTelaInicial}"
                     Spacing="15">
 
                     <Label Text="Você não possui grupo ativo"
@@ -62,7 +62,7 @@
                     <HorizontalStackLayout Spacing="10">
                         <Label Text="{Binding CodigoGrupo}"
                                FontSize="20"
-                               TextColor="Green" />
+                               TextColor="Purple" />
 
                         <Button Text="Copiar"
                                 Clicked="OnCopiarCodigoClicked"/>
@@ -92,7 +92,7 @@
 
             </VerticalStackLayout>
         </ScrollView>
-        
+
         <Grid 
             BackgroundColor="#80000000"
             IsVisible="{Binding IsLoading}">

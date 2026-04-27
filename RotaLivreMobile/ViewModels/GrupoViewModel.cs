@@ -96,12 +96,13 @@ public class GrupoViewModel : BaseViewModel
                 CodigoDigitado = null;
 
                 OnPropertyChanged(nameof(CodigoGrupo));
-                OnPropertyChanged(nameof(TemGrupoAtivo));
-                OnPropertyChanged(nameof(MostrarCardGrupoSalvo));
                 OnPropertyChanged(nameof(CodigoDigitado));
+                AtualizarEstados();
             });
         };
     }
+
+    
     private async Task CriarGrupo()
     {
         if (TemGrupoAtivo)
@@ -121,9 +122,8 @@ public class GrupoViewModel : BaseViewModel
         CodigoGrupo = grupo.codigo_convite;
 
         OnPropertyChanged(nameof(CodigoGrupo));
-        OnPropertyChanged(nameof(TemGrupoAtivo));
         OnPropertyChanged(nameof(LinkGrupo));
-        OnPropertyChanged(nameof(MostrarCardGrupoSalvo));
+        AtualizarEstados();
 
         var nomeUsuario = await _apiService.GetNomeUsuario();
 
@@ -151,8 +151,7 @@ public class GrupoViewModel : BaseViewModel
         CodigoDigitado = null;
 
         OnPropertyChanged(nameof(CodigoGrupo));
-        OnPropertyChanged(nameof(TemGrupoAtivo));
-        OnPropertyChanged(nameof(MostrarCardGrupoSalvo));
+        AtualizarEstados();
 
         await SecureStorage.SetAsync("grupo_codigo", CodigoGrupo);
 
@@ -167,7 +166,7 @@ public class GrupoViewModel : BaseViewModel
         CodigoGrupo = CodigoDigitado;
 
         OnPropertyChanged(nameof(CodigoGrupo));
-        OnPropertyChanged(nameof(TemGrupoAtivo));
+        AtualizarEstados();
 
         var nomeUsuario = await _apiService.GetNomeUsuario();
 
@@ -215,8 +214,7 @@ public class GrupoViewModel : BaseViewModel
 
         OnPropertyChanged(nameof(GrupoCodigoSalvo));
         OnPropertyChanged(nameof(GrupoNomeSalvo));
-        OnPropertyChanged(nameof(TemGrupoSalvo));
-        OnPropertyChanged(nameof(MostrarCardGrupoSalvo));
+        AtualizarEstados();
     }
 
     public async Task SairGrupo()
@@ -234,8 +232,15 @@ public class GrupoViewModel : BaseViewModel
 
         await Shell.Current.GoToAsync("//HomePage");
 
+        AtualizarEstados();
+    }
+
+    private void AtualizarEstados()
+    {
         OnPropertyChanged(nameof(TemGrupoAtivo));
+        OnPropertyChanged(nameof(TemGrupoSalvo));
         OnPropertyChanged(nameof(MostrarCardGrupoSalvo));
+        OnPropertyChanged(nameof(MostrarTelaInicial));
     }
 
 }

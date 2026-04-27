@@ -52,7 +52,7 @@ namespace RotaLivreMobile
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<HomeViewModel>();
             builder.Services.AddTransient<PasseioDetalheViewModel>();
-            builder.Services.AddTransient<GrupoViewModel>();
+            builder.Services.AddSingleton<GrupoViewModel>();
             builder.Services.AddTransient<CategoriaViewModel>();
 
             // Pages

@@ -8,12 +8,12 @@ using Microsoft.EntityFrameworkCore;
 namespace Rota_LivreWEB_API.Controllers
 {
     [ApiController]
-    [Route("api/grupo")]
+    [Route("grupo")]
     public class GrupoController : ControllerBase
     {
         private readonly AppDbContext _context;
 
-        [HttpGet("grupo")]
+        [HttpGet("")]
         public ActionResult AbrirGrupo(string codigo)
         {
             var deepLink = $"rotalivre://grupo?codigo={codigo}";

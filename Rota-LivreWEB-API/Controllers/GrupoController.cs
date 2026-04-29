@@ -16,28 +16,29 @@ namespace Rota_LivreWEB_API.Controllers
         [HttpGet("/grupo")]
         public ActionResult AbrirGrupo(string codigo)
         {
-            if (string.IsNullOrEmpty(codigo))
-                return BadRequest("Código inválido");
-
             var deepLink = $"rotalivre://grupo?codigo={codigo}";
 
             var html = $@"
-        <html>
-        <head>
-            <script>
-                setTimeout(function() {{
-                    window.location.href = '{deepLink}';
-                }}, 500);
-            </script>
-        </head>
-        <body>
-            <h2>Abra o app Rota Livre</h2>
-            <p>Se não abrir automaticamente:</p>
-            <a href='{deepLink}'>Clique aqui</a>
-            <p>Para entrar no grupo, é necessário o aplicativo instalado.</p>
-            <h3>Código do grupo: {codigo}</h3>
-        </body>
-        </html>";
+    <html>
+    <head>
+        <script>
+            function abrirApp() {{
+                window.location.href = '{deepLink}';
+            }}
+
+            setTimeout(abrirApp, 500);
+        </script>
+    </head>
+    <body>
+        <h2>Abrindo o app...</h2>
+
+        <p>Se não abrir automaticamente:</p>
+        <button onclick='abrirApp()'>Abrir no app</button>
+
+        <p>Código do grupo:</p>
+        <h3>{codigo}</h3>
+    </body>
+    </html>";
 
             return Content(html, "text/html");
         }

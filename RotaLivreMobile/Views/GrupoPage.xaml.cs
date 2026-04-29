@@ -76,6 +76,8 @@ public partial class GrupoPage : ContentPage
     {
         set
         {
+            Console.WriteLine($"DEEP LINK CODIGO RECEBIDO: {value}");
+
             if (!string.IsNullOrEmpty(value))
             {
                 MainThread.BeginInvokeOnMainThread(async () =>

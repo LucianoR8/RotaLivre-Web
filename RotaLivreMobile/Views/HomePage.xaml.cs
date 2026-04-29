@@ -27,6 +27,7 @@ namespace RotaLivreMobile.Views
 
             await Shell.Current.GoToAsync(
                 $"{nameof(CategoriaPage)}?categoriaId={categoria.IdCategoria}&categoriaNome={Uri.EscapeDataString(categoria.TipoCategoria)}");
+            //await Shell.Current.GoToAsync("grupoDetalhe?codigo=c1fcf4");
         }
 
         protected override async void OnAppearing()

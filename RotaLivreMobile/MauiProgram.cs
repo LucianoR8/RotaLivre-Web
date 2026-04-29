@@ -7,6 +7,8 @@ using Mapsui.Tiling;
 using Mapsui.UI.Maui;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net;
+using System.Net.Http;
 
 namespace RotaLivreMobile
 {
@@ -33,16 +35,22 @@ namespace RotaLivreMobile
             builder.Services.AddHttpClient<BaseApiService>(client =>
             {
                 client.BaseAddress = new Uri("https://rotalivre-web.onrender.com/api/");
+                client.DefaultRequestVersion = HttpVersion.Version11;
+                client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             });
 
             builder.Services.AddHttpClient<ApiService>(client =>
             {
                 client.BaseAddress = new Uri("https://rotalivre-web.onrender.com/api/");
-            });
+                client.DefaultRequestVersion = HttpVersion.Version11;
+                client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+            }); ;
 
             builder.Services.AddHttpClient<PasseioApiService>(client =>
             {
                 client.BaseAddress = new Uri("https://rotalivre-web.onrender.com/api/");
+                client.DefaultRequestVersion = HttpVersion.Version11;
+                client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             });
 
             builder.Services.AddSingleton<AuthService>();

@@ -163,15 +163,13 @@ public class GrupoViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(CodigoDigitado))
             return;
 
-        CodigoGrupo = CodigoDigitado;
-
-        OnPropertyChanged(nameof(CodigoGrupo));
-        AtualizarEstados();
-
         var nomeUsuario = await _apiService.GetNomeUsuario();
 
         await _signalR.ConectarAsync();
-        await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
+
+        await Task.Delay(300);
+
+        await _signalR.EntrarGrupo(CodigoDigitado, nomeUsuario);
     }
 
     public async Task RestaurarGrupo()

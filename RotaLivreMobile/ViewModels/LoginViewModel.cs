@@ -28,6 +28,16 @@ public class LoginViewModel : BaseViewModel
         if (sucesso)
         {
             Application.Current.MainPage = new AppShell();
+
+            await Task.Delay(500);
+
+            var app = (App)Application.Current;
+
+            if (!string.IsNullOrEmpty(app.CodigoDeepLink))
+            {
+                await Shell.Current.GoToAsync($"grupoDetalhe?codigo={app.CodigoDeepLink}");
+                app.CodigoDeepLink = null;
+            }
         }
         else
         {

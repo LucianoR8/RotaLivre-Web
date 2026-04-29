@@ -5,7 +5,6 @@ namespace RotaLivreMobile.Views;
 
 [QueryProperty(nameof(NomePasseio), "nomePasseio")]
 [QueryProperty(nameof(IdPasseio), "idPasseio")]
-[QueryProperty(nameof(Codigo), "codigo")]
 public partial class GrupoPage : ContentPage
 {
     private readonly GrupoViewModel _viewModel;

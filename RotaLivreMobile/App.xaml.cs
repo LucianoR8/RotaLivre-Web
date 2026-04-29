@@ -7,7 +7,7 @@ namespace RotaLivreMobile
 {
     public partial class App : Application
     {
-        private string _codigoDeepLink;
+        public string CodigoDeepLink;
 
         public App()
         {
@@ -33,13 +33,13 @@ namespace RotaLivreMobile
             {
                 MainPage = new AppShell();
 
-                if (!string.IsNullOrEmpty(_codigoDeepLink))
+                if (!string.IsNullOrEmpty(CodigoDeepLink))
                 {
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        await Task.Delay(500);
-                        await Shell.Current.GoToAsync($"//grupoDetalhe?codigo={_codigoDeepLink}");
-                        _codigoDeepLink = null;
+                        await Task.Delay(1000);
+                        await Shell.Current.GoToAsync($"grupoDetalhe?codigo={CodigoDeepLink}");
+                        CodigoDeepLink = null;
                     });
                 }
             }
@@ -48,7 +48,6 @@ namespace RotaLivreMobile
         protected override void OnAppLinkRequestReceived(Uri uri)
         {
             base.OnAppLinkRequestReceived(uri);
-            Console.WriteLine("DEEP LINK RECEBIDO");
 
             if (uri.Host == "grupo")
             {
@@ -57,15 +56,9 @@ namespace RotaLivreMobile
 
                 if (!string.IsNullOrEmpty(codigo))
                 {
-                    _codigoDeepLink = codigo;
-
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        if (Shell.Current != null)
-                        {
-                            await Shell.Current.GoToAsync($"//grupoDetalhe?codigo={codigo}");
-                            _codigoDeepLink = null;
-                        }
+                        await Shell.Current.GoToAsync($"//grupoDetalhe?codigo={codigo}");
                     });
                 }
             }

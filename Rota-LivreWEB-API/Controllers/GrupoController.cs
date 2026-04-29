@@ -19,26 +19,21 @@ namespace Rota_LivreWEB_API.Controllers
             var deepLink = $"rotalivre://grupo?codigo={codigo}";
 
             var html = $@"
-    <html>
-    <head>
-        <script>
-            function abrirApp() {{
-                window.location.href = '{deepLink}';
-            }}
+<html>
+<head>
+</head>
+<body>
+    <h2>Entrar no grupo</h2>
 
-            setTimeout(abrirApp, 500);
-        </script>
-    </head>
-    <body>
-        <h2>Abrindo o app...</h2>
+    <a href='{deepLink}' style='font-size:20px; color:blue;'>
+    </a>
 
-        <p>Se não abrir automaticamente:</p>
-        <button onclick='abrirApp()'>Abrir no app</button>
+    <p>Se não abrir, toque no link acima.</p>
 
-        <p>Código do grupo:</p>
-        <h3>{codigo}</h3>
-    </body>
-    </html>";
+    <p>Código do grupo:</p>
+    <h3>{codigo}</h3>
+</body>
+</html>";
 
             return Content(html, "text/html");
         }

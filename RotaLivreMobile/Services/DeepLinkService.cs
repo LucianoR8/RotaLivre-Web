@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace RotaLivreMobile.Services
 {
-    internal class DeepLinkService
+    public static class DeepLinkService
     {
+        public static string CodigoGrupo { get; set; }
+
     }
 }

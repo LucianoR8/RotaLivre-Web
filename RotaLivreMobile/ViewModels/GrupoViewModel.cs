@@ -135,7 +135,7 @@ public class GrupoViewModel : BaseViewModel
         await SecureStorage.SetAsync("grupo_id", IdPasseio.ToString());
     }
 
-    private async Task EntrarGrupo()
+    public async Task EntrarGrupo()
     {
         if (string.IsNullOrWhiteSpace(CodigoDigitado))
             return;
@@ -165,11 +165,17 @@ public class GrupoViewModel : BaseViewModel
 
         var nomeUsuario = await _apiService.GetNomeUsuario();
 
+        Console.WriteLine("VAI NAVEGAR AGORA");
+
         await _signalR.ConectarAsync();
 
         await Task.Delay(300);
 
         await _signalR.EntrarGrupo(CodigoDigitado, nomeUsuario);
+
+        Console.WriteLine("ENTROU NO SIGNALR");
+
+        await Shell.Current.GoToAsync($"grupoDetalhe?codigo={CodigoDigitado}");
     }
 
     public async Task RestaurarGrupo()

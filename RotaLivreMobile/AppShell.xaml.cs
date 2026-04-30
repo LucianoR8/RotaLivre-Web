@@ -1,11 +1,15 @@
 ﻿using RotaLivreMobile.Views;
 using RotaLivreMobile.ViewModels;
 using RotaLivreMobile.Services;
+using RotaLivreMobile.Models;
 
 namespace RotaLivreMobile
 {
     public partial class AppShell : Shell
     {
+        private string _ultimoCodigoProcessado;
+        private IDispatcherTimer _clipboardTimer;
+
         public AppShell()
         {
             InitializeComponent();
@@ -15,31 +19,97 @@ namespace RotaLivreMobile
             Routing.RegisterRoute(nameof(RealizarPasseioPage), typeof(RealizarPasseioPage));
             Routing.RegisterRoute("grupo", typeof(GrupoPage));
             Routing.RegisterRoute("grupoDetalhe", typeof(GrupoPage));
+
+            IniciarMonitoramentoClipboard();
         }
 
-        protected override async void OnAppearing()
+        private void IniciarMonitoramentoClipboard()
         {
-            base.OnAppearing();
+            _clipboardTimer = Dispatcher.CreateTimer();
+            _clipboardTimer.Interval = TimeSpan.FromSeconds(2); 
 
-            if (!string.IsNullOrEmpty(DeepLinkService.CodigoGrupo))
+            _clipboardTimer.Tick += async (s, e) =>
             {
-                var codigo = DeepLinkService.CodigoGrupo;
-                DeepLinkService.CodigoGrupo = null;
+                await VerificarCodigoClipboard();
+            };
 
-                await Task.Delay(500);
+            _clipboardTimer.Start();
+        }
 
-                await Shell.Current.GoToAsync("grupoDetalhe");
+        private async Task VerificarCodigoClipboard()
+        {
+            try
+            {
+                var texto = await Clipboard.GetTextAsync();
 
-                var page = Shell.Current.CurrentPage as GrupoPage;
+                if (string.IsNullOrWhiteSpace(texto))
+                    return;
+
+                if (texto.Contains("codigo="))
+                {
+                    texto = texto.Split("codigo=").Last();
+                }
+
+                if (!EhCodigoValido(texto))
+                    return;
+
+                if (texto == _ultimoCodigoProcessado)
+                    return;
+
+                _ultimoCodigoProcessado = texto;
+
+                bool entrar = await Application.Current.MainPage.DisplayAlert(
+                    "Convite de grupo",
+                    $"Deseja entrar no grupo com código {texto}?",
+                    "Entrar",
+                    "Cancelar");
+
+                if (entrar)
+                {
+                    await EntrarNoGrupoViaClipboard(texto);
+                }
+            }
+            catch
+            {
+
+            }
+        }
+
+        private async Task EntrarNoGrupoViaClipboard(string codigo)
+        {
+            try
+            {
+                var page = Shell.Current.CurrentPage;
 
                 if (page?.BindingContext is GrupoViewModel vm)
                 {
                     vm.CodigoDigitado = codigo;
-                    await vm.EntrarGrupoDireto();
+                    await vm.EntrarGrupo();
                 }
+                else
+                {
+                    await Shell.Current.GoToAsync("grupo");
+
+                    await Task.Delay(500);
+
+                    var novaPage = Shell.Current.CurrentPage;
+
+                    if (novaPage?.BindingContext is GrupoViewModel novoVm)
+                    {
+                        novoVm.CodigoDigitado = codigo;
+                        await novoVm.EntrarGrupo();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Erro", ex.Message, "OK");
             }
         }
 
-
+        private bool EhCodigoValido(string texto)
+        {
+            return texto.Length == 6 && texto.All(char.IsLetterOrDigit);
+        }
     }
 }

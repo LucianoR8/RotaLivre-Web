@@ -26,6 +26,7 @@ namespace RotaLivreMobile
         private void IniciarMonitoramentoClipboard()
         {
             _clipboardTimer = Dispatcher.CreateTimer();
+
             _clipboardTimer.Interval = TimeSpan.FromSeconds(2);
 
             _clipboardTimer.Tick += async (s, e) =>

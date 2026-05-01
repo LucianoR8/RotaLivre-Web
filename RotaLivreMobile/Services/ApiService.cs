@@ -69,7 +69,7 @@ public class ApiService
 
         var tokenDebug = _httpClient.DefaultRequestHeaders.Authorization?.Parameter;
 
-        await Application.Current.MainPage.DisplayAlert("Token enviado", tokenDebug ?? "NULL", "OK");
+        // await Application.Current.MainPage.DisplayAlert("Token enviado", tokenDebug ?? "NULL", "OK");
     }
 
     public async Task<HttpResponseMessage> GetAsync(string endpoint)

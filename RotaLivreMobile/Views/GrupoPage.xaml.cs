@@ -5,6 +5,7 @@ namespace RotaLivreMobile.Views;
 
 [QueryProperty(nameof(NomePasseio), "nomePasseio")]
 [QueryProperty(nameof(IdPasseio), "idPasseio")]
+[QueryProperty(nameof(Codigo), "codigo")]
 public partial class GrupoPage : ContentPage
 {
     private readonly GrupoViewModel _viewModel;
@@ -75,14 +76,14 @@ public partial class GrupoPage : ContentPage
     {
         set
         {
-            Console.WriteLine($"DEEP LINK CODIGO RECEBIDO: {value}");
+            Console.WriteLine($"Chegou com codigo: {value}");
 
             if (!string.IsNullOrEmpty(value))
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     _viewModel.CodigoDigitado = value;
-                    await _viewModel.EntrarGrupoDireto(); 
+                    await _viewModel.EntrarGrupoDireto();
                 });
             }
         }

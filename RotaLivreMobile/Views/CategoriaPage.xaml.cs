@@ -45,6 +45,10 @@ public partial class CategoriaPage : ContentPage
 
         ((CollectionView)sender).SelectedItem = null;
 
-        await Shell.Current.GoToAsync($"detalhe?passeioId={passeio.Id}");
+        await Shell.Current.GoToAsync("detalhe",
+            new Dictionary<string, object>
+            {
+                { "PasseioId", passeio.Id }
+            });
     }
 }

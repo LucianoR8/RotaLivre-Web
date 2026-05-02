@@ -16,7 +16,7 @@
                     <VerticalStackLayout>
 
                         <Image
-                            Source="{Binding ImagemUrl}"
+                            Source="{Binding ImgSource}"
                             HeightRequest="180"
                             Aspect="AspectFill"
                             InputTransparent="True"/>

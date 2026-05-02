@@ -30,19 +30,23 @@ namespace RotaLivreMobile.Views
             //await Shell.Current.GoToAsync("grupoDetalhe?codigo=c1fcf4");
         }
 
+        private bool _carregado = false;
+
         protected override async void OnAppearing()
         {
             base.OnAppearing();
 
-            await _viewModel.CarregarHome();
+            if (!_carregado)
+            {
+                await _viewModel.CarregarHome();
+                _carregado = true;
+            }
 
             _currentIndex = 0;
 
             if (_viewModel.Categorias?.Any() == true)
                 _timer.Start();
-
         }
-
         protected override void OnDisappearing()
         {
             base.OnDisappearing();

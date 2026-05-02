@@ -1,6 +1,7 @@
 ﻿using RotaLivreMobile.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 
 namespace RotaLivreMobile.ViewModels;
 
@@ -45,6 +46,33 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
         set { _imagemUrl = value; OnPropertyChanged(); }
     }
 
+    private bool _curtido;
+    public bool Curtido
+    {
+        get => _curtido;
+        set
+        {
+            _curtido = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(TextoBotaoCurtir));
+            OnPropertyChanged(nameof(CorBotaoCurtir));
+        }
+    }
+
+    private int _quantidadeCurtidas;
+    public int QuantidadeCurtidas
+    {
+        get => _quantidadeCurtidas;
+        set
+        {
+            _quantidadeCurtidas = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string TextoBotaoCurtir => Curtido ? "Curtido" : "Curtir";
+    public Color CorBotaoCurtir => Curtido ? Colors.Red : Colors.Gray;
+
     public PasseioDetalheViewModel(PasseioApiService service)
     {
         _service = service;
@@ -70,8 +98,10 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
         Descricao = passeio.Descricao;
         Funcionamento = passeio.Funcionamento;
         ImagemUrl = passeio.ImagemUrl;
+        Curtido = passeio.UsuarioJaCurtiu;
+        QuantidadeCurtidas = passeio.QuantidadeCurtidas;
 
-       
+
     }
 
     private void OnPropertyChanged([CallerMemberName] string name = null)
@@ -88,6 +118,21 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
         Descricao = passeio.Descricao;
         Funcionamento = passeio.Funcionamento;
         ImagemUrl = passeio.ImagemUrl;
+    }
+
+    public ICommand CurtirCommand => new Command(async () => await Curtir());
+
+    private async Task Curtir()
+    {
+        var curtiu = await _service.CurtirAsync(Id);
+
+        if (curtiu && !Curtido)
+            QuantidadeCurtidas++;
+
+        if (!curtiu && Curtido)
+            QuantidadeCurtidas--;
+
+        Curtido = curtiu;
     }
 
 }

@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Rota_LivreWEB_API.Interfaces;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Rota_LivreWEB_API.DTOs;
+using Rota_LivreWEB_API.Interfaces;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Rota_LivreWEB_API.Controllers.Api
 {
@@ -25,22 +26,21 @@ namespace Rota_LivreWEB_API.Controllers.Api
             return Ok(passeios);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(int id)
         {
-            try
-            {
-                var passeio = await _service.GetByIdAsync(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                if (passeio == null)
-                    return NotFound();
+            if (userId == null)
+                return Unauthorized();
 
-                return Ok(passeio);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.ToString()); 
-            }
+            var passeio = await _service.GetByIdComUsuarioAsync(id, int.Parse(userId));
+
+            if (passeio == null)
+                return NotFound();
+
+            return Ok(passeio);
         }
 
         [HttpPost]
@@ -48,6 +48,27 @@ namespace Rota_LivreWEB_API.Controllers.Api
         {
             var novo = await _service.CreateAsync(dto);
             return CreatedAtAction(nameof(Get), new { id = novo.Id }, novo);
+        }
+
+        [HttpGet("categoria/{categoriaId}")]
+        public async Task<ActionResult> GetByCategoria(int categoriaId)
+        {
+            var passeios = await _service.GetByCategoriaAsync(categoriaId);
+            return Ok(passeios);
+        }
+
+        [Authorize]
+        [HttpPost("{id}/curtir")]
+        public async Task<ActionResult> Curtir(int id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
+                return Unauthorized();
+
+            var curtiu = await _service.AlternarCurtidaAsync(int.Parse(userId), id);
+
+            return Ok(new { curtiu });
         }
     }
 }

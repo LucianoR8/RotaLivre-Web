@@ -37,4 +37,19 @@ public class PasseioApiService : BaseApiService
                 PropertyNameCaseInsensitive = true
             });
     }
+
+    public async Task<bool> CurtirAsync(int id)
+    {
+        var response = await GetAsync($"PasseiosApi/{id}/curtir");
+
+        if (response == null || !response.IsSuccessStatusCode)
+            return false;
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<Dictionary<string, bool>>(json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        return result != null && result.ContainsKey("curtiu") && result["curtiu"];
+    }
 }

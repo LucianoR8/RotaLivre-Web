@@ -6,6 +6,7 @@
     public string Funcionamento { get; set; }
     public string ImagemUrl { get; set; }
     public int QuantidadeCurtidas { get; set; }
+    public bool UsuarioJaCurtiu { get; set; }
 
     public ImageSource ImagemSource
     {

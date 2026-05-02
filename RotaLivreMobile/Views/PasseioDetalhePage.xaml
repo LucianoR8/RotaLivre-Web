@@ -26,8 +26,14 @@
 
             <Label Text="{Binding Funcionamento}" />
 
-            <Button Text="Curtir"
-                    Command="{Binding CurtirCommand}" />
+            <Label Text="{Binding QuantidadeCurtidas, StringFormat='Curtidas: {0}'}"
+                   FontSize="14"
+                   TextColor="Gray"/>
+
+            <Button Text="{Binding TextoBotaoCurtir}"
+                    BackgroundColor="{Binding CorBotaoCurtir}"
+                    TextColor="White"
+                    Command="{Binding CurtirCommand}" />    
 
             <Button Text="Adicionar"
                     Command="{Binding PendenteCommand}" />

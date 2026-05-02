@@ -9,5 +9,8 @@ namespace Rota_LivreWEB_API.Interfaces
         Task<IEnumerable<PasseioDto>> GetAllAsync();
         Task<PasseioDto> GetByIdAsync(int id);
         Task<PasseioDto> CreateAsync(PasseioDto dto);
+        Task<IEnumerable<PasseioDto>> GetByCategoriaAsync(int categoriaId);
+        Task<bool> AlternarCurtidaAsync(int usuarioId, int passeioId);
+        Task<PasseioDto> GetByIdComUsuarioAsync(int id, int usuarioId);
     }
 }

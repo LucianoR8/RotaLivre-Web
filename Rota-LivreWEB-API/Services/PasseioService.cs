@@ -50,6 +50,7 @@ namespace Rota_LivreWEB_API.Services
                 Funcionamento = passeio.funcionamento,
                 ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{passeio.img_url}",
                 QuantidadeCurtidas = passeio.QuantidadeCurtidas,
+                UsuarioJaCurtiu = false,
                 Endereco = passeio.Endereco != null ? new EnderecoDto
                 {
                     NomeRua = passeio.Endereco.nome_rua,
@@ -80,6 +81,69 @@ namespace Rota_LivreWEB_API.Services
             return dto;
         }
 
-       
+        public async Task<IEnumerable<PasseioDto>> GetByCategoriaAsync(int categoriaId)
+        {
+            return await _context.Passeio
+                .Where(p => p.id_categoria == categoriaId)
+                .Select(p => new PasseioDto
+                {
+                    Id = p.id_passeio,
+                    Nome = p.nome_passeio,
+                    Descricao = p.descricao,
+                    Funcionamento = p.funcionamento,
+                    ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{p.img_url}",
+                    QuantidadeCurtidas = p.QuantidadeCurtidas
+                })
+                .ToListAsync();
+        }
+
+        public async Task<bool> AlternarCurtidaAsync(int usuarioId, int passeioId)
+        {
+            var curtida = await _context.CurtidaPasseio
+                .FirstOrDefaultAsync(c => c.id_usuario == usuarioId && c.id_passeio == passeioId);
+
+            if (curtida != null)
+            {
+                _context.CurtidaPasseio.Remove(curtida);
+                await _context.SaveChangesAsync();
+                return false;
+            }
+
+            var novaCurtida = new CurtidaPasseio
+            {
+                id_usuario = usuarioId,
+                id_passeio = passeioId
+            };
+
+            await _context.CurtidaPasseio.AddAsync(novaCurtida);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<PasseioDto> GetByIdComUsuarioAsync(int id, int usuarioId)
+        {
+            var passeio = await _context.Passeio
+                .Include(p => p.Endereco)
+                .FirstOrDefaultAsync(p => p.id_passeio == id);
+
+            if (passeio == null)
+                return null;
+
+            var jaCurtiu = await _context.CurtidaPasseio
+                .AnyAsync(c => c.id_usuario == usuarioId && c.id_passeio == id);
+
+            return new PasseioDto
+            {
+                Id = passeio.id_passeio,
+                Nome = passeio.nome_passeio,
+                Descricao = passeio.descricao,
+                Funcionamento = passeio.funcionamento,
+                ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{passeio.img_url}",
+                QuantidadeCurtidas = passeio.QuantidadeCurtidas,
+                UsuarioJaCurtiu = jaCurtiu
+            };
+        }
+
     }
 }

@@ -93,6 +93,10 @@
                             <Label Text="{Binding Descricao}"
                                    FontSize="14" />
 
+                            <Label Text="{Binding QuantidadeCurtidas, StringFormat='Curtidas: {0}'}"
+                                    FontSize="12"
+                                    TextColor="Gray" />
+
                         </VerticalStackLayout>
 
                     </Frame>

@@ -129,7 +129,7 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
         if (curtiu && !Curtido)
             QuantidadeCurtidas++;
 
-        if (!curtiu && Curtido)
+        if (!curtiu && Curtido && QuantidadeCurtidas > 0)
             QuantidadeCurtidas--;
 
         Curtido = curtiu;

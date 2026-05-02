@@ -50,6 +50,7 @@ namespace Rota_LivreWEB_API.Controllers.Api
             return CreatedAtAction(nameof(Get), new { id = novo.Id }, novo);
         }
 
+        [Authorize]
         [HttpGet("categoria/{categoriaId}")]
         public async Task<ActionResult> GetByCategoria(int categoriaId)
         {

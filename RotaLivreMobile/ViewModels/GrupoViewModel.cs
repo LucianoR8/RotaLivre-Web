@@ -102,7 +102,12 @@ public class GrupoViewModel : BaseViewModel
         };
     }
 
-
+    public void ResetarEstado()
+    {
+        NomePasseio = null;
+        IdPasseio = 0;
+        CodigoGrupo = null;
+    }
     private async Task CriarGrupo()
     {
         if (TemGrupoAtivo)

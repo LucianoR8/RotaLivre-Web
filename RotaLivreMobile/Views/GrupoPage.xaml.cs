@@ -20,12 +20,17 @@ public partial class GrupoPage : ContentPage
     {
         base.OnAppearing();
 
-        Title = _viewModel.NomePasseio ?? "Grupo";
-
-        if (BindingContext is GrupoViewModel vm)
+        if (_viewModel.IdPasseio == 0)
         {
-            await vm.CarregarGrupoSalvo();
+            _viewModel.ResetarEstado();
+            Title = "Grupos";
         }
+        else
+        {
+            Title = _viewModel.NomePasseio ?? "Grupo";
+        }
+
+        await _viewModel.CarregarGrupoSalvo();
     }
 
     private async void OnCopiarCodigoClicked(object sender, EventArgs e)

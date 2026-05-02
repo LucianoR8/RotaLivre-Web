@@ -28,8 +28,18 @@ namespace RotaLivreMobile.ViewModels
         {
             var response = await _api.GetAsync($"passeios/categoria/{categoriaId}");
 
-            if (response == null || !response.IsSuccessStatusCode)
+            if (response == null)
+            {
+                Console.WriteLine("Response NULL (provável 401)");
                 return;
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var erro = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Erro API: {erro}");
+                return;
+            }
 
             var json = await response.Content.ReadAsStringAsync();
 

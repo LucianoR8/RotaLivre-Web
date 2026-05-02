@@ -49,7 +49,8 @@ namespace Rota_LivreWEB_API.Services
                 Descricao = passeio.descricao,
                 Funcionamento = passeio.funcionamento,
                 ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{passeio.img_url}",
-                QuantidadeCurtidas = passeio.QuantidadeCurtidas,
+                QuantidadeCurtidas = await _context.CurtidaPasseio
+                    .CountAsync(c => c.id_passeio == passeio.id_passeio),
                 UsuarioJaCurtiu = false,
                 Endereco = passeio.Endereco != null ? new EnderecoDto
                 {
@@ -92,7 +93,8 @@ namespace Rota_LivreWEB_API.Services
                     Descricao = p.descricao,
                     Funcionamento = p.funcionamento,
                     ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{p.img_url}",
-                    QuantidadeCurtidas = p.QuantidadeCurtidas
+                    QuantidadeCurtidas = _context.CurtidaPasseio
+                        .Count(c => c.id_passeio == p.id_passeio)
                 })
                 .ToListAsync();
         }
@@ -140,7 +142,8 @@ namespace Rota_LivreWEB_API.Services
                 Descricao = passeio.descricao,
                 Funcionamento = passeio.funcionamento,
                 ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{passeio.img_url}",
-                QuantidadeCurtidas = passeio.QuantidadeCurtidas,
+                QuantidadeCurtidas = await _context.CurtidaPasseio
+                    .CountAsync(c => c.id_passeio == passeio.id_passeio),
                 UsuarioJaCurtiu = jaCurtiu
             };
         }

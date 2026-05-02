@@ -67,9 +67,14 @@ namespace Rota_LivreWEB_API.Controllers.Api
             if (userId == null)
                 return Unauthorized();
 
-            var curtiu = await _service.AlternarCurtidaAsync(int.Parse(userId), id);
+            var (curtiu, totalCurtidas) =
+                await _service.AlternarCurtidaComTotalAsync(int.Parse(userId), id);
 
-            return Ok(new { curtiu });
+            return Ok(new
+            {
+                curtiu,
+                totalCurtidas
+            });
         }
     }
 }

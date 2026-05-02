@@ -148,5 +148,37 @@ namespace Rota_LivreWEB_API.Services
             };
         }
 
+        public async Task<(bool curtiu, int totalCurtidas)> AlternarCurtidaComTotalAsync(int usuarioId, int passeioId)
+        {
+            var curtida = await _context.CurtidaPasseio
+                .FirstOrDefaultAsync(c => c.id_usuario == usuarioId && c.id_passeio == passeioId);
+
+            bool curtiu;
+
+            if (curtida != null)
+            {
+                _context.CurtidaPasseio.Remove(curtida);
+                curtiu = false;
+            }
+            else
+            {
+                var nova = new CurtidaPasseio
+                {
+                    id_usuario = usuarioId,
+                    id_passeio = passeioId
+                };
+
+                await _context.CurtidaPasseio.AddAsync(nova);
+                curtiu = true;
+            }
+
+            await _context.SaveChangesAsync();
+
+            var total = await _context.CurtidaPasseio
+                .CountAsync(c => c.id_passeio == passeioId);
+
+            return (curtiu, total);
+        }
+
     }
 }

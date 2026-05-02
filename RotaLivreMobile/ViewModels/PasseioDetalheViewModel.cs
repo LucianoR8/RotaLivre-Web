@@ -124,15 +124,13 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
 
     private async Task Curtir()
     {
-        var curtiu = await _service.CurtirAsync(Id);
+        var result = await _service.CurtirAsync(Id);
 
-        if (curtiu && !Curtido)
-            QuantidadeCurtidas++;
+        if (result == null)
+            return;
 
-        if (!curtiu && Curtido && QuantidadeCurtidas > 0)
-            QuantidadeCurtidas--;
-
-        Curtido = curtiu;
+        Curtido = result.Curtiu;
+        QuantidadeCurtidas = result.TotalCurtidas;
     }
 
 }

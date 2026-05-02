@@ -26,7 +26,7 @@ namespace RotaLivreMobile.ViewModels
 
         private async Task CarregarPasseios(int categoriaId)
         {
-            var response = await _api.GetAsync($"passeios/categoria/{categoriaId}");
+            var response = await _api.GetAsync($"PasseiosApi/categoria/{categoriaId}");
 
             if (response == null)
             {
@@ -40,6 +40,9 @@ namespace RotaLivreMobile.ViewModels
                 Console.WriteLine($"Erro API: {erro}");
                 return;
             }
+
+            Console.WriteLine("Chamando API categoria...");
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
 
             var json = await response.Content.ReadAsStringAsync();
 

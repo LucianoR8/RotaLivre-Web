@@ -29,6 +29,22 @@ public class BaseApiService
         return true;
     }
 
+    protected async Task<HttpResponseMessage?> PostAsync(string endpoint, HttpContent content)
+    {
+        try
+        {
+            AddAuthorizationHeader();
+
+            var response = await _httpClient.PostAsync(endpoint, content);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro POST: {ex.Message}");
+            return null;
+        }
+    }
+
     public async Task<HttpResponseMessage?> GetAsync(string endpoint)
     {
         var autorizado = await AddAuthorizationHeader();

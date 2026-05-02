@@ -40,7 +40,8 @@ namespace Rota_LivreWEB_API.Services
                     Descricao = p.descricao,
                     Funcionamento = p.funcionamento,
                     ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{p.img_url}",
-                    QuantidadeCurtidas = p.QuantidadeCurtidas
+                    QuantidadeCurtidas = _context.CurtidaPasseio
+                        .Count(c => c.id_passeio == p.id_passeio)
                 })
                 .ToListAsync();
 

@@ -8,6 +8,12 @@ public class PasseioApiService : BaseApiService
     {
     }
 
+    public class CurtidaResponse
+    {
+        public bool Curtiu { get; set; }
+        public int TotalCurtidas { get; set; }
+    }
+
     public async Task<PasseioDto?> GetByIdAsync(int id)
     {
         var response = await GetAsync($"PasseiosApi/{id}");
@@ -38,18 +44,18 @@ public class PasseioApiService : BaseApiService
             });
     }
 
-    public async Task<bool> CurtirAsync(int id)
+    public async Task<CurtidaResponse?> CurtirAsync(int id)
     {
-        var response = await GetAsync($"PasseiosApi/{id}/curtir");
+        var response = await PostAsync($"PasseiosApi/{id}/curtir", null);
 
         if (response == null || !response.IsSuccessStatusCode)
-            return false;
+            return null;
 
         var json = await response.Content.ReadAsStringAsync();
 
-        var result = JsonSerializer.Deserialize<Dictionary<string, bool>>(json,
+        var result = JsonSerializer.Deserialize<CurtidaResponse>(json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        return result != null && result.ContainsKey("curtiu") && result["curtiu"];
+        return result ?? new CurtidaResponse();
     }
 }

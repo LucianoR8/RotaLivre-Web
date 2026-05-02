@@ -12,5 +12,6 @@ namespace Rota_LivreWEB_API.Interfaces
         Task<IEnumerable<PasseioDto>> GetByCategoriaAsync(int categoriaId);
         Task<bool> AlternarCurtidaAsync(int usuarioId, int passeioId);
         Task<PasseioDto> GetByIdComUsuarioAsync(int id, int usuarioId);
+        Task<(bool curtiu, int totalCurtidas)> AlternarCurtidaComTotalAsync(int usuarioId, int passeioId);
     }
 }

@@ -31,8 +31,6 @@ namespace Rota_LivreWEB_API.Services
              .ToListAsync();
 
             var destaques = await _context.Passeio
-                .OrderByDescending(p => p.QuantidadeCurtidas)
-                .Take(5)
                 .Select(p => new PasseioDto
                 {
                     Id = p.id_passeio,
@@ -43,6 +41,8 @@ namespace Rota_LivreWEB_API.Services
                     QuantidadeCurtidas = _context.CurtidaPasseio
                         .Count(c => c.id_passeio == p.id_passeio)
                 })
+                .OrderByDescending(p => p.QuantidadeCurtidas)
+                .Take(5)
                 .ToListAsync();
 
             return new HomeDto

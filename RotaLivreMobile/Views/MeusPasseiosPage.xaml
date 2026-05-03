@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RotaLivreMobile.Views.MeusPasseiosPage"
+             Title="MeusPasseiosPage">
+    <VerticalStackLayout Padding="10">
+
+        <Label Text="Meus Passeios"
+               FontSize="22"
+               HorizontalOptions="Center"
+               TextColor="Orange"/>
+
+        <HorizontalStackLayout HorizontalOptions="Center">
+
+            <Button Text="Curtidos"
+                    Command="{Binding MostrarCurtidosCommand}" />
+
+            <Button Text="Pendentes"
+                    Command="{Binding MostrarPendentesCommand}" />
+
+        </HorizontalStackLayout>
+
+        <CollectionView ItemsSource="{Binding Curtidos}"
+                        IsVisible="{Binding IsCurtidos}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="5">
+                        <VerticalStackLayout>
+                            <Image Source="{Binding ImagemSource}" HeightRequest="120"/>
+                            <Label Text="{Binding Nome}" />
+
+                            <Button Text="Ver"
+                                    Command="{Binding BindingContext.AbrirDetalheCommand, Source={x:Reference Name=Page}}"
+                                    CommandParameter="{Binding Id}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+        <CollectionView ItemsSource="{Binding Pendentes}"
+                        IsVisible="{Binding IsCurtidos, Converter={StaticResource InverseBoolConverter}}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="5">
+                        <VerticalStackLayout>
+                            <Image Source="{Binding ImagemSource}" HeightRequest="120"/>
+                            <Label Text="{Binding Nome}" />
+
+                            <Button Text="Ver"
+                                    Command="{Binding BindingContext.AbrirDetalheCommand, Source={x:Reference Name=Page}}"
+                                    CommandParameter="{Binding Id}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </VerticalStackLayout>
+</ContentPage>

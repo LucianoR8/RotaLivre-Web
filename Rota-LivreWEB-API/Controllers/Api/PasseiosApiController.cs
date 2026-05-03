@@ -76,5 +76,38 @@ namespace Rota_LivreWEB_API.Controllers.Api
                 totalCurtidas
             });
         }
+
+        [Authorize]
+        [HttpPost("{id}/pendente")]
+        public async Task<ActionResult> AlternarPendente(int id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
+                return Unauthorized();
+
+            var pendente = await _service.AlternarPendenteAsync(int.Parse(userId), id);
+
+            return Ok(new { pendente });
+        }
+
+        [Authorize]
+        [HttpGet("meus")]
+        public async Task<ActionResult> MeusPasseios()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
+                return Unauthorized();
+
+            var (curtidos, pendentes) =
+                await _service.GetMeusPasseiosAsync(int.Parse(userId));
+
+            return Ok(new
+            {
+                curtidos,
+                pendentes
+            });
+        }
     }
 }

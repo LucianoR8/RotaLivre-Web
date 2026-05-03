@@ -73,6 +73,22 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
     public string TextoBotaoCurtir => Curtido ? "Curtido" : "Curtir";
     public Color CorBotaoCurtir => Curtido ? Colors.Red : Colors.Gray;
 
+    private bool _pendente;
+    public bool Pendente
+    {
+        get => _pendente;
+        set
+        {
+            _pendente = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(TextoBotaoPendente));
+            OnPropertyChanged(nameof(CorBotaoPendente));
+        }
+    }
+
+    public string TextoBotaoPendente => Pendente ? "Pendente" : "Salvar";
+    public Color CorBotaoPendente => Pendente ? Colors.Orange : Colors.Gray;
+
     public PasseioDetalheViewModel(PasseioApiService service)
     {
         _service = service;
@@ -100,7 +116,7 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
         ImagemUrl = passeio.ImagemUrl;
         Curtido = passeio.UsuarioJaCurtiu;
         QuantidadeCurtidas = passeio.QuantidadeCurtidas;
-
+        Pendente = passeio.UsuarioJaPendente;
 
     }
 
@@ -131,6 +147,14 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
 
         Curtido = result.Curtiu;
         QuantidadeCurtidas = result.TotalCurtidas;
+    }
+
+    public ICommand PendenteCommand => new Command(async () => await AlternarPendente());
+
+    private async Task AlternarPendente()
+    {
+        var pendente = await _service.AlternarPendenteAsync(Id);
+        Pendente = pendente;
     }
 
 }

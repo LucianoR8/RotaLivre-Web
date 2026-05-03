@@ -180,5 +180,55 @@ namespace Rota_LivreWEB_API.Services
             return (curtiu, total);
         }
 
+        public async Task<bool> AlternarPendenteAsync(int usuarioId, int passeioId)
+        {
+            var existente = await _context.PasseioPendente
+                .FirstOrDefaultAsync(p => p.id_usuario == usuarioId && p.id_passeio == passeioId);
+
+            if (existente != null)
+            {
+                _context.PasseioPendente.Remove(existente);
+                await _context.SaveChangesAsync();
+                return false;
+            }
+
+            var novo = new PasseioPendente
+            {
+                id_usuario = usuarioId,
+                id_passeio = passeioId,
+                data_adicao = DateTime.UtcNow
+            };
+
+            await _context.PasseioPendente.AddAsync(novo);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<(List<PasseioDto>, List<PasseioDto>)> GetMeusPasseiosAsync(int userId)
+        {
+            var curtidos = await _context.CurtidaPasseio
+                .Where(c => c.id_usuario == userId)
+                .Select(c => new PasseioDto
+                {
+                    Id = c.Passeio.id_passeio,
+                    Nome = c.Passeio.nome_passeio,
+                    ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{c.Passeio.img_url}"
+                })
+                .ToListAsync();
+
+            var pendentes = await _context.PasseioPendente
+                .Where(p => p.id_usuario == userId)
+                .Select(p => new PasseioDto
+                {
+                    Id = p.Passeio.id_passeio,
+                    Nome = p.Passeio.nome_passeio,
+                    ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{p.Passeio.img_url}"
+                })
+                .ToListAsync();
+
+            return (curtidos, pendentes);
+        }
+
     }
 }

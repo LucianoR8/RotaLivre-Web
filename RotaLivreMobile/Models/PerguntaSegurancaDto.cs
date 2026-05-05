@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text.Json.Serialization;
 
-namespace RotaLivreMobile.Models
+public class PerguntaSegurancaDto
 {
-    public class PerguntaSegurancaDto
+    [JsonPropertyName("id_pergunta")]
+    public int Id_Pergunta { get; set; }
+
+    [JsonPropertyName("pergunta_seg")]
+    public string pergunta_seg { get; set; }
+
+    public override string ToString()
     {
-        public int Id_Pergunta { get; set; }
-        public string Pergunta { get; set; }
+        return pergunta_seg;
     }
 }

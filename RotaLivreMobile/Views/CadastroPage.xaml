@@ -17,15 +17,16 @@
            Text="{Binding ConfirmarSenha}" 
            IsPassword="True"/>
 
-        <Entry Placeholder="Data de Nascimento (yyyy-MM-dd)" 
-           Text="{Binding DataNasc}" />
+        <DatePicker 
+            Date="{Binding DataSelecionada}" 
+            Format="dd/MM/yyyy" />
 
-        <Picker Title="Pergunta de Segurança"
-                ItemsSource="{Binding Perguntas}"
-                ItemDisplayBinding="{Binding Pergunta}"
-                SelectedItem="{Binding PerguntaSelecionada}" />
+        <Picker
+            Title="Selecione uma pergunta"
+            ItemsSource="{Binding Perguntas}"
+            SelectedItem="{Binding PerguntaSelecionada}" />
 
-        <Entry Placeholder="Resposta de Segurança"
+            <Entry Placeholder="Resposta de Segurança"
                 Text="{Binding RespostaSeg}" />
 
         <Button Text="Cadastrar" Command="{Binding CadastrarCommand}" />

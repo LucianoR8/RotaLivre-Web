@@ -1,5 +1,6 @@
 ﻿using System.Windows.Input;
 using RotaLivreMobile.Services;
+using RotaLivreMobile.Views;
 
 namespace RotaLivreMobile.ViewModels;
 
@@ -27,7 +28,7 @@ public class LoginViewModel : BaseViewModel
 
         if (sucesso)
         {
-            Application.Current.MainPage = new AppShell();
+            await Shell.Current.GoToAsync("//HomePage");
 
             await Task.Delay(500);
 
@@ -47,6 +48,7 @@ public class LoginViewModel : BaseViewModel
 
     private async void OnIrParaCadastro()
     {
-        await Shell.Current.GoToAsync("CadastroPage");
+        await Shell.Current.GoToAsync(nameof(CadastroPage));
     }
+
 }

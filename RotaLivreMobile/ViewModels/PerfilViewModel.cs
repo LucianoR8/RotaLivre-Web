@@ -16,7 +16,7 @@ public class PerfilViewModel : BaseViewModel
 
     private async Task Logout()
     {
-        bool confirm = await Application.Current.MainPage.DisplayAlert(
+        bool confirm = await Shell.Current.DisplayAlert(
             "Sair",
             "Deseja realmente sair da conta?",
             "Sim",
@@ -30,12 +30,6 @@ public class PerfilViewModel : BaseViewModel
         SecureStorage.Remove("usuario_id");
         SecureStorage.Remove("usuario_nome");
 
-        var loginPage = Application.Current
-            .Handler
-            .MauiContext
-            .Services
-            .GetService<LoginPage>();
-
-        Application.Current.MainPage = new NavigationPage(loginPage);
+        await Shell.Current.GoToAsync("//LoginPage");
     }
 }

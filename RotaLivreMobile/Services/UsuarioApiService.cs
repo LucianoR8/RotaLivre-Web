@@ -11,7 +11,7 @@ public class UsuarioApiService : BaseApiService
 
     public async Task<List<PerguntaSegurancaDto>> GetPerguntasAsync()
     {
-        var response = await _httpClient.GetAsync("api/UsuarioApi/perguntas");
+        var response = await _httpClient.GetAsync("UsuarioApi/perguntas");
 
         if (!response.IsSuccessStatusCode)
             return new List<PerguntaSegurancaDto>();
@@ -24,7 +24,7 @@ public class UsuarioApiService : BaseApiService
 
     public async Task<bool> CadastrarUsuario(UsuarioCadastroDto dto)
     {
-        var response = await PostAsync("api/UsuarioApi/cadastrar", dto);
+        var response = await PostAsync("UsuarioApi/cadastrar", dto);
 
         return response != null && response.IsSuccessStatusCode;
     }

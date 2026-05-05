@@ -18,6 +18,7 @@ public class CadastroViewModel : BaseViewModel
     public string DataNasc { get; set; }
     public string Email { get; set; }
     public string Senha { get; set; }
+    public string ConfirmarSenha { get; set; }
     public string RespostaSeg { get; set; }
 
 
@@ -34,27 +35,62 @@ public class CadastroViewModel : BaseViewModel
         }
     }
 
+    private DateTime _dataSelecionada = DateTime.Today;
+
+    public DateTime DataSelecionada
+    {
+        get => _dataSelecionada;
+        set
+        {
+            _dataSelecionada = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ICommand CadastrarCommand { get; }
 
     private async Task Cadastrar()
     {
+
+
+        if (string.IsNullOrWhiteSpace(Nome) ||
+        string.IsNullOrWhiteSpace(Email) ||
+        string.IsNullOrWhiteSpace(Senha) ||
+        string.IsNullOrWhiteSpace(ConfirmarSenha) ||
+        string.IsNullOrWhiteSpace(RespostaSeg))
+        {
+            await Shell.Current.DisplayAlert("Erro", "Preencha todos os campos", "OK");
+            return;
+        }
+
+        if (Senha != ConfirmarSenha)
+        {
+            await Shell.Current.DisplayAlert("Erro", "As senhas não coincidem", "OK");
+            return;
+        }
+
+        if (PerguntaSelecionada == null)
+        {
+            await Shell.Current.DisplayAlert("Erro", "Selecione uma pergunta de segurança", "OK");
+            return;
+        }
+
         var dto = new UsuarioCadastroDto
         {
             Nome = Nome,
-            DataNasc = DataNasc,
+            DataNasc = DataSelecionada.ToString("yyyy-MM-dd"),
             Email = Email,
             Senha = Senha,
             RespostaSeg = RespostaSeg,
-            IdPergunta = PerguntaSelecionada != null
-        ? PerguntaSelecionada.Id_Pergunta
-        : 0
+            IdPergunta = PerguntaSelecionada.Id_Pergunta
         };
 
         var sucesso = await _usuarioService.CadastrarUsuario(dto);
 
         if (sucesso)
         {
-            await Shell.Current.DisplayAlert("Sucesso", "Cadastro realizado!", "OK");
+            await Application.Current.MainPage.DisplayAlert("Sucesso", "Cadastro realizado!", "OK");
+
             await Shell.Current.GoToAsync("//LoginPage");
         }
         else
@@ -63,13 +99,29 @@ public class CadastroViewModel : BaseViewModel
         }
     }
 
+
     public async Task CarregarPerguntas()
     {
         var lista = await _usuarioService.GetPerguntasAsync();
 
+        if (lista == null || lista.Count == 0)
+            return;
+
         Perguntas.Clear();
 
+        Console.WriteLine($"TOTAL: {Perguntas.Count}");
+
         foreach (var p in lista)
+        {
+            Console.WriteLine($"ID: {p.Id_Pergunta} - Pergunta: {p.pergunta_seg}");
+        }
+
+        foreach (var p in lista)
+        {
             Perguntas.Add(p);
+        }
+        Console.WriteLine($"TOTAL DEPOIS: {Perguntas.Count}");
+
+        OnPropertyChanged(nameof(Perguntas));
     }
 }

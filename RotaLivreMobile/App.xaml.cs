@@ -13,8 +13,25 @@ namespace RotaLivreMobile
         {
             InitializeComponent();
 
-            MainPage = new ContentPage();
-            VerificarLogin();
+            MainPage = new AppShell();
+
+            InicializarApp();
+        }
+
+        private async void InicializarApp()
+        {
+            await Task.Delay(300); 
+
+            var token = await SecureStorage.GetAsync("auth_token");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                await Shell.Current.GoToAsync("//LoginPage");
+            }
+            else
+            {
+                await Shell.Current.GoToAsync("//HomePage");
+            }
         }
 
         private async void VerificarLogin()

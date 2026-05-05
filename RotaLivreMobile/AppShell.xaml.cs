@@ -14,6 +14,7 @@ namespace RotaLivreMobile
         {
             InitializeComponent();
 
+            Routing.RegisterRoute(nameof(CadastroPage), typeof(CadastroPage));
             Routing.RegisterRoute("detalhe", typeof(PasseioDetalhePage));
             Routing.RegisterRoute(nameof(CategoriaPage), typeof(CategoriaPage));
             Routing.RegisterRoute(nameof(RealizarPasseioPage), typeof(RealizarPasseioPage));
@@ -23,6 +24,8 @@ namespace RotaLivreMobile
 
             IniciarMonitoramentoClipboard();
         }
+
+        
 
         private void IniciarMonitoramentoClipboard()
         {

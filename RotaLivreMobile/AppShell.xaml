@@ -4,6 +4,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:RotaLivreMobile.Views">
 
+
+    <ShellContent
+        Title="Login"
+        Route="LoginPage"
+        ContentTemplate="{DataTemplate views:LoginPage}" />
+    
     <TabBar>
         <ShellContent
             Title="Home"

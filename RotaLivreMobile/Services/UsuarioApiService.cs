@@ -22,10 +22,18 @@ public class UsuarioApiService : BaseApiService
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
 
-    public async Task<bool> CadastrarUsuario(UsuarioCadastroDto dto)
+    public async Task<(bool sucesso, string erro)> CadastrarUsuario(UsuarioCadastroDto dto)
     {
         var response = await PostAsync("UsuarioApi/cadastrar", dto);
 
-        return response != null && response.IsSuccessStatusCode;
+        if (response == null)
+            return (false, "Erro de conexão");
+
+        if (response.IsSuccessStatusCode)
+            return (true, null);
+
+        var erro = await response.Content.ReadAsStringAsync();
+
+        return (false, erro);
     }
 }

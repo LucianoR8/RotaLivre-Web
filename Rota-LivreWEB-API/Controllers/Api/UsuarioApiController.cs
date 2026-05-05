@@ -23,6 +23,11 @@ namespace Rota_LivreWEB_API.Controllers.Api
         [HttpPost("cadastrar")]
         public async Task<ActionResult> Cadastrar([FromBody] UsuarioCadastroDto dto)
         {
+            if (_repo.EmailExiste(dto.Email))
+            {
+                return BadRequest("EMAIL_JA_EXISTE");
+            }
+
             var usuario = new Usuario
             {
                 nome_completo = dto.Nome,
@@ -38,7 +43,7 @@ namespace Rota_LivreWEB_API.Controllers.Api
             if (sucesso)
                 return Ok();
 
-            return BadRequest();
+            return BadRequest("ERRO_AO_CADASTRAR");
         }
 
         [HttpGet("perguntas")]

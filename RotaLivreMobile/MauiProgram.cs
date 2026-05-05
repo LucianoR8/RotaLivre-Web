@@ -70,6 +70,7 @@ namespace RotaLivreMobile
             builder.Services.AddTransient<GrupoViewModel>();
             builder.Services.AddTransient<CategoriaViewModel>();
             builder.Services.AddTransient<CadastroViewModel>();
+            builder.Services.AddTransient<MeusPasseiosViewModel>();
 
             // Pages
             builder.Services.AddTransient<LoginPage>();
@@ -78,6 +79,7 @@ namespace RotaLivreMobile
             builder.Services.AddTransient<GrupoPage>();
             builder.Services.AddTransient<CategoriaPage>();
             builder.Services.AddTransient<CadastroPage>();
+            builder.Services.AddTransient<MeusPasseiosPage>();
 
 
             return builder.Build();

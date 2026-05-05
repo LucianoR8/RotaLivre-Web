@@ -37,7 +37,7 @@ public class MeusPasseiosViewModel : BaseViewModel
         MostrarPendentesCommand = new Command(() => IsCurtidos = false);
         AbrirDetalheCommand = new Command<int>(async (id) =>
         {
-            await Shell.Current.GoToAsync($"PasseioDetalhePage?id={id}");
+            await Shell.Current.GoToAsync($"detalhe?id={id}");
         });
     }
 

@@ -85,7 +85,7 @@ public class CadastroViewModel : BaseViewModel
             IdPergunta = PerguntaSelecionada.Id_Pergunta
         };
 
-        var sucesso = await _usuarioService.CadastrarUsuario(dto);
+        var (sucesso, erro) = await _usuarioService.CadastrarUsuario(dto);
 
         if (sucesso)
         {
@@ -95,7 +95,14 @@ public class CadastroViewModel : BaseViewModel
         }
         else
         {
-            await Shell.Current.DisplayAlert("Erro", "Falha ao cadastrar", "OK");
+            if (erro == "EMAIL_JA_EXISTE")
+            {
+                await Shell.Current.DisplayAlert("Erro", "Email já cadastrado", "OK");
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert("Erro", "Falha ao cadastrar", "OK");
+            }
         }
     }
 

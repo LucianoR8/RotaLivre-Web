@@ -87,7 +87,7 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
     }
 
     public string TextoBotaoPendente => Pendente ? "Pendente" : "Salvar";
-    public Color CorBotaoPendente => Pendente ? Colors.Orange : Colors.Gray;
+    public Color CorBotaoPendente => Pendente ? Colors.Purple : Colors.Gray;
 
     public PasseioDetalheViewModel(PasseioApiService service)
     {

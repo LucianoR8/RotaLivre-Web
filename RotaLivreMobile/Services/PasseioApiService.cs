@@ -99,7 +99,7 @@ public class PasseioApiService : BaseApiService
 
     public async Task<MeusPasseiosResponse?> GetMeusPasseiosAsync()
     {
-        var response = await GetAsync("api/PasseiosApi/meus");
+        var response = await GetAsync("PasseiosApi/meus");
 
         if (response == null || !response.IsSuccessStatusCode)
             return null;

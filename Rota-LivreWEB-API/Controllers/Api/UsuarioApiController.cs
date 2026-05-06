@@ -59,5 +59,55 @@ namespace Rota_LivreWEB_API.Controllers.Api
 
             return Ok(perguntas);
         }
+
+        [HttpGet("perfil/{id}")]
+        public async Task<ActionResult> GetPerfil(int id)
+        {
+            var usuario = await _repo.BuscarPorIdAsync(id);
+
+            if (usuario == null)
+                return NotFound("Usuário não encontrado");
+
+            var dto = new UsuarioPerfilDto
+            {
+                Id = usuario.id_usuario,
+                Nome = usuario.nome_completo,
+                Email = usuario.email,
+                DataNasc = usuario.data_nasc.ToString("yyyy-MM-dd")
+            };
+
+            return Ok(dto);
+        }
+
+        [HttpPut("editar")]
+        public async Task<ActionResult> Editar([FromBody] UsuarioPerfilDto dto)
+        {
+            var usuario = await _repo.BuscarPorIdAsync(dto.Id);
+
+            if (usuario == null)
+                return NotFound("Usuário não encontrado");
+
+            usuario.nome_completo = dto.Nome;
+            usuario.email = dto.Email;
+            usuario.data_nasc = DateOnly.Parse(dto.DataNasc);
+
+            if (_repo.EmailExiste(dto.Email) && usuario.email != dto.Email)
+            {
+                return BadRequest("EMAIL_JA_EXISTE");
+            }
+
+            await _repo.AtualizarUsuarioAsync(usuario);
+
+            return Ok();
+        }
+
+        [HttpDelete("deletar/{id}")]
+        public async Task<ActionResult> Deletar(int id)
+        {
+            await _repo.DeletarUsuarioAsync(id);
+            return Ok();
+        }
+
+
     }
 }

@@ -33,10 +33,12 @@
             <Button Text="{Binding TextoBotaoCurtir}"
                     BackgroundColor="{Binding CorBotaoCurtir}"
                     TextColor="White"
-                    Command="{Binding CurtirCommand}" />    
+                    Command="{Binding CurtirCommand}" />
 
-            <Button Text="Adicionar"
-                    Command="{Binding PendenteCommand}" />
+            <Button Text="{Binding TextoBotaoPendente}"
+                    BackgroundColor="{Binding CorBotaoPendente}"
+                    TextColor="White"
+                    Command="{Binding PendenteCommand}" />  
 
             <Button Text="Realizar Passeio"
                     Clicked="OnRealizarPasseioClicked"/>

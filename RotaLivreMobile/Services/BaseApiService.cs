@@ -2,6 +2,7 @@
 using System.Net.Http.Headers;
 using Microsoft.Maui.Storage;
 using System.Text.Json;
+using System.Text;
 
 namespace RotaLivreMobile.Services;
 
@@ -65,4 +66,22 @@ public class BaseApiService
 
         return response;
     }
+
+    protected async Task<HttpResponseMessage?> PutAsync(string endpoint, object data)
+    {
+        await AddAuthorizationHeader();
+
+        var json = JsonSerializer.Serialize(data);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        return await _httpClient.PutAsync(endpoint, content);
+    }
+
+    protected async Task<HttpResponseMessage?> DeleteAsync(string endpoint)
+    {
+        await AddAuthorizationHeader();
+        return await _httpClient.DeleteAsync(endpoint);
+    }
+
+
 }

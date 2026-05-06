@@ -19,4 +19,11 @@ public partial class PerfilPage : ContentPage
         if (_viewModel.CarregarCommand.CanExecute(null))
             _viewModel.CarregarCommand.Execute(null);
     }
+
+    private async void OnEditarClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(nameof(EditarPerfilPage));
+    }
+
+
 }

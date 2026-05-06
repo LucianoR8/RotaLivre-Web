@@ -19,7 +19,8 @@
 
         <VerticalStackLayout Grid.Row="2" Spacing="10">
 
-            <Button Text="Editar Perfil" />
+            <Button Text="Editar Perfil"
+                    Clicked="OnEditarClicked" />
 
             <Button Text="Excluir Conta"
                     BackgroundColor="Red"

@@ -85,6 +85,9 @@
 	  <MauiXaml Update="Views\CategoriaPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\EditarPerfilPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\MeusPasseiosPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

@@ -87,14 +87,15 @@ namespace Rota_LivreWEB_API.Controllers.Api
             if (usuario == null)
                 return NotFound("Usuário não encontrado");
 
+            var emailJaExiste = _context.Usuario
+                .Any(u => u.email == dto.Email && u.id_usuario != dto.Id);
+
+            if (emailJaExiste)
+                return BadRequest("EMAIL_JA_EXISTE");
+
             usuario.nome_completo = dto.Nome;
             usuario.email = dto.Email;
             usuario.data_nasc = DateOnly.Parse(dto.DataNasc);
-
-            if (_repo.EmailExiste(dto.Email) && usuario.email != dto.Email)
-            {
-                return BadRequest("EMAIL_JA_EXISTE");
-            }
 
             await _repo.AtualizarUsuarioAsync(usuario);
 

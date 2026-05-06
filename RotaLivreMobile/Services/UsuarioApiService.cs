@@ -51,11 +51,18 @@ public class UsuarioApiService : BaseApiService
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
 
-    public async Task<bool> AtualizarPerfil(UsuarioPerfilDto dto)
+    public async Task<(bool sucesso, string erro)> AtualizarPerfil(UsuarioPerfilDto dto)
     {
         var response = await PutAsync("UsuarioApi/editar", dto);
 
-        return response != null && response.IsSuccessStatusCode;
+        if (response == null)
+            return (false, "Erro de conexão");
+
+        if (response.IsSuccessStatusCode)
+            return (true, null);
+
+        var erro = await response.Content.ReadAsStringAsync();
+        return (false, erro);
     }
 
     public async Task<bool> DeletarConta(int id)

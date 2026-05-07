@@ -1,4 +1,5 @@
-﻿<ContentPage
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="RotaLivreMobile.Views.HomePage"
@@ -22,6 +23,7 @@
 
             <CarouselView.ItemTemplate>
                 <DataTemplate>
+
                     <Frame CornerRadius="20"
                            Margin="5"
                            Padding="0"
@@ -50,6 +52,7 @@
                         </Grid>
 
                     </Frame>
+
                 </DataTemplate>
             </CarouselView.ItemTemplate>
         </CarouselView>
@@ -63,9 +66,7 @@
 
         <CollectionView
             Grid.Row="3"
-            ItemsSource="{Binding Destaques}"
-            SelectionMode="Single"
-            SelectionChanged="OnPasseioSelecionado">
+            ItemsSource="{Binding Destaques}">
 
             <CollectionView.Header>
                 <Label Text="Destaques"
@@ -76,9 +77,16 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
+
                     <Frame Margin="0,5"
                            CornerRadius="15"
                            HasShadow="True">
+
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Tapped="OnPasseioClicado"
+                                CommandParameter="{Binding .}" />
+                        </Frame.GestureRecognizers>
 
                         <VerticalStackLayout Spacing="5">
 
@@ -93,13 +101,15 @@
                             <Label Text="{Binding Descricao}"
                                    FontSize="14" />
 
-                            <Label Text="{Binding QuantidadeCurtidas, StringFormat='Curtidas: {0}'}"
-                                    FontSize="12"
-                                    TextColor="Gray" />
+                            <Label Text="{Binding QuantidadeCurtidas,
+                                                   StringFormat='Curtidas: {0}'}"
+                                   FontSize="12"
+                                   TextColor="Gray" />
 
                         </VerticalStackLayout>
 
                     </Frame>
+
                 </DataTemplate>
             </CollectionView.ItemTemplate>
 

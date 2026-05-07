@@ -1,41 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="RotaLivreMobile.Views.CategoriaPage"
     Title="Categoria">
 
-    <CollectionView
-        ItemsSource="{Binding Passeios}"
-        SelectionMode="Single"
-        SelectionChanged="OnPasseioSelecionado">
+    <CollectionView ItemsSource="{Binding Passeios}">
 
         <CollectionView.ItemTemplate>
             <DataTemplate>
-                <Frame Margin="10" Padding="0">
+
+                <Frame Margin="10"
+                       Padding="0">
+
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Tapped="OnPasseioClicado"
+                            CommandParameter="{Binding .}" />
+                    </Frame.GestureRecognizers>
 
                     <VerticalStackLayout>
 
-                        <Image
-                            Source="{Binding ImagemSource}"
-                            HeightRequest="180"
-                            Aspect="AspectFill"
-                            InputTransparent="True"/>
+                        <Image Source="{Binding ImagemSource}"
+                               HeightRequest="180"
+                               Aspect="AspectFill" />
 
-                        <Label
-                            Text="{Binding Nome}"
-                            FontSize="18"
-                            FontAttributes="Bold"
-                            Margin="10,5,10,0"
-                            InputTransparent="True"/>
+                        <Label Text="{Binding Nome}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               Margin="10,5,10,0" />
 
-                        <Label
-                            Text="{Binding Descricao}"
-                            Margin="10,0,10,10"
-                            InputTransparent="True"/>
+                        <Label Text="{Binding Descricao}"
+                               Margin="10,0,10,10" />
 
                     </VerticalStackLayout>
 
                 </Frame>
+
             </DataTemplate>
         </CollectionView.ItemTemplate>
 

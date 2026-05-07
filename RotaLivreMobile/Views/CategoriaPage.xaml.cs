@@ -36,19 +36,15 @@ public partial class CategoriaPage : ContentPage
         }
     }
 
-    private async void OnPasseioSelecionado(object sender, SelectionChangedEventArgs e)
+    private async void OnPasseioClicado(object sender, TappedEventArgs e)
     {
-        if (e.CurrentSelection == null || e.CurrentSelection.Count == 0)
+        if (e.Parameter is not PasseioDto passeio)
             return;
-
-        var passeio = e.CurrentSelection[0] as PasseioDto;
-
-        ((CollectionView)sender).SelectedItem = null;
 
         await Shell.Current.GoToAsync("detalhe",
             new Dictionary<string, object>
             {
-                { "PasseioId", passeio.Id }
+            { "PasseioId", passeio.Id }
             });
     }
 }

@@ -66,14 +66,9 @@ namespace RotaLivreMobile.Views
             carouselCategorias.Position = _currentIndex;
         }
 
-        private async void OnPasseioSelecionado(object sender, SelectionChangedEventArgs e)
+        private async void OnPasseioClicado(object sender, TappedEventArgs e)
         {
-            if (e.CurrentSelection == null || e.CurrentSelection.Count == 0)
-                return;
-
-            var passeio = e.CurrentSelection[0] as PasseioDto;
-
-            if (passeio == null)
+            if (e.Parameter is not PasseioDto passeio)
                 return;
 
             await Shell.Current.GoToAsync("detalhe",
@@ -81,9 +76,6 @@ namespace RotaLivreMobile.Views
                 {
             { "PasseioId", passeio.Id }
                 });
-
-            if (sender is CollectionView collection)
-                collection.SelectedItem = null;
         }
     }
 }

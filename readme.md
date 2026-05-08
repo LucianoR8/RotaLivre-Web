@@ -11,7 +11,6 @@ O Rota Livre é um aplicação composta por uma API desenvolvida em ASP.NET e um
  - Banco de dados: PostgreSQL
  - ORM: Entity Framework Core
  - Autenticação: JWT (Em implementação)
- - Documentação: Swagger
  - Mobile: .NET MAUI (MVVM)
 
 ### Funcionalidades
@@ -26,7 +25,6 @@ O Rota Livre é um aplicação composta por uma API desenvolvida em ASP.NET e um
 ![.NET MAUI](https://img.shields.io/badge/.NET_MAUI-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Entity Framework](https://img.shields.io/badge/Entity_Framework_Core-68217A?style=for-the-badge&logo=dotnet&logoColor=white)
-![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
 
 ## Objetivo
 

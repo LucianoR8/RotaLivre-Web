@@ -4,6 +4,7 @@ using Rota_LivreWEB_API.DTOs;
 using Rota_LivreWEB_API.Interfaces;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Rota_LivreWEB_API.Repositories;
 
 namespace Rota_LivreWEB_API.Controllers.Api
 {
@@ -13,10 +14,12 @@ namespace Rota_LivreWEB_API.Controllers.Api
     public class PasseiosApiController : ControllerBase
     {
         private readonly IPasseioService _service;
+        private readonly PasseioRepository _repo;
 
-        public PasseiosApiController(IPasseioService service)
+        public PasseiosApiController(IPasseioService service, PasseioRepository repo)
         {
             _service = service;
+            _repo = repo;
         }
 
         [HttpGet]
@@ -109,5 +112,23 @@ namespace Rota_LivreWEB_API.Controllers.Api
                 pendentes
             });
         }
+
+        [HttpGet("buscar")]
+        public async Task<ActionResult> Buscar([FromQuery] string termo)
+        {
+            var passeios = await _repo.BuscarPasseioPorNomeAsync(termo);
+
+            var resultado = passeios.Select(p => new PasseioDto
+            {
+                Id = p.id_passeio,
+                Nome = p.nome_passeio,
+                Descricao = p.descricao,
+                ImagemUrl = p.img_url,
+                QuantidadeCurtidas = p.QuantidadeCurtidas
+            });
+
+            return Ok(resultado);
+        }
+
     }
 }

@@ -22,6 +22,7 @@ namespace RotaLivreMobile
             Routing.RegisterRoute("grupoDetalhe", typeof(GrupoPage));
             Routing.RegisterRoute(nameof(MeusPasseiosPage), typeof(MeusPasseiosPage));
             Routing.RegisterRoute(nameof(EditarPerfilPage), typeof(EditarPerfilPage));
+            Routing.RegisterRoute(nameof(BuscaPage), typeof(BuscaPage));
 
             IniciarMonitoramentoClipboard();
         }

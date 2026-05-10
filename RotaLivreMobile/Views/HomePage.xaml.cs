@@ -77,5 +77,21 @@ namespace RotaLivreMobile.Views
             { "PasseioId", passeio.Id }
                 });
         }
+
+        private async void OnBuscarPressed(object sender, EventArgs e)
+        {
+            if (sender is not SearchBar searchBar)
+                return;
+
+            var termo = searchBar.Text;
+
+            if (string.IsNullOrWhiteSpace(termo))
+                return;
+
+            await Shell.Current.GoToAsync(
+                $"{nameof(BuscaPage)}?termo={Uri.EscapeDataString(termo)}");
+
+            searchBar.Text = string.Empty;
+        }
     }
 }

@@ -9,10 +9,22 @@
           RowDefinitions="Auto,Auto,Auto,*"
           RowSpacing="15">
 
-        <Label Grid.Row="0"
-               Text="{Binding NomeUsuario, StringFormat='Olá, {0}'}"
-               FontSize="18"
-               FontAttributes="Bold" />
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+
+            <Label
+                Grid.Column="0"
+                Text="{Binding NomeUsuario, StringFormat='Olá, {0}'}"
+                FontSize="18"
+                FontAttributes="Bold"/>
+
+            <SearchBar
+                Grid.Column="1"
+                x:Name="searchBar"
+                Placeholder="Buscar"
+                WidthRequest="220"
+                SearchButtonPressed="OnBuscarPressed"/>
+
+        </Grid>
 
         <CarouselView
             x:Name="carouselCategorias"

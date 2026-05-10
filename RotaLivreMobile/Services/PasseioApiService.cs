@@ -111,4 +111,22 @@ public class PasseioApiService : BaseApiService
             PropertyNameCaseInsensitive = true
         });
     }
+
+    public async Task<List<PasseioDto>> BuscarPasseios(string termo)
+    {
+        var response = await GetAsync($"PasseioApi/buscar?termo={Uri.EscapeDataString(termo)}");
+
+        if (response == null || !response.IsSuccessStatusCode)
+            return new List<PasseioDto>();
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        return JsonSerializer.Deserialize<List<PasseioDto>>(json,
+            new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            }) ?? new List<PasseioDto>();
+    }
+
+
 }

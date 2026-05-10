@@ -73,6 +73,7 @@ namespace RotaLivreMobile
             builder.Services.AddTransient<MeusPasseiosViewModel>();
             builder.Services.AddTransient<PerfilViewModel>();
             builder.Services.AddTransient<EditarPerfilViewModel>();
+            builder.Services.AddTransient<BuscaViewModel>();
 
             // Pages
             builder.Services.AddTransient<LoginPage>();
@@ -84,6 +85,8 @@ namespace RotaLivreMobile
             builder.Services.AddTransient<MeusPasseiosPage>();
             builder.Services.AddTransient<PerfilPage>();
             builder.Services.AddTransient<EditarPerfilPage>();
+            builder.Services.AddTransient<BuscaPage>();
+            
 
             return builder.Build();
         }

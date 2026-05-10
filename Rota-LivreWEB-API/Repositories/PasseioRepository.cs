@@ -162,8 +162,11 @@ namespace Rota_LivreWEB_API.Repositories
 
         public async Task<List<Passeio>> BuscarPasseioPorNomeAsync(string termo)
         {
+            if (string.IsNullOrWhiteSpace(termo))
+                return new List<Passeio>();
+
             var lista = await _context.Passeio
-                .Where(p => p.nome_passeio.Contains(termo))
+                .Where(p => p.nome_passeio.ToLower().Contains(termo.ToLower()))
                 .ToListAsync();
 
             foreach (var p in lista)

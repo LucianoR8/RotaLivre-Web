@@ -109,6 +109,5 @@ namespace Rota_LivreWEB_API.Controllers.Api
             return Ok();
         }
 
-
     }
 }

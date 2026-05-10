@@ -114,7 +114,7 @@ public class PasseioApiService : BaseApiService
 
     public async Task<List<PasseioDto>> BuscarPasseios(string termo)
     {
-        var response = await GetAsync($"PasseioApi/buscar?termo={Uri.EscapeDataString(termo)}");
+        var response = await GetAsync($"PasseiosApi/buscar?termo={Uri.EscapeDataString(termo)}");
 
         if (response == null || !response.IsSuccessStatusCode)
             return new List<PasseioDto>();

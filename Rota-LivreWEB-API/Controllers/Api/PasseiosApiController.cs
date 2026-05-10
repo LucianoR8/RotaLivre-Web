@@ -123,7 +123,7 @@ namespace Rota_LivreWEB_API.Controllers.Api
                 Id = p.id_passeio,
                 Nome = p.nome_passeio,
                 Descricao = p.descricao,
-                ImagemUrl = p.img_url,
+                ImagemUrl = $"{Request.Scheme}://{Request.Host}/img/{p.img_url}",
                 QuantidadeCurtidas = p.QuantidadeCurtidas
             });
 

@@ -13,10 +13,13 @@
     {
         get
         {
-            if (string.IsNullOrEmpty(ImagemUrl))
+            if (string.IsNullOrWhiteSpace(ImagemUrl))
                 return null;
 
-            return ImageSource.FromUri(new Uri(ImagemUrl));
+            if (!Uri.TryCreate(ImagemUrl, UriKind.Absolute, out var uri))
+                return null;
+
+            return ImageSource.FromUri(uri);
         }
     }
 }

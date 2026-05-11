@@ -40,8 +40,8 @@
                     TextColor="White"
                     Command="{Binding PendenteCommand}" />  
 
-            <Button Text="Realizar Passeio"
-                    Clicked="OnRealizarPasseioClicked"/>
+           <!-- <Button Text="Realizar Passeio"
+                    Clicked="OnRealizarPasseioClicked"/> -->
 
             <Button Text="Criar Passeio"
                     Clicked="OnCriarGrupoClicked"/>

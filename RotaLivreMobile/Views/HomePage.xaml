@@ -9,19 +9,26 @@
           RowDefinitions="Auto,Auto,Auto,*"
           RowSpacing="15">
 
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+        <Grid Grid.Row="0"
+      ColumnDefinitions="*,Auto"
+      VerticalOptions="Center"
+      ColumnSpacing="10">
 
             <Label
                 Grid.Column="0"
                 Text="{Binding NomeUsuario, StringFormat='Olá, {0}'}"
                 FontSize="18"
-                FontAttributes="Bold"/>
+                FontAttributes="Bold"
+                VerticalOptions="Center"/>
 
             <SearchBar
                 Grid.Column="1"
                 x:Name="searchBar"
                 Placeholder="Buscar"
-                WidthRequest="220"
+                WidthRequest="140"
+                HeightRequest="45"
+                VerticalOptions="Center"
+                BackgroundColor="#F5F5F5"
                 SearchButtonPressed="OnBuscarPressed"/>
 
         </Grid>

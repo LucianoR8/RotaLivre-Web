@@ -10,4 +10,5 @@ public class UsuarioPerfilDto
     public string Nome { get; set; }
     public string Email { get; set; }
     public string DataNasc { get; set; }
+    public string? FotoPerfilUrl { get; set; }
 }

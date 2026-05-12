@@ -31,6 +31,7 @@ namespace Rota_LivreWEB_API.Models
 
         [ForeignKey(nameof(id_pergunta))]
         public PerguntaSeguranca? PerguntaSeguranca { get; set; }
+        public string? FotoPerfilUrl { get; set; }
 
 
         public Usuario()

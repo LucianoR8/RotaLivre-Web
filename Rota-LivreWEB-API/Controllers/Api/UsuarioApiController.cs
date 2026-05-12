@@ -4,6 +4,7 @@ using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.DTOs;
 using Rota_LivreWEB_API.Models;
 using Rota_LivreWEB_API.Repositories;
+using Rota_LivreWEB_API.Utilidades.Seguranca;
 
 namespace Rota_LivreWEB_API.Controllers.Api
 {
@@ -109,5 +110,81 @@ namespace Rota_LivreWEB_API.Controllers.Api
             return Ok();
         }
 
+
+
+        [HttpGet("pergunta")]
+        public ActionResult BuscarPergunta([FromQuery] string email)
+        {
+            var usuario = _repo.BuscarUsuarioPorEmail(email);
+
+            if (usuario == null)
+                return NotFound(new
+                {
+                    mensagem = "Usuário não encontrado"
+                });
+
+            var pergunta = _repo.BuscarPerguntaDoUsuario(email);
+
+            return Ok(new
+            {
+                pergunta
+            });
+        }
+
+        [HttpPost("verificar-resposta")]
+        public ActionResult VerificarResposta([FromBody] VerificarRespostaDto dto)
+        {
+            string respostaHash =
+                HashHelper.GerarHash(dto.Resposta);
+
+            string respostaBanco =
+                _repo.ObterRespostaDoBanco(dto.Email);
+
+            if (respostaHash != respostaBanco)
+            {
+                return BadRequest(new
+                {
+                    mensagem = "Resposta incorreta"
+                });
+            }
+
+            return Ok(new
+            {
+                sucesso = true
+            });
+        }
+
+        [HttpPost("redefinir")]
+        public ActionResult RedefinirSenha([FromBody] RedefinirSenhaDto dto)
+        {
+            var usuario =
+                _repo.BuscarUsuarioPorEmail(dto.Email);
+
+            if (usuario == null)
+            {
+                return NotFound(new
+                {
+                    mensagem = "Usuário não encontrado"
+                });
+            }
+
+            bool sucesso =
+                _repo.AlterarSenha(
+                    usuario.id_usuario,
+                    dto.NovaSenha);
+
+            if (!sucesso)
+            {
+                return StatusCode(500, new
+                {
+                    mensagem = "Erro ao alterar senha"
+                });
+            }
+
+            return Ok(new
+            {
+                mensagem = "Senha alterada com sucesso"
+            });
+        }
     }
 }

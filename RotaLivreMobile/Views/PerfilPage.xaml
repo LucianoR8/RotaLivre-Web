@@ -3,21 +3,30 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RotaLivreMobile.Views.PerfilPage"
              Title="Perfil">
-    <Grid Padding="20" RowDefinitions="Auto,Auto,*">
+    <Grid Padding="20" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
 
-        <Label Grid.Row="0"
+        <Image Grid.Row="0" 
+               Source="profilepic.png" 
+               WidthRequest="100" 
+               HeightRequest="100" 
+               HorizontalOptions="Center" Margin ="0, 0, 0, 20"/>
+
+        <Label Grid.Row="1"
                Text="{Binding Nome}"
                FontSize="24"
-               HorizontalOptions="Center" />
+               HorizontalOptions="Center" Margin ="0, 0, 0, 30"/>
 
-        <VerticalStackLayout Grid.Row="1" Spacing="10">
+        <Label Grid.Row="2" Text="Informações" HorizontalOptions="Center"
+               FontAttributes="Bold" FontSize="18"/>
+
+        <VerticalStackLayout Grid.Row="3" Spacing="10">
 
             <Label Text="{Binding Email}" />
-            <Label Text="{Binding DataNasc}" />
+            <Label Text="{Binding DataNasc}" Margin ="0, 0, 0, 50"/>
 
         </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Row="2" Spacing="10">
+        <VerticalStackLayout Grid.Row="4" Spacing="10">
 
             <Button Text="Editar Perfil"
                     Clicked="OnEditarClicked" />

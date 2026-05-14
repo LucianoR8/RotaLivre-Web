@@ -86,7 +86,10 @@ namespace RotaLivreMobile
             builder.Services.AddTransient<PerfilPage>();
             builder.Services.AddTransient<EditarPerfilPage>();
             builder.Services.AddTransient<BuscaPage>();
-            
+            builder.Services.AddTransient<RecuperarSenhaPage>();
+            builder.Services.AddTransient<ConfirmarRespostaPage>();
+            builder.Services.AddTransient<NovaSenhaPage>();
+
 
             return builder.Build();
         }

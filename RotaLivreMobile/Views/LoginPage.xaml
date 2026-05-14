@@ -24,6 +24,10 @@
             Text="Criar Conta"
             Command="{Binding IrParaCadastroCommand}" />
 
+        <Button
+            Text="Esqueci minha senha"
+            Command="{Binding IrParaRecuperacaoCommand}" />
+
     </VerticalStackLayout>
 
 </ContentPage>

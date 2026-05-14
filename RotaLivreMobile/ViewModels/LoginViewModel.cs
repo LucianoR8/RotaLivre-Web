@@ -13,18 +13,30 @@ public class LoginViewModel : BaseViewModel
 
     public ICommand LoginCommand { get; }
     public ICommand IrParaCadastroCommand { get; }
+    public ICommand IrParaRecuperacaoCommand { get; }
 
     public LoginViewModel(ApiService apiService)
     {
         _apiService = apiService;
 
-        LoginCommand = new Command(async () => await OnLogin());
-        IrParaCadastroCommand = new Command(OnIrParaCadastro);
+        LoginCommand =
+            new Command(async () => await OnLogin());
+
+        IrParaCadastroCommand =
+            new Command(OnIrParaCadastro);
+
+        IrParaRecuperacaoCommand =
+            new Command(async () =>
+            {
+                await Shell.Current.GoToAsync(
+                    nameof(RecuperarSenhaPage));
+            }); 
     }
 
     private async Task OnLogin()
     {
-        bool sucesso = await _apiService.Login(Email, Senha);
+        bool sucesso =
+            await _apiService.Login(Email, Senha);
 
         if (sucesso)
         {
@@ -36,19 +48,24 @@ public class LoginViewModel : BaseViewModel
 
             if (!string.IsNullOrEmpty(app.CodigoDeepLink))
             {
-                await Shell.Current.GoToAsync($"grupoDetalhe?codigo={app.CodigoDeepLink}");
+                await Shell.Current.GoToAsync(
+                    $"grupoDetalhe?codigo={app.CodigoDeepLink}");
+
                 app.CodigoDeepLink = null;
             }
         }
         else
         {
-            await Application.Current.MainPage.DisplayAlert("Erro", "Email ou senha inválidos", "OK");
+            await Application.Current.MainPage.DisplayAlert(
+                "Erro",
+                "Email ou senha inválidos",
+                "OK");
         }
     }
 
     private async void OnIrParaCadastro()
     {
-        await Shell.Current.GoToAsync(nameof(CadastroPage));
+        await Shell.Current.GoToAsync(
+            nameof(CadastroPage));
     }
-
 }

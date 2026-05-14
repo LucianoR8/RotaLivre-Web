@@ -73,48 +73,30 @@ public class UsuarioApiService : BaseApiService
 
     public async Task<string?> BuscarPerguntaSeguranca(string email)
     {
-        try
-        {
-            Console.WriteLine("1 - Iniciando busca");
+        var response = await GetPublicAsync(
+            $"UsuarioApi/pergunta?email={Uri.EscapeDataString(email)}");
 
-            var response = await GetAsync(
-                $"UsuarioApi/pergunta?email={Uri.EscapeDataString(email)}");
-
-            Console.WriteLine($"2 - Status: {response?.StatusCode}");
-
-            if (response == null)
-            {
-                Console.WriteLine("3 - Response null");
-                return null;
-            }
-
-            if (!response.IsSuccessStatusCode)
-            {
-                Console.WriteLine("4 - Status não sucesso");
-                return null;
-            }
-
-            var json = await response.Content.ReadAsStringAsync();
-
-            Console.WriteLine($"5 - JSON: {json}");
-
-            var resultado = JsonSerializer.Deserialize<PerguntaResponse>(
-                json,
-                new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-            Console.WriteLine($"6 - Pergunta: {resultado?.Pergunta}");
-
-            return resultado?.Pergunta;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"ERRO REAL: {ex}");
-
+        if (response == null)
             return null;
-        }
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        await Application.Current.MainPage.DisplayAlert(
+            "DEBUG",
+            json,
+            "OK");
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        var resultado = JsonSerializer.Deserialize<PerguntaResponse>(
+            json,
+            new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+        return resultado?.Pergunta;
     }
 
     public async Task<bool> VerificarRespostaAsync(
@@ -128,7 +110,7 @@ public class UsuarioApiService : BaseApiService
         };
 
         var response =
-            await PostAsync(
+            await PostPublicAsync(
                 "UsuarioApi/verificar-resposta",
                 dto);
 
@@ -147,7 +129,7 @@ public class UsuarioApiService : BaseApiService
         };
 
         var response =
-            await PostAsync(
+            await PostPublicAsync(
                 "UsuarioApi/redefinir",
                 dto);
 

@@ -83,5 +83,40 @@ public class BaseApiService
         return await _httpClient.DeleteAsync(endpoint);
     }
 
+    public async Task<HttpResponseMessage?> GetPublicAsync(string endpoint)
+    {
+        try
+        {
+            return await _httpClient.GetAsync(endpoint);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            return null;
+        }
+    }
 
+    public async Task<HttpResponseMessage?> PostPublicAsync(
+        string endpoint,
+        object data)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(data);
+
+            var content = new StringContent(
+                json,
+                Encoding.UTF8,
+                "application/json");
+
+            return await _httpClient.PostAsync(
+                endpoint,
+                content);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            return null;
+        }
+    }
 }

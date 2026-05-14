@@ -16,7 +16,10 @@ public partial class RecuperarSenhaPage : ContentPage
         base.OnAppearing();
 
         _service ??=
-            Handler?.MauiContext?.Services
+            Application.Current?
+            .Handler?
+            .MauiContext?
+            .Services
             .GetService<UsuarioApiService>();
     }
 

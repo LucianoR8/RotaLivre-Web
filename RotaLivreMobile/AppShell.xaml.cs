@@ -25,7 +25,7 @@ namespace RotaLivreMobile
             Routing.RegisterRoute(nameof(BuscaPage), typeof(BuscaPage));
             Routing.RegisterRoute(nameof(RecuperarSenhaPage), typeof(RecuperarSenhaPage));
             Routing.RegisterRoute(nameof(ConfirmarRespostaPage), typeof(ConfirmarRespostaPage));
-            Routing.RegisterRoute(nameof(RedefinirSenhaPage), typeof(RedefinirSenhaPage));
+            Routing.RegisterRoute(nameof(NovaSenhaPage), typeof(NovaSenhaPage));
 
             IniciarMonitoramentoClipboard();
         }

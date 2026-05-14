@@ -13,7 +13,8 @@ public partial class ConfirmarRespostaPage : ContentPage
     public string Pergunta
     {
         get => perguntaLabel.Text;
-        set => perguntaLabel.Text = Uri.UnescapeDataString(value);
+        set => perguntaLabel.Text =
+            Uri.UnescapeDataString(value);
     }
 
     public ConfirmarRespostaPage()
@@ -26,7 +27,10 @@ public partial class ConfirmarRespostaPage : ContentPage
         base.OnAppearing();
 
         _service ??=
-            Handler?.MauiContext?.Services
+            Application.Current?
+            .Handler?
+            .MauiContext?
+            .Services
             .GetService<UsuarioApiService>();
     }
 
@@ -63,7 +67,7 @@ public partial class ConfirmarRespostaPage : ContentPage
         }
 
         await Shell.Current.GoToAsync(
-            $"{nameof(RedefinirSenhaPage)}" +
+            $"{nameof(NovaSenhaPage)}" +
             $"?email={Email}");
     }
 }

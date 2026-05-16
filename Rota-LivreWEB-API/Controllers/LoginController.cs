@@ -1,0 +1,135 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Rota_LivreWEB_API.Data;
+using Rota_LivreWEB_API.Repositories;
+using Rota_LivreWEB_API.Utilidades.Seguranca;
+
+namespace Rota_LivreWEB_API.Controllers
+{
+    public class LoginController : Controller
+    {
+        private readonly UsuarioRepository _usuarioRp;
+
+        public LoginController(UsuarioRepository usuarioRp)
+        {
+            _usuarioRp = usuarioRp;
+        }
+        public ViewResult Login()
+        {
+            return View();
+        }
+
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Login(string email, string senha)
+        {
+            Console.WriteLine($"Tentando login: {email} - {senha}"); 
+
+            if (_usuarioRp.VerificarLogin(email, senha))
+            {
+                
+                int idUsuario = _usuarioRp.BuscarIdPorEmail(email);
+                string nome_completo = _usuarioRp.BuscarNomePorEmail(email);
+
+
+                HttpContext.Session.SetInt32("IdUsuario", idUsuario);
+                HttpContext.Session.SetString("NomeUsuario", nome_completo);
+
+
+                return RedirectToAction("Home", "HomeBase");
+            }
+            else
+            {
+                ViewBag.MensagemErro = "Email ou senha inválidos!";
+                return View();
+            }
+        }
+
+        public ActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login", "Login");
+        }
+
+
+        public ViewResult SolicitarRedefinicao()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult SolicitarRedefinicaoSenha(string email)
+        {
+            var usuario = _usuarioRp.BuscarUsuarioPorEmail(email);
+            if (usuario == null)
+            {
+                ViewBag.Erro = "E-mail não encontrado!";
+                return View("SolicitarRedefinicao");
+            }
+
+
+            return RedirectToAction("ConfirmarResposta", new { email = email });
+        }
+
+        public ViewResult DefinirNovaSenha(int id)
+        {
+            ViewBag.IdUsuario = id;
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult DefinirNovaSenha(int id_usuario, string novaSenha, string confirmarSenha)
+        {
+            if (novaSenha != confirmarSenha)
+            {
+                ViewBag.Erro = "As senhas não coincidem!";
+                ViewBag.IdUsuario = id_usuario;
+                return View();
+            }
+
+            bool sucesso = _usuarioRp.AlterarSenha(id_usuario, novaSenha);
+
+            if (sucesso)
+                return RedirectToAction("SenhaAlteradaSucesso");
+            else
+                return StatusCode(500, "Erro ao redefinir senha.");
+        }
+
+        public ActionResult ConfirmarResposta(string email)
+        {
+            var pergunta = _usuarioRp.BuscarPerguntaDoUsuario(email);
+            ViewBag.Email = email;
+            ViewBag.Pergunta = pergunta;
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult VerificarResposta(string email, string RespostaInformada)
+        {
+            string respostaHash = HashHelper.GerarHash(RespostaInformada);
+            string respostaBanco = _usuarioRp.ObterRespostaDoBanco(email);
+
+            if (respostaHash == respostaBanco)
+            {
+                var usuario = _usuarioRp.BuscarUsuarioPorEmail(email);
+                return RedirectToAction("DefinirNovaSenha", new { id = usuario.id_usuario });
+            }
+            else
+            {
+                ViewBag.Erro = "Resposta incorreta.";
+                var pergunta = _usuarioRp.BuscarPerguntaDoUsuario(email);
+                ViewBag.Email = email;
+                ViewBag.Pergunta = pergunta;
+                return View("ConfirmarResposta");
+            }
+        }
+
+
+
+
+        public ViewResult SenhaAlteradaSucesso()
+        {
+            return View(); 
+        }
+    }
+}

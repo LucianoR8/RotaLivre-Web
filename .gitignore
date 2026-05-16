@@ -1,0 +1,4 @@
+.vs/ 
+bin/ 
+obj/ 
+Rota-LivreWEB-API/appsettings.Development.json

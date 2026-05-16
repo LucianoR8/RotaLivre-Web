@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="RotaLivreMobile.Views.RecuperarSenhaPage"
+    Title="Recuperar Senha">
+
+    <VerticalStackLayout
+        Padding="25"
+        Spacing="20"
+        VerticalOptions="Center">
+
+        <Label
+            Text="Recuperação de senha"
+            FontSize="26"
+            FontAttributes="Bold"
+            HorizontalOptions="Center"/>
+
+        <Label
+            Text="Digite o e-mail da conta"
+            FontSize="16"/>
+
+        <Entry
+            x:Name="emailEntry"
+            Placeholder="E-mail"
+            Keyboard="Email"/>
+
+        <Button
+            Text="Continuar"
+            Clicked="OnContinuarClicked"/>
+
+    </VerticalStackLayout>
+
+</ContentPage>

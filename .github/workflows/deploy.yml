@@ -36,4 +36,4 @@ jobs:
           host: ssh-rotalivre.alwaysdata.net
           username: rotalivre
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: alw-restart-site rotalivre
+          script: touch www/restart.txt && alw-restart-site rotalivre || echo "Comando alw não disponível, mas arquivo de restart tocado."

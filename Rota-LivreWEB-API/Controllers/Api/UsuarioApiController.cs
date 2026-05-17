@@ -245,5 +245,43 @@ namespace Rota_LivreWEB_API.Controllers.Api
                 fotoUrl = urlPublica
             });
         }
+
+        [HttpDelete("remover-foto/{id}")]
+        public async Task<IActionResult> RemoverFoto(int id)
+        {
+            var usuario = await _repo.BuscarPorIdAsync(id);
+
+            if (usuario == null)
+                return NotFound();
+
+            if (string.IsNullOrEmpty(usuario.FotoPerfilUrl))
+                return BadRequest("Usuário não possui foto.");
+
+            var fileName = usuario.FotoPerfilUrl
+                .Split('/')
+                .Last();
+
+            var supabaseUrl = _config["Supabase:Url"];
+            var supabaseKey = _config["Supabase:Key"];
+            var bucket = _config["Supabase:Bucket"];
+
+            using var client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", supabaseKey);
+
+            var request = new HttpRequestMessage(
+                HttpMethod.Delete,
+                $"{supabaseUrl}/storage/v1/object/{bucket}/{fileName}");
+
+            var response = await client.SendAsync(request);
+
+            usuario.FotoPerfilUrl = null;
+
+            await _repo.AtualizarUsuarioAsync(usuario);
+
+            return Ok();
+        }
+
     }
 }

@@ -10,6 +10,24 @@ public class PerfilViewModel : BaseViewModel
     public string Email { get; set; }
     public string DataNasc { get; set; }
 
+    private string? _fotoPerfilUrl;
+
+    public string? FotoPerfilUrl
+    {
+        get => _fotoPerfilUrl;
+        set
+        {
+            _fotoPerfilUrl = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(FotoExibicao));
+        }
+    }
+
+    public string FotoExibicao =>
+        string.IsNullOrEmpty(FotoPerfilUrl)
+            ? "profilepic.png"
+            : FotoPerfilUrl;
+
     public ICommand CarregarCommand { get; }
     public ICommand LogoutCommand { get; }
     public ICommand DeletarCommand { get; }
@@ -37,6 +55,7 @@ public class PerfilViewModel : BaseViewModel
         Nome = perfil.Nome;
         Email = perfil.Email;
         DataNasc = perfil.DataNasc;
+        FotoPerfilUrl = perfil.FotoPerfilUrl;
 
         OnPropertyChanged(nameof(Nome));
         OnPropertyChanged(nameof(Email));

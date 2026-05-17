@@ -271,6 +271,8 @@ namespace Rota_LivreWEB_API.Controllers.Api
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", supabaseKey);
 
+            client.DefaultRequestHeaders.Add("apikey", supabaseKey);
+
             var request = new HttpRequestMessage(
                 HttpMethod.Delete,
                 $"{supabaseUrl}/storage/v1/object/{bucket}/{fileName}");

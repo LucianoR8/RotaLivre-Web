@@ -88,7 +88,11 @@ public partial class EditarPerfilPage : ContentPage
 
             if (!sucesso)
             {
-                await DisplayAlert("Erro", erro, "OK");
+                await DisplayAlert(
+                    "Erro",
+                    erro ?? "Erro desconhecido",
+                    "OK");
+
                 return;
             }
 
@@ -101,7 +105,7 @@ public partial class EditarPerfilPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Erro", ex.Message, "OK");
+            await DisplayAlert("Erro", ex.ToString(), "OK");
         }
     }
 

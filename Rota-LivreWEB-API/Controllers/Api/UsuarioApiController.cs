@@ -257,9 +257,10 @@ namespace Rota_LivreWEB_API.Controllers.Api
             if (string.IsNullOrEmpty(usuario.FotoPerfilUrl))
                 return BadRequest("Usuário não possui foto.");
 
-            var fileName = usuario.FotoPerfilUrl
-                .Split('/')
-                .Last();
+            var uri = new Uri(usuario.FotoPerfilUrl);
+
+            var fileName =
+                Path.GetFileName(uri.LocalPath);
 
             var supabaseUrl = _config["Supabase:Url"];
             var supabaseKey = _config["Supabase:Key"];
@@ -275,6 +276,14 @@ namespace Rota_LivreWEB_API.Controllers.Api
                 $"{supabaseUrl}/storage/v1/object/{bucket}/{fileName}");
 
             var response = await client.SendAsync(request);
+
+            var responseContent =
+                await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return BadRequest(responseContent);
+            }
 
             usuario.FotoPerfilUrl = null;
 

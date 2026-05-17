@@ -45,12 +45,19 @@ public class ApiService
             responseContent,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
+        await Application.Current.MainPage.DisplayAlert(
+            "DEBUG LOGIN",
+            responseContent,
+            "OK");
+
         if (result == null)
             return false;
 
         await SecureStorage.SetAsync("auth_token", result.Token);
         await SecureStorage.SetAsync("usuario_id", result.Usuario.Id.ToString());
         await SecureStorage.SetAsync("usuario_nome", result.Usuario.Nome);
+        Preferences.Set("IdUsuario", result.Usuario.Id);
+        Preferences.Set("NomeUsuario", result.Usuario.Nome);
 
         return true;
     }

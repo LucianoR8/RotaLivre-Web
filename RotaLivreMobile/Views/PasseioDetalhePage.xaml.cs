@@ -1,4 +1,5 @@
 ﻿using RotaLivreMobile.ViewModels;
+using RotaLivreMobile.Models;
 
 namespace RotaLivreMobile.Views;
 
@@ -32,6 +33,15 @@ public partial class PasseioDetalhePage : ContentPage, IQueryAttributable
         await Shell.Current.GoToAsync(
             $"grupo?nomePasseio={Uri.EscapeDataString(_viewModel.Nome)}&idPasseio={_viewModel.Id}"
         );
+    }
+
+    private async void OnComentariosClicked(
+    object sender,
+    EventArgs e)
+    {
+        await Shell.Current.GoToAsync(
+            $"{nameof(ComentariosPage)}" +
+            $"?idPasseio={_viewModel.Id}");
     }
 
 

@@ -11,6 +11,13 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(int.Parse(port));
+});
+
 // Controllers / MVC
 builder.Services.AddControllers();
 builder.Services.AddControllersWithViews();
@@ -105,7 +112,7 @@ if (app.Environment.IsDevelopment())
 // Middleware pipeline
 app.UseCors("AllowAll");
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
@@ -123,6 +130,10 @@ app.MapControllerRoute(
 
 app.MapHub<GrupoHub>("/grupohub");
 
-
+app.MapGet("/status-deploy", () => new { 
+    status = "Online", 
+    versao = "1.0.1", 
+    data = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")
+});
 
 app.Run();

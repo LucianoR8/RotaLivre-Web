@@ -27,7 +27,7 @@ jobs:
           username: rotalivre
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "./publish/*"
-          target: "www"
+          target: "api/"
           strip_components: 1
 
       - name: Restart Site

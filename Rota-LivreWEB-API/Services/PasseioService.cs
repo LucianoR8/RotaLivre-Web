@@ -38,7 +38,7 @@ namespace Rota_LivreWEB_API.Services
             var passeio = await _context.Passeio
                 .Include(p => p.Endereco)
                 .FirstOrDefaultAsync(p => p.id_passeio == id);
-            
+
             if (passeio == null)
                 return null;
 
@@ -165,13 +165,14 @@ namespace Rota_LivreWEB_API.Services
             else
             {
                 var pendente = await _context.PasseioPendente
-                    .FirstOrDefaultAsync(p =>
+                    .Where(p =>
                         p.id_usuario == usuarioId &&
-                        p.id_passeio == passeioId);
+                        p.id_passeio == passeioId)
+                    .ToListAsync();
 
-                if (pendente != null)
+                if (pendente.Any())
                 {
-                    _context.PasseioPendente.Remove(pendente);
+                    _context.PasseioPendente.RemoveRange(pendente);
                 }
 
                 var nova = new CurtidaPasseio
@@ -209,14 +210,15 @@ namespace Rota_LivreWEB_API.Services
                 return false;
             }
 
-            var curtida = await _context.CurtidaPasseio
-                .FirstOrDefaultAsync(c =>
+            var curtidas = await _context.CurtidaPasseio
+                .Where(c =>
                     c.id_usuario == usuarioId &&
-                    c.id_passeio == passeioId);
+                    c.id_passeio == passeioId)
+                .ToListAsync();
 
-            if (curtida != null)
+            if (curtidas.Any())
             {
-                _context.CurtidaPasseio.Remove(curtida);
+                _context.CurtidaPasseio.RemoveRange(curtidas);
             }
 
             var novo = new PasseioPendente

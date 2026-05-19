@@ -1,5 +1,4 @@
-﻿using Microsoft.Maui.Controls.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using RotaLivreMobile.Services;
 using RotaLivreMobile.ViewModels;
 using RotaLivreMobile.Views;
@@ -61,16 +60,8 @@ namespace RotaLivreMobile
                 client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             });
 
-            builder.Services.AddHttpClient<AvaliacaoApiService>(client =>
-            {
-                client.BaseAddress =
-                    new Uri("https://rotalivre-web.onrender.com/api/");
-            });
-
-
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddSingleton<GrupoSignalRService>();
-            builder.Services.AddSingleton<LocationService>();
 
             // ViewModels
             builder.Services.AddTransient<LoginViewModel>();
@@ -98,9 +89,6 @@ namespace RotaLivreMobile
             builder.Services.AddTransient<RecuperarSenhaPage>();
             builder.Services.AddTransient<ConfirmarRespostaPage>();
             builder.Services.AddTransient<NovaSenhaPage>();
-			      builder.Services.AddTransient<MapaGrupoPage>();
-            builder.Services.AddTransient<ComentariosPage>();
-
 
 
             return builder.Build();

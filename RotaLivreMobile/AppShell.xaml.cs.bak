@@ -17,7 +17,7 @@ namespace RotaLivreMobile
             Routing.RegisterRoute(nameof(CadastroPage), typeof(CadastroPage));
             Routing.RegisterRoute("detalhe", typeof(PasseioDetalhePage));
             Routing.RegisterRoute(nameof(CategoriaPage), typeof(CategoriaPage));
-            // Routing.RegisterRoute(nameof(RealizarPasseioPage), typeof(RealizarPasseioPage));
+            Routing.RegisterRoute(nameof(RealizarPasseioPage), typeof(RealizarPasseioPage));
             Routing.RegisterRoute("grupo", typeof(GrupoPage));
             Routing.RegisterRoute("grupoDetalhe", typeof(GrupoPage));
             Routing.RegisterRoute(nameof(MeusPasseiosPage), typeof(MeusPasseiosPage));
@@ -26,8 +26,6 @@ namespace RotaLivreMobile
             Routing.RegisterRoute(nameof(RecuperarSenhaPage), typeof(RecuperarSenhaPage));
             Routing.RegisterRoute(nameof(ConfirmarRespostaPage), typeof(ConfirmarRespostaPage));
             Routing.RegisterRoute(nameof(NovaSenhaPage), typeof(NovaSenhaPage));
-            Routing.RegisterRoute(nameof(MapaGrupoPage), typeof(MapaGrupoPage));
-            Routing.RegisterRoute( nameof(ComentariosPage), typeof(ComentariosPage));
 
             IniciarMonitoramentoClipboard();
         }

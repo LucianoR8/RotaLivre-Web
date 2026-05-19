@@ -83,7 +83,9 @@
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
-
+                    
+                    <Button Text="Realizar Passeio"
+                        Clicked="OnRealizarPasseioClicked"/>
                     <Button 
                         Text="Sair do Grupo"
                         Clicked="OnSairGrupoClicked" />

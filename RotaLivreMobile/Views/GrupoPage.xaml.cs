@@ -52,6 +52,10 @@ public partial class GrupoPage : ContentPage
         }
     }
 
+    private async void OnRealizarPasseioClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(nameof(MapaGrupoPage));
+    }
     private async void OnSairGrupoClicked(object sender, EventArgs e)
     {
         if (BindingContext is GrupoViewModel vm)

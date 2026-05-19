@@ -5,6 +5,8 @@ using Rota_LivreWEB_API.DTOs;
 using Rota_LivreWEB_API.Models;
 using Rota_LivreWEB_API.Repositories;
 using Rota_LivreWEB_API.Utilidades.Seguranca;
+using Supabase;
+using System.Net.Http.Headers;
 
 namespace Rota_LivreWEB_API.Controllers.Api
 {
@@ -14,11 +16,13 @@ namespace Rota_LivreWEB_API.Controllers.Api
     {
         private readonly UsuarioRepository _repo;
         private readonly AppDbContext _context;
+        private readonly IConfiguration _config;
 
-        public UsuarioApiController(UsuarioRepository repo, AppDbContext context)
+        public UsuarioApiController(UsuarioRepository repo, AppDbContext context, IConfiguration config)
         {
             _repo = repo;
             _context = context;
+            _config = config;
         }
 
         [HttpPost("cadastrar")]
@@ -74,7 +78,8 @@ namespace Rota_LivreWEB_API.Controllers.Api
                 Id = usuario.id_usuario,
                 Nome = usuario.nome_completo,
                 Email = usuario.email,
-                DataNasc = usuario.data_nasc.ToString("yyyy-MM-dd")
+                DataNasc = usuario.data_nasc.ToString("yyyy-MM-dd"),
+                FotoPerfilUrl = usuario.FotoPerfilUrl
             };
 
             return Ok(dto);
@@ -186,5 +191,108 @@ namespace Rota_LivreWEB_API.Controllers.Api
                 mensagem = "Senha alterada com sucesso"
             });
         }
+
+        [HttpPost("upload-foto/{id}")]
+        public async Task<ActionResult> UploadFoto(int id, IFormFile foto)
+        {
+            var usuario = await _repo.BuscarPorIdAsync(id);
+
+            if (usuario == null)
+                return NotFound("Usuário não encontrado");
+
+            if (foto == null || foto.Length == 0)
+                return BadRequest("Imagem inválida");
+
+            var supabaseUrl = _config["Supabase:Url"];
+            var supabaseKey = _config["Supabase:Key"];
+            var bucket = _config["Supabase:Bucket"];
+
+            var fileName = $"usuario_{id}_{Guid.NewGuid()}.jpg";
+
+            using var httpClient = new HttpClient();
+
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", supabaseKey);
+
+            httpClient.DefaultRequestHeaders.Add("apikey", supabaseKey);
+
+            using var stream = foto.OpenReadStream();
+
+            var content = new StreamContent(stream);
+
+            content.Headers.ContentType =
+                new MediaTypeHeaderValue(foto.ContentType);
+
+            var response = await httpClient.PostAsync(
+                $"{supabaseUrl}/storage/v1/object/{bucket}/{fileName}",
+                content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var erro = await response.Content.ReadAsStringAsync();
+                return BadRequest(erro);
+            }
+
+            var urlPublica =
+                $"{supabaseUrl}/storage/v1/object/public/{bucket}/{fileName}";
+
+            usuario.FotoPerfilUrl = urlPublica;
+
+            await _repo.AtualizarUsuarioAsync(usuario);
+
+            return Ok(new
+            {
+                fotoUrl = urlPublica
+            });
+        }
+
+        [HttpDelete("remover-foto/{id}")]
+        public async Task<IActionResult> RemoverFoto(int id)
+        {
+            var usuario = await _repo.BuscarPorIdAsync(id);
+
+            if (usuario == null)
+                return NotFound();
+
+            if (string.IsNullOrEmpty(usuario.FotoPerfilUrl))
+                return BadRequest("Usuário não possui foto.");
+
+            var uri = new Uri(usuario.FotoPerfilUrl);
+
+            var fileName =
+                Path.GetFileName(uri.LocalPath);
+
+            var supabaseUrl = _config["Supabase:Url"];
+            var supabaseKey = _config["Supabase:Key"];
+            var bucket = _config["Supabase:Bucket"];
+
+            using var client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", supabaseKey);
+
+            client.DefaultRequestHeaders.Add("apikey", supabaseKey);
+
+            var request = new HttpRequestMessage(
+                HttpMethod.Delete,
+                $"{supabaseUrl}/storage/v1/object/{bucket}/{fileName}");
+
+            var response = await client.SendAsync(request);
+
+            var responseContent =
+                await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return BadRequest(responseContent);
+            }
+
+            usuario.FotoPerfilUrl = null;
+
+            await _repo.AtualizarUsuarioAsync(usuario);
+
+            return Ok();
+        }
+
     }
 }

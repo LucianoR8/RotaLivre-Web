@@ -5,133 +5,145 @@
     x:Class="RotaLivreMobile.Views.HomePage"
     Title="Home">
 
-    <Grid Padding="20"
-          RowDefinitions="Auto,Auto,Auto,*"
-          RowSpacing="15">
+    <ScrollView>
 
-        <Grid Grid.Row="0"
-      ColumnDefinitions="*,Auto"
-      VerticalOptions="Center"
-      ColumnSpacing="10">
+        <VerticalStackLayout
+            Padding="20"
+            Spacing="15">
+
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="10">
+
+                <Label
+                    Grid.Column="0"
+                    Text="{Binding NomeUsuario, StringFormat='Olá, {0}'}"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" />
+
+                <SearchBar
+                    Grid.Column="1"
+                    x:Name="searchBar"
+                    Placeholder="Buscar"
+                    WidthRequest="140"
+                    HeightRequest="45"
+                    VerticalOptions="Center"
+                    BackgroundColor="#F5F5F5"
+                    SearchButtonPressed="OnBuscarPressed" />
+
+            </Grid>
+
+            <CarouselView
+                x:Name="carouselCategorias"
+                ItemsSource="{Binding Categorias}"
+                HeightRequest="200"
+                IndicatorView="indicatorCategorias">
+
+                <CarouselView.ItemTemplate>
+                    <DataTemplate>
+
+                        <Frame
+                            CornerRadius="20"
+                            Margin="5"
+                            Padding="0"
+                            HasShadow="True">
+
+                            <Grid>
+
+                                <Image
+                                    Source="{Binding ImgSource}"
+                                    Aspect="AspectFill" />
+
+                                <BoxView BackgroundColor="#60000000" />
+
+                                <Label
+                                    Text="{Binding TipoCategoria}"
+                                    TextColor="White"
+                                    FontSize="22"
+                                    FontAttributes="Bold"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center" />
+
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Tapped="OnCategoriaClicada"
+                                        CommandParameter="{Binding .}" />
+                                </Grid.GestureRecognizers>
+
+                            </Grid>
+
+                        </Frame>
+
+                    </DataTemplate>
+                </CarouselView.ItemTemplate>
+
+            </CarouselView>
+
+            <IndicatorView
+                x:Name="indicatorCategorias"
+                HorizontalOptions="Center"
+                IndicatorColor="LightGray"
+                SelectedIndicatorColor="Black" />
 
             <Label
-                Grid.Column="0"
-                Text="{Binding NomeUsuario, StringFormat='Olá, {0}'}"
-                FontSize="18"
+                Text="Destaques"
+                FontSize="22"
                 FontAttributes="Bold"
-                VerticalOptions="Center"/>
+                Margin="0,10,0,5" />
 
-            <SearchBar
-                Grid.Column="1"
-                x:Name="searchBar"
-                Placeholder="Buscar"
-                WidthRequest="140"
-                HeightRequest="45"
-                VerticalOptions="Center"
-                BackgroundColor="#F5F5F5"
-                SearchButtonPressed="OnBuscarPressed"/>
+            <VerticalStackLayout
+                BindableLayout.ItemsSource="{Binding Destaques}"
+                Spacing="10">
 
-        </Grid>
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
 
-        <CarouselView
-            x:Name="carouselCategorias"
-            Grid.Row="1"
-            ItemsSource="{Binding Categorias}"
-            HeightRequest="200"
-            IndicatorView="indicatorCategorias">
+                        <Frame
+                            CornerRadius="15"
+                            HasShadow="True"
+                            Padding="0">
 
-            <CarouselView.ItemTemplate>
-                <DataTemplate>
-
-                    <Frame CornerRadius="20"
-                           Margin="5"
-                           Padding="0"
-                           HasShadow="True">
-
-                        <Grid>
-
-                            <Image Source="{Binding ImgSource}"
-                                   Aspect="AspectFill" />
-
-                            <BoxView BackgroundColor="#60000000" />
-
-                            <Label Text="{Binding TipoCategoria}"
-                                   TextColor="White"
-                                   FontSize="22"
-                                   FontAttributes="Bold"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center" />
-
-                            <Grid.GestureRecognizers>
+                            <Frame.GestureRecognizers>
                                 <TapGestureRecognizer
-                                    Tapped="OnCategoriaClicada"
+                                    Tapped="OnPasseioClicado"
                                     CommandParameter="{Binding .}" />
-                            </Grid.GestureRecognizers>
+                            </Frame.GestureRecognizers>
 
-                        </Grid>
+                            <VerticalStackLayout Spacing="5">
 
-                    </Frame>
+                                <Image
+                                    Source="{Binding ImagemSource}"
+                                    HeightRequest="180"
+                                    Aspect="AspectFill" />
 
-                </DataTemplate>
-            </CarouselView.ItemTemplate>
-        </CarouselView>
+                                <VerticalStackLayout Padding="10"
+                                                     Spacing="5">
 
-        <IndicatorView
-            x:Name="indicatorCategorias"
-            Grid.Row="2"
-            HorizontalOptions="Center"
-            IndicatorColor="LightGray"
-            SelectedIndicatorColor="Black" />
+                                    <Label
+                                        Text="{Binding Nome}"
+                                        FontSize="18"
+                                        FontAttributes="Bold"
+                                        HorizontalOptions="Center" />
 
-        <CollectionView
-            Grid.Row="3"
-            ItemsSource="{Binding Destaques}">
+                                    <Label
+                                        Text="{Binding QuantidadeCurtidas,
+                                               StringFormat='Curtidas: {0}'}"
+                                        FontSize="12"
+                                        TextColor="Gray" />
 
-            <CollectionView.Header>
-                <Label Text="Destaques"
-                       FontSize="22"
-                       FontAttributes="Bold"
-                       Margin="0,10,0,10" />
-            </CollectionView.Header>
+                                </VerticalStackLayout>
 
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
+                            </VerticalStackLayout>
 
-                    <Frame Margin="0,5"
-                           CornerRadius="15"
-                           HasShadow="True">
+                        </Frame>
 
-                        <Frame.GestureRecognizers>
-                            <TapGestureRecognizer
-                                Tapped="OnPasseioClicado"
-                                CommandParameter="{Binding .}" />
-                        </Frame.GestureRecognizers>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
 
-                        <VerticalStackLayout Spacing="5">
+            </VerticalStackLayout>
 
-                            <Image Source="{Binding ImagemSource}"
-                                   HeightRequest="180"
-                                   Aspect="AspectFill" />
+        </VerticalStackLayout>
 
-                            <Label Text="{Binding Nome}"
-                                   FontSize="18"
-                                   FontAttributes="Bold"
-                                   HorizontalOptions="Center"/>
-
-                            <Label Text="{Binding QuantidadeCurtidas,
-                                                   StringFormat='Curtidas: {0}'}"
-                                   FontSize="12"
-                                   TextColor="Gray" />
-
-                        </VerticalStackLayout>
-
-                    </Frame>
-
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-
-        </CollectionView>
-
-    </Grid>
+    </ScrollView>
 
 </ContentPage>

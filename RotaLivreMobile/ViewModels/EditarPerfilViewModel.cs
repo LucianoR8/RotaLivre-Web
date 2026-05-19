@@ -40,7 +40,22 @@ public class EditarPerfilViewModel : BaseViewModel
             OnPropertyChanged();
         }
     }
-    
+
+    private string? _fotoPerfilUrl;
+    public string? FotoPerfilUrl
+    {
+        get => _fotoPerfilUrl;
+        set
+        {
+            _fotoPerfilUrl = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(FotoExibicao));
+        }
+    }
+    public string FotoExibicao =>
+    string.IsNullOrEmpty(FotoPerfilUrl)
+        ? "profilepic.png"
+        : FotoPerfilUrl;
 
     public ICommand CarregarCommand { get; }
     public ICommand SalvarCommand { get; }
@@ -68,6 +83,7 @@ public class EditarPerfilViewModel : BaseViewModel
         Nome = perfil.Nome;
         Email = perfil.Email;
         DataNasc = DateTime.Parse(perfil.DataNasc);
+        FotoPerfilUrl = perfil.FotoPerfilUrl;
 
         OnPropertyChanged(nameof(Nome));
         OnPropertyChanged(nameof(Email));

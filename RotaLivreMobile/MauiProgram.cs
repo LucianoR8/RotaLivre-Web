@@ -61,6 +61,13 @@ namespace RotaLivreMobile
                 client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             });
 
+            builder.Services.AddHttpClient<AvaliacaoApiService>(client =>
+            {
+                client.BaseAddress =
+                    new Uri("https://rotalivre-web.onrender.com/api/");
+            });
+
+
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddSingleton<GrupoSignalRService>();
             builder.Services.AddSingleton<LocationService>();
@@ -91,7 +98,10 @@ namespace RotaLivreMobile
             builder.Services.AddTransient<RecuperarSenhaPage>();
             builder.Services.AddTransient<ConfirmarRespostaPage>();
             builder.Services.AddTransient<NovaSenhaPage>();
-			builder.Services.AddTransient<MapaGrupoPage>();
+			      builder.Services.AddTransient<MapaGrupoPage>();
+            builder.Services.AddTransient<ComentariosPage>();
+
+
 
             return builder.Build();
         }

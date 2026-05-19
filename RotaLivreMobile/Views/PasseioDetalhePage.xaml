@@ -35,6 +35,10 @@
                     TextColor="White"
                     Command="{Binding CurtirCommand}" />
 
+            <Button
+                    Text="Comentários"
+                    Clicked="OnComentariosClicked"/>    
+
             <Button Text="{Binding TextoBotaoPendente}"
                     BackgroundColor="{Binding CorBotaoPendente}"
                     TextColor="White"
@@ -45,6 +49,7 @@
 
             <Button Text="Criar Passeio"
                     Clicked="OnCriarGrupoClicked"/>
+            
 
         </VerticalStackLayout>
     </ScrollView>

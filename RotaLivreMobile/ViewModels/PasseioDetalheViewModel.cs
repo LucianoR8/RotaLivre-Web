@@ -147,6 +147,9 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
 
         Curtido = result.Curtiu;
         QuantidadeCurtidas = result.TotalCurtidas;
+
+        if (Curtido)
+            Pendente = false;
     }
 
     public ICommand PendenteCommand => new Command(async () => await AlternarPendente());
@@ -155,6 +158,9 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
     {
         var pendente = await _service.AlternarPendenteAsync(Id);
         Pendente = pendente;
+
+        if (Pendente)
+            Curtido = false;
     }
 
 }

@@ -91,6 +91,9 @@
 	  <MauiXaml Update="Views\CategoriaPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\ComentariosPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\ConfirmarRespostaPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

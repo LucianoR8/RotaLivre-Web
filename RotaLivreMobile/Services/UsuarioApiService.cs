@@ -1,5 +1,6 @@
 ﻿using RotaLivreMobile.Models;
 using System.Text.Json;
+using Microsoft.Maui.Storage;
 
 namespace RotaLivreMobile.Services;
 
@@ -135,5 +136,77 @@ public class UsuarioApiService : BaseApiService
 
         return response != null &&
                response.IsSuccessStatusCode;
+    }
+
+    public async Task<(bool sucesso, string? fotoUrl, string? erro)>
+    UploadFotoPerfil(int usuarioId, FileResult foto)
+    {
+        try
+        {
+            var autorizado = await AddAuthorizationHeader();
+
+            if (!autorizado)
+                return (false, null, "Não autorizado");
+
+            using var stream = await foto.OpenReadAsync();
+
+            using var content = new MultipartFormDataContent();
+
+            var streamContent = new StreamContent(stream);
+
+            streamContent.Headers.ContentType =
+                new System.Net.Http.Headers.MediaTypeHeaderValue(foto.ContentType);
+
+            content.Add(streamContent, "foto", foto.FileName);
+
+            var response = await _httpClient.PostAsync(
+                $"UsuarioApi/upload-foto/{usuarioId}",
+                content);
+
+            var resposta = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                return (false, null, resposta);
+
+            var json = JsonDocument.Parse(resposta);
+
+            var fotoUrl = json
+                .RootElement
+                .GetProperty("fotoUrl")
+                .GetString();
+
+            return (true, fotoUrl, null);
+        }
+        catch (Exception ex)
+        {
+            return (false, null, ex.Message);
+        }
+
+    }
+
+    public async Task<(bool sucesso, string? erro)>
+    RemoverFotoPerfil(int usuarioId)
+    {
+        try
+        {
+            var autorizado = await AddAuthorizationHeader();
+
+            if (!autorizado)
+                return (false, "Não autorizado");
+
+            var response = await _httpClient.DeleteAsync(
+                $"UsuarioApi/remover-foto/{usuarioId}");
+
+            if (response.IsSuccessStatusCode)
+                return (true, null);
+
+            var erro = await response.Content.ReadAsStringAsync();
+
+            return (false, erro);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
     }
 }

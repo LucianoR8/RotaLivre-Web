@@ -18,6 +18,32 @@
 
             <DatePicker Date="{Binding DataNasc}" />
 
+            <Frame Padding="0"
+                   CornerRadius="60"
+                   HeightRequest="120"
+                   WidthRequest="120"
+                   IsClippedToBounds="True"
+                   HorizontalOptions="Center">
+
+                <Image Source="{Binding FotoExibicao}"
+               Aspect="AspectFill">
+
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnSelecionarFotoTapped"/>
+                        </Image.GestureRecognizers>
+
+                    </Image>
+
+                </Frame>
+
+                <Button Text="Alterar Foto"
+                        Clicked="OnSelecionarFotoTapped"/>
+
+                <Button Text="Remover Foto"
+                        BackgroundColor="Red"
+                        TextColor="White"
+                        Clicked="OnRemoverFotoClicked"/>
+
             <Button Text="Salvar"
                     BackgroundColor="Green"
                     TextColor="White"

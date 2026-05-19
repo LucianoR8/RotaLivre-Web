@@ -38,7 +38,7 @@ namespace Rota_LivreWEB_API.Services
             var passeio = await _context.Passeio
                 .Include(p => p.Endereco)
                 .FirstOrDefaultAsync(p => p.id_passeio == id);
-            
+
             if (passeio == null)
                 return null;
 
@@ -151,7 +151,9 @@ namespace Rota_LivreWEB_API.Services
         public async Task<(bool curtiu, int totalCurtidas)> AlternarCurtidaComTotalAsync(int usuarioId, int passeioId)
         {
             var curtida = await _context.CurtidaPasseio
-                .FirstOrDefaultAsync(c => c.id_usuario == usuarioId && c.id_passeio == passeioId);
+                .FirstOrDefaultAsync(c =>
+                    c.id_usuario == usuarioId &&
+                    c.id_passeio == passeioId);
 
             bool curtiu;
 
@@ -162,6 +164,17 @@ namespace Rota_LivreWEB_API.Services
             }
             else
             {
+                var pendente = await _context.PasseioPendente
+                    .Where(p =>
+                        p.id_usuario == usuarioId &&
+                        p.id_passeio == passeioId)
+                    .ToListAsync();
+
+                if (pendente.Any())
+                {
+                    _context.PasseioPendente.RemoveRange(pendente);
+                }
+
                 var nova = new CurtidaPasseio
                 {
                     id_usuario = usuarioId,
@@ -169,6 +182,7 @@ namespace Rota_LivreWEB_API.Services
                 };
 
                 await _context.CurtidaPasseio.AddAsync(nova);
+
                 curtiu = true;
             }
 
@@ -183,13 +197,28 @@ namespace Rota_LivreWEB_API.Services
         public async Task<bool> AlternarPendenteAsync(int usuarioId, int passeioId)
         {
             var existente = await _context.PasseioPendente
-                .FirstOrDefaultAsync(p => p.id_usuario == usuarioId && p.id_passeio == passeioId);
+                .FirstOrDefaultAsync(p =>
+                    p.id_usuario == usuarioId &&
+                    p.id_passeio == passeioId);
 
             if (existente != null)
             {
                 _context.PasseioPendente.Remove(existente);
+
                 await _context.SaveChangesAsync();
+
                 return false;
+            }
+
+            var curtidas = await _context.CurtidaPasseio
+                .Where(c =>
+                    c.id_usuario == usuarioId &&
+                    c.id_passeio == passeioId)
+                .ToListAsync();
+
+            if (curtidas.Any())
+            {
+                _context.CurtidaPasseio.RemoveRange(curtidas);
             }
 
             var novo = new PasseioPendente
@@ -200,6 +229,7 @@ namespace Rota_LivreWEB_API.Services
             };
 
             await _context.PasseioPendente.AddAsync(novo);
+
             await _context.SaveChangesAsync();
 
             return true;

@@ -3,14 +3,22 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RotaLivreMobile.Views.PerfilPage"
              Title="Perfil">
+    
     <Grid Padding="20" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
 
-        <Image Grid.Row="0" 
-               Source="profilepic.png" 
-               WidthRequest="100" 
-               HeightRequest="100" 
-               HorizontalOptions="Center" Margin ="0, 0, 0, 20"/>
+        <Frame Grid.Row="0"
+               Padding="0"
+               CornerRadius="100"
+               HeightRequest="150"
+               WidthRequest="150"
+               IsClippedToBounds="True"
+               HorizontalOptions="Center"
+               Margin="0,0,0,20">
 
+            <Image Source="{Binding FotoExibicao}"
+               Aspect="AspectFill"/>
+        </Frame>
+        
         <Label Grid.Row="1"
                Text="{Binding Nome}"
                FontSize="24"

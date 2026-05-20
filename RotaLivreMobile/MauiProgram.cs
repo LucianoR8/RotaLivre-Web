@@ -35,28 +35,28 @@ namespace RotaLivreMobile
 
             builder.Services.AddHttpClient<BaseApiService>(client =>
             {
-                client.BaseAddress = new Uri("https://rotalivre-web.onrender.com/api/");
+                client.BaseAddress = new Uri("http://rotalivre.alwaysdata.net/api/");
                 client.DefaultRequestVersion = HttpVersion.Version11;
                 client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             });
 
             builder.Services.AddHttpClient<ApiService>(client =>
             {
-                client.BaseAddress = new Uri("https://rotalivre-web.onrender.com/api/");
+                client.BaseAddress = new Uri("http://rotalivre.alwaysdata.net/api/");
                 client.DefaultRequestVersion = HttpVersion.Version11;
                 client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             }); ;
 
             builder.Services.AddHttpClient<PasseioApiService>(client =>
             {
-                client.BaseAddress = new Uri("https://rotalivre-web.onrender.com/api/");
+                client.BaseAddress = new Uri("http://rotalivre.alwaysdata.net/api/");
                 client.DefaultRequestVersion = HttpVersion.Version11;
                 client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             });
 
             builder.Services.AddHttpClient<UsuarioApiService>(client =>
             {
-                client.BaseAddress = new Uri("https://rotalivre-web.onrender.com/api/");
+                client.BaseAddress = new Uri("http://rotalivre.alwaysdata.net/api/");
                 client.DefaultRequestVersion = HttpVersion.Version11;
                 client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             });
@@ -64,7 +64,7 @@ namespace RotaLivreMobile
             builder.Services.AddHttpClient<AvaliacaoApiService>(client =>
             {
                 client.BaseAddress =
-                    new Uri("https://rotalivre-web.onrender.com/api/");
+                    new Uri("http://rotalivre.alwaysdata.net/api/");
             });
 
 

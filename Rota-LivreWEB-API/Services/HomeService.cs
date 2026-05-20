@@ -26,7 +26,7 @@ namespace Rota_LivreWEB_API.Services
              {
                  IdCategoria = c.id_categoria,
                  TipoCategoria = c.tipo_categoria,
-                 ImgUrl = $"https://rotalivre-web.onrender.com/img/categorias/{c.img}"
+                 ImgUrl = $"http://rotalivre.alwaysdata.net/img/categorias/{c.img}"
              })
              .ToListAsync();
 
@@ -37,7 +37,7 @@ namespace Rota_LivreWEB_API.Services
                     Nome = p.nome_passeio,
                     Descricao = p.descricao,
                     Funcionamento = p.funcionamento,
-                    ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{p.img_url}",
+                    ImagemUrl = $"http://rotalivre.alwaysdata.net/img/passeios/{p.img_url}",
                     QuantidadeCurtidas = _context.CurtidaPasseio
                         .Count(c => c.id_passeio == p.id_passeio)
                 })

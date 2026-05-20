@@ -27,7 +27,7 @@ namespace Rota_LivreWEB_API.Services
                     Nome = p.nome_passeio,
                     Descricao = p.descricao,
                     Funcionamento = p.funcionamento,
-                    ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{p.img_url}",
+                    ImagemUrl = $"http://rotalivre.alwaysdata.net/img/passeios/{p.img_url}",
                     QuantidadeCurtidas = p.QuantidadeCurtidas
                 })
                 .ToListAsync();
@@ -48,7 +48,7 @@ namespace Rota_LivreWEB_API.Services
                 Nome = passeio.nome_passeio,
                 Descricao = passeio.descricao,
                 Funcionamento = passeio.funcionamento,
-                ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{passeio.img_url}",
+                ImagemUrl = $"http://rotalivre.alwaysdata.net/img/passeios/{passeio.img_url}",
                 QuantidadeCurtidas = await _context.CurtidaPasseio
                     .CountAsync(c => c.id_passeio == passeio.id_passeio),
                 UsuarioJaCurtiu = false,
@@ -92,7 +92,7 @@ namespace Rota_LivreWEB_API.Services
                     Nome = p.nome_passeio,
                     Descricao = p.descricao,
                     Funcionamento = p.funcionamento,
-                    ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{p.img_url}",
+                    ImagemUrl = $"http://rotalivre.alwaysdata.net/img/passeios/{p.img_url}",
                     QuantidadeCurtidas = _context.CurtidaPasseio
                         .Count(c => c.id_passeio == p.id_passeio)
                 })
@@ -141,7 +141,7 @@ namespace Rota_LivreWEB_API.Services
                 Nome = passeio.nome_passeio,
                 Descricao = passeio.descricao,
                 Funcionamento = passeio.funcionamento,
-                ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{passeio.img_url}",
+                ImagemUrl = $"http://rotalivre.alwaysdata.net/img/passeios/{passeio.img_url}",
                 QuantidadeCurtidas = await _context.CurtidaPasseio
                     .CountAsync(c => c.id_passeio == passeio.id_passeio),
                 UsuarioJaCurtiu = jaCurtiu
@@ -243,7 +243,7 @@ namespace Rota_LivreWEB_API.Services
                 {
                     Id = c.Passeio.id_passeio,
                     Nome = c.Passeio.nome_passeio,
-                    ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{c.Passeio.img_url}"
+                    ImagemUrl = $"http://rotalivre.alwaysdata.net/img/passeios/{c.Passeio.img_url}"
                 })
                 .ToListAsync();
 
@@ -253,7 +253,7 @@ namespace Rota_LivreWEB_API.Services
                 {
                     Id = p.Passeio.id_passeio,
                     Nome = p.Passeio.nome_passeio,
-                    ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{p.Passeio.img_url}"
+                    ImagemUrl = $"http://rotalivre.alwaysdata.net/img/passeios/{p.Passeio.img_url}"
                 })
                 .ToListAsync();
 

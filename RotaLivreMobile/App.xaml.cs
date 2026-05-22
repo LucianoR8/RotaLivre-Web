@@ -75,7 +75,9 @@ namespace RotaLivreMobile
                 {
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        await Shell.Current.GoToAsync($"//grupoDetalhe?codigo={codigo}");
+                        await Task.Delay(800);
+
+                        await Shell.Current.GoToAsync($"grupoDetalhe?codigo={codigo}");
                     });
                 }
             }

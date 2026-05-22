@@ -21,17 +21,44 @@ namespace Rota_LivreWEB_API.Controllers
             var html = $@"
 <html>
 <head>
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
 </head>
-<body>
-    <h2>Entrar no grupo</h2>
 
-    <a href='{deepLink}' style='font-size:20px; color:blue;'>
-    </a>
+<body style='font-family:Arial; padding:30px;'>
 
-    <p>Se não abrir, toque no link acima.</p>
+<h2>Entrar no grupo</h2>
 
-    <p>Código do grupo:</p>
-    <h3>{codigo}</h3>
+<p>Código do grupo:</p>
+
+<h1>{codigo}</h1>
+
+<br/>
+
+<a href='{deepLink}'
+   style='font-size:22px;
+          background:#2196F3;
+          color:white;
+          padding:15px 25px;
+          text-decoration:none;
+          border-radius:10px;'>
+
+    ABRIR NO APP
+
+</a>
+
+<br/><br/>
+
+<p>Se o aplicativo não abrir automaticamente,
+volte ao app que o código será detectado.</p>
+
+<script>
+
+setTimeout(function(){{
+    window.location.href = '{deepLink}';
+}}, 1000);
+
+</script>
+
 </body>
 </html>";
 

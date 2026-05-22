@@ -36,7 +36,7 @@ public class GrupoViewModel : BaseViewModel
     public string GrupoCodigoSalvo { get; set; }
     public bool TemGrupoSalvo => !string.IsNullOrEmpty(GrupoCodigoSalvo);
     public string LinkGrupo =>
-        $"https://rotalivre-web.onrender.com/grupo?codigo={CodigoGrupo}";
+        $"http://rotalivre.alwaysdata.net/grupo?codigo={CodigoGrupo}";
     public bool MostrarCardGrupoSalvo => TemGrupoSalvo && !TemGrupoAtivo;
     public bool MostrarTelaInicial => !TemGrupoAtivo && !MostrarCardGrupoSalvo;
     public ICommand EntrarGrupoCommand { get; }
@@ -170,7 +170,7 @@ public class GrupoViewModel : BaseViewModel
 
         var nomeUsuario = await _apiService.GetNomeUsuario();
 
-        Console.WriteLine("VAI NAVEGAR AGORA");
+        Console.WriteLine("VAI CONECTAR");
 
         await _signalR.ConectarAsync();
 
@@ -180,7 +180,11 @@ public class GrupoViewModel : BaseViewModel
 
         Console.WriteLine("ENTROU NO SIGNALR");
 
-        await Shell.Current.GoToAsync($"grupoDetalhe?codigo={CodigoDigitado}");
+        CodigoGrupo = CodigoDigitado;
+
+        OnPropertyChanged(nameof(CodigoGrupo));
+
+        AtualizarEstados();
     }
 
     public async Task RestaurarGrupo()

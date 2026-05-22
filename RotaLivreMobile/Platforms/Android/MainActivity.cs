@@ -10,9 +10,12 @@ namespace RotaLivreMobile;
     MainLauncher = true,
     LaunchMode = LaunchMode.SingleTop,
     Exported = true,
-    ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation |
-                           ConfigChanges.UiMode | ConfigChanges.ScreenLayout |
-                           ConfigChanges.SmallestScreenSize | ConfigChanges.Density
+    ConfigurationChanges = ConfigChanges.ScreenSize |
+                           ConfigChanges.Orientation |
+                           ConfigChanges.UiMode |
+                           ConfigChanges.ScreenLayout |
+                           ConfigChanges.SmallestScreenSize |
+                           ConfigChanges.Density
 )]
 
 [IntentFilter(
@@ -23,7 +26,8 @@ namespace RotaLivreMobile;
         Intent.CategoryBrowsable
     },
     DataScheme = "rotalivre",
-    DataHost = "grupo"
+    DataHost = "grupo",
+    DataPathPrefix = "/entrar"
 )]
 
 public class MainActivity : MauiAppCompatActivity

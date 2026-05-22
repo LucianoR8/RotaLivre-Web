@@ -16,7 +16,7 @@ namespace Rota_LivreWEB_API.Controllers
         [HttpGet("/grupo")]
         public ActionResult AbrirGrupo(string codigo)
         {
-            var deepLink = $"rotalivre://grupo?codigo={codigo}";
+            var deepLink = $"rotalivre://grupo/entrar?codigo={codigo}";
 
             var html = $@"
 <html>

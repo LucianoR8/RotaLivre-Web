@@ -3,6 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RotaLivreMobile.Views.CadastroPage"
              Title="Cadastro">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FFF5F7FA" Offset="0.0" />
+            <GradientStop Color="#FFE9F2F5" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+    
     <VerticalStackLayout Padding="20">
 
         <Entry Placeholder="Nome" Text="{Binding Nome}" />

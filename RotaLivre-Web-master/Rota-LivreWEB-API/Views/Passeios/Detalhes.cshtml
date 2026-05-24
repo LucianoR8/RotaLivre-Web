@@ -1,0 +1,763 @@
+﻿@{
+    Layout = null;
+}
+
+@model Rota_LivreWEB_API.Models.Passeio
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota Livre - @Model.nome_passeio</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== VARIÁVEIS ===== */
+        :root {
+            --primary-color: #1a535c;
+            --secondary-color: #4ecdc4;
+            --accent-color: #ff6b6b;
+            --light-color: #fff9f5;
+            --dark-color: #1a535c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --gray-bg: #f8f9fa;
+        }
+
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9f2f5 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+
+        /* ===== FUNDO DECORATIVO ===== */
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(78, 205, 196, 0.08) 0%, transparent 20%), radial-gradient(circle at 80% 70%, rgba(255, 107, 107, 0.05) 0%, transparent 25%), radial-gradient(circle at 40% 80%, rgba(26, 83, 92, 0.06) 0%, transparent 30%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .brand-compass {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 150px;
+            height: 150px;
+            opacity: 0.04;
+            z-index: -1;
+            background: radial-gradient(circle, var(--secondary-color) 3px, transparent 3px), conic-gradient(from 0deg, var(--primary-color) 0deg 90deg, var(--secondary-color) 90deg 180deg, var(--accent-color) 180deg 270deg, var(--dark-color) 270deg 360deg);
+            background-size: 100% 100%;
+            border-radius: 50%;
+            filter: blur(1px);
+            pointer-events: none;
+        }
+
+        .route-dots {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 20% 30%, var(--secondary-color) 2px, transparent 2px), radial-gradient(circle at 40% 70%, var(--primary-color) 2px, transparent 2px), radial-gradient(circle at 60% 20%, var(--accent-color) 2px, transparent 2px), radial-gradient(circle at 80% 50%, var(--dark-color) 2px, transparent 2px);
+            background-size: 200px 200px;
+            opacity: 0.03;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ===== HEADER ===== */
+        .cabecalho {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.15);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1050;
+            padding: 15px 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border-bottom: 3px solid var(--secondary-color);
+        }
+
+        .name-pj {
+            font-weight: 800;
+            font-size: 1.8rem;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .name-pj::after {
+            content: "✦";
+            position: absolute;
+            right: -25px;
+            top: -5px;
+            color: var(--accent-color);
+            font-size: 20px;
+            -webkit-text-fill-color: initial;
+            animation: spin 4s linear infinite;
+        }
+
+        @@keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .cabecalho .text-end {
+            z-index: 1100;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .opcA {
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .opc1 {
+            background: linear-gradient(135deg, var(--primary-color), #236c78);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 83, 92, 0.3);
+        }
+
+        .opc1:hover {
+            background: linear-gradient(135deg, #236c78, var(--primary-color));
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(26, 83, 92, 0.4);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px 80px;
+        }
+
+        /* ===== CARD DO PASSEIO ===== */
+        .passeio-card {
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(26, 83, 92, 0.15);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        /* Imagem */
+        .passeio-imagem {
+            position: relative;
+            height: 450px;
+            overflow: hidden;
+        }
+
+        .passeio-imagem img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .passeio-card:hover .passeio-imagem img {
+            transform: scale(1.05);
+        }
+
+        .imagem-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, rgba(26, 83, 92, 0.6) 100%);
+        }
+
+        /* Badge de curtidas */
+        .curtidas-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 2;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .curtidas-badge i {
+            font-size: 18px;
+        }
+
+        /* Título */
+        .passeio-titulo {
+            padding: 30px 40px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .passeio-titulo h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .passeio-titulo h1 i {
+            color: var(--secondary-color);
+            font-size: 28px;
+        }
+
+        /* Conteúdo */
+        .passeio-conteudo {
+            padding: 30px 40px;
+        }
+
+        /* Seções */
+        .info-section {
+            margin-bottom: 35px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .section-header i {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .section-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .section-content {
+            background: var(--gray-bg);
+            border-radius: 20px;
+            padding: 20px 25px;
+            color: #555;
+            line-height: 1.7;
+        }
+
+        .section-content p {
+            margin: 0;
+        }
+
+        /* Endereço */
+        .endereco-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .endereco-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+        }
+
+        .endereco-item i {
+            width: 30px;
+            color: var(--secondary-color);
+            font-size: 18px;
+        }
+
+        .endereco-item span {
+            color: #555;
+        }
+
+        /* ===== BOTÕES DE AÇÃO ===== */
+        .passeio-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-action {
+            padding: 14px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-avaliar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-avaliar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(78, 205, 196, 0.4);
+            color: white;
+        }
+
+        .btn-pendente {
+            background: transparent;
+            border: 2px solid var(--warning-color);
+            color: var(--warning-color);
+        }
+
+        .btn-pendente:hover, .btn-pendente.pendente-active {
+            background: var(--warning-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-curtir {
+            background: transparent;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .btn-curtir:hover, .btn-curtir.curtido-active {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            box-shadow: 0 -5px 25px rgba(78, 205, 196, 0.15);
+            display: flex;
+            justify-content: space-around;
+            z-index: 1000;
+            border-top: 3px solid var(--secondary-color);
+        }
+
+        footer button {
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 10px 25px;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.7;
+        }
+
+        footer button i {
+            font-size: 18px;
+        }
+
+        footer button:hover {
+            color: var(--secondary-color);
+            background: rgba(78, 205, 196, 0.1);
+            transform: translateY(-3px);
+            opacity: 1;
+        }
+
+        /* ===== ANIMAÇÕES ===== */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @@media (max-width: 768px) {
+            main {
+                padding: 90px 15px 80px;
+            }
+
+            .passeio-imagem {
+                height: 300px;
+            }
+
+            .passeio-titulo {
+                padding: 20px 25px;
+            }
+
+            .passeio-titulo h1 {
+                font-size: 24px;
+            }
+
+            .passeio-conteudo {
+                padding: 20px 25px;
+            }
+
+            .section-header h2 {
+                font-size: 20px;
+            }
+
+            .btn-action {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .curtidas-badge {
+                padding: 6px 15px;
+                font-size: 14px;
+            }
+
+            .brand-compass {
+                width: 80px;
+                height: 80px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .passeio-imagem {
+                height: 220px;
+            }
+
+            .passeio-titulo h1 {
+                font-size: 20px;
+            }
+
+            .passeio-actions {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                justify-content: center;
+            }
+
+            .endereco-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-content {
+                padding: 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Elementos decorativos -->
+    <div class="background-pattern"></div>
+    <div class="brand-compass"></div>
+    <div class="route-dots"></div>
+
+    <!-- Header -->
+    <header class="cabecalho">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-between">
+                <a href="/" class="d-flex align-items-center text-decoration-none">
+                    <h1 class="name-pj">Rota Livre</h1>
+                </a>
+                <div class="text-end">
+                    <button class="opc1 opcA btn btn-primary" type="button" onclick="window.location.href='/Login/Login'">Entrar</button>
+                    <button class="opc1 opcA btn btn-primary" type="button" onclick="window.location.href='/RotaLivre/Create'">Cadastrar</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="passeio-card">
+            <!-- Imagem -->
+            <div class="passeio-imagem">
+                <img src="@Url.Content("~/img/passeios/" + Model.img_url)" alt="@Model.nome_passeio">
+                <div class="imagem-overlay"></div>
+
+                <!-- Badge de curtidas -->
+                <div class="curtidas-badge">
+                    <i class="fas fa-heart"></i>
+                    <span id="quantidadeCurtidas">@Model.QuantidadeCurtidas</span>
+                    <span>curtidas</span>
+                </div>
+            </div>
+
+            <!-- Título -->
+            <div class="passeio-titulo">
+                <h1>
+                    <i class="fas fa-map-pin"></i>
+                    @Model.nome_passeio
+                </h1>
+            </div>
+
+            <!-- Conteúdo -->
+            <div class="passeio-conteudo">
+                <!-- Descrição -->
+                <div class="info-section">
+                    <div class="section-header">
+                        <i class="fas fa-info-circle"></i>
+                        <h2>Sobre o passeio</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>@Model.descricao</p>
+                    </div>
+                </div>
+
+                <!-- Funcionamento -->
+                <div class="info-section">
+                    <div class="section-header">
+                        <i class="fas fa-clock"></i>
+                        <h2>Horários e Funcionamento</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>@Model.funcionamento</p>
+                    </div>
+                </div>
+
+                <!-- Endereço -->
+                @if (Model.Endereco != null)
+                {
+                    <div class="info-section">
+                        <div class="section-header">
+                            <i class="fas fa-location-dot"></i>
+                            <h2>Localização</h2>
+                        </div>
+                        <div class="section-content">
+                            <div class="endereco-grid">
+                                <div class="endereco-item">
+                                    <i class="fas fa-road"></i>
+                                    <span>@Model.Endereco.nome_rua, @Model.Endereco.numero_rua</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(Model.Endereco.complemento))
+                                {
+                                    <div class="endereco-item">
+                                        <i class="fas fa-building"></i>
+                                        <span>Complemento: @Model.Endereco.complemento</span>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.Endereco.bairro))
+                                {
+                                    <div class="endereco-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>Bairro: @Model.Endereco.bairro</span>
+                                    </div>
+                                }
+                                <div class="endereco-item">
+                                    <i class="fas fa-mail-bulk"></i>
+                                    <span>CEP: @Model.Endereco.cep</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Botões de ação -->
+                <div class="passeio-actions">
+                    <a asp-controller="Avaliacao" asp-action="Index" asp-route-id="@Model.id_passeio" class="btn-action btn-avaliar">
+                        <i class="fas fa-star"></i> Avaliar passeio
+                    </a>
+
+                    <button id="btn-pendente"
+                            class="btn-action btn-pendente @(Model.UsuarioJaPendente ? "pendente-active" : "")"
+                            data-id="@Model.id_passeio">
+                        <i class="fas @(Model.UsuarioJaPendente ? "fa-check-circle" : "fa-plus-circle")"></i>
+                        @(Model.UsuarioJaPendente ? "Na minha lista" : "Adicionar à lista")
+                    </button>
+
+                    <button id="btn-curtir"
+                            class="btn-action btn-curtir @(Model.UsuarioJaCurtiu ? "curtido-active" : "")"
+                            data-id="@Model.id_passeio">
+                        <i class="fas @(Model.UsuarioJaCurtiu ? "fa-heart" : "fa-heart")"></i>
+                        @(Model.UsuarioJaCurtiu ? "Curtido" : "Curtir")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <button id="btnTopo" type="button" onclick="window.location.href='/HomeBase/Home'">
+            <i class="fas fa-home"></i> Home
+        </button>
+        <button onclick="window.location.href='/MeusPasseios/MeusPasseios'">
+            <i class="fas fa-bus"></i> Meus Passeios
+        </button>
+        <button onclick="window.location.href='/Perfil/Perfil'">
+            <i class="fas fa-user"></i> Perfil
+        </button>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Efeito de scroll no header
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.cabecalho');
+            if (header) {
+                if (window.scrollY > 50) {
+                    header.style.padding = '10px 0';
+                    header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+                } else {
+                    header.style.padding = '15px 0';
+                    header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+                }
+            }
+        });
+
+        // Scroll suave para o topo
+        const btnTopo = document.getElementById('btnTopo');
+        if (btnTopo) {
+            btnTopo.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // Curtir passeio
+        document.addEventListener("DOMContentLoaded", function () {
+            const botaoCurtir = document.getElementById("btn-curtir");
+            const quantidadeSpan = document.getElementById("quantidadeCurtidas");
+
+            if (botaoCurtir) {
+                botaoCurtir.addEventListener("click", function () {
+                    const idPasseio = botaoCurtir.getAttribute("data-id");
+
+                    fetch('/Passeios/Curtir/' + idPasseio, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.sucesso) {
+                            if (data.curtiu) {
+                                botaoCurtir.innerHTML = '<i class="fas fa-heart"></i> Curtido';
+                                botaoCurtir.classList.add("curtido-active");
+                                if (quantidadeSpan) {
+                                    quantidadeSpan.innerText = parseInt(quantidadeSpan.innerText) + 1;
+                                }
+                            } else {
+                                botaoCurtir.innerHTML = '<i class="fas fa-heart"></i> Curtir';
+                                botaoCurtir.classList.remove("curtido-active");
+                                if (quantidadeSpan) {
+                                    quantidadeSpan.innerText = parseInt(quantidadeSpan.innerText) - 1;
+                                }
+                            }
+                        } else {
+                            alert(data.mensagem || "Erro ao curtir. Faça login primeiro.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erro ao enviar curtida:", error);
+                        alert("Erro ao processar a curtida.");
+                    });
+                });
+            }
+        });
+
+        // Adicionar à lista de pendentes
+        document.addEventListener("DOMContentLoaded", function () {
+            const botaoPendente = document.getElementById("btn-pendente");
+
+            if (botaoPendente) {
+                botaoPendente.addEventListener("click", function () {
+                    const idPasseio = botaoPendente.getAttribute("data-id");
+
+                    fetch('/MeusPasseios/AlternarPendente', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'idPasseio=' + encodeURIComponent(idPasseio)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.sucesso) {
+                            if (data.pendente) {
+                                botaoPendente.innerHTML = '<i class="fas fa-check-circle"></i> Na minha lista';
+                                botaoPendente.classList.add("pendente-active");
+                            } else {
+                                botaoPendente.innerHTML = '<i class="fas fa-plus-circle"></i> Adicionar à lista';
+                                botaoPendente.classList.remove("pendente-active");
+                            }
+                        } else {
+                            alert(data.mensagem || "Erro ao processar. Faça login primeiro.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erro:", error);
+                        alert("Erro ao processar a solicitação.");
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

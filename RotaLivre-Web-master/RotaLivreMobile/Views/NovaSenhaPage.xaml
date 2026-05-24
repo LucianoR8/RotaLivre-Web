@@ -1,0 +1,34 @@
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="RotaLivreMobile.Views.NovaSenhaPage"
+    Title="Nova Senha">
+
+    <VerticalStackLayout
+        Padding="25"
+        Spacing="20"
+        VerticalOptions="Center">
+
+        <Label
+            Text="Definir nova senha"
+            FontSize="24"
+            FontAttributes="Bold"
+            HorizontalOptions="Center"/>
+
+        <Entry
+            x:Name="novaSenhaEntry"
+            Placeholder="Nova senha"
+            IsPassword="True"/>
+
+        <Entry
+            x:Name="confirmarSenhaEntry"
+            Placeholder="Confirmar senha"
+            IsPassword="True"/>
+
+        <Button
+            Text="Alterar senha"
+            Clicked="OnAlterarSenhaClicked"/>
+
+    </VerticalStackLayout>
+
+</ContentPage>

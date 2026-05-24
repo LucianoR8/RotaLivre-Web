@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RotaLivreMobile.Views.MeusPasseiosPage"
+             x:Name="Page"
+             Title="Meus Passeios">
+
+    <Grid Padding="20"
+          RowDefinitions="Auto,Auto,*"
+          RowSpacing="15">
+
+        <Label Grid.Row="0"
+               Text="Meus Passeios"
+               FontSize="22"
+               FontAttributes="Bold"
+               HorizontalOptions="Center" />
+
+        <HorizontalStackLayout
+            Grid.Row="1"
+            HorizontalOptions="Center"
+            Spacing="10">
+
+            <Button Text="Curtidos"
+                    Command="{Binding MostrarCurtidosCommand}" />
+
+            <Button Text="Pendentes"
+                    Command="{Binding MostrarPendentesCommand}" />
+
+        </HorizontalStackLayout>
+
+        <CollectionView
+            Grid.Row="2"
+            ItemsSource="{Binding ListaAtual}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+
+                    <Frame Margin="0,5"
+                           CornerRadius="15"
+                           HasShadow="True"
+                           Padding="0">
+
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding BindingContext.AbrirDetalheCommand,
+                                                  Source={x:Reference Name=Page}}"
+                                CommandParameter="{Binding Id}" />
+                        </Frame.GestureRecognizers>
+
+                        <VerticalStackLayout Spacing="5">
+
+                            <Image Source="{Binding ImagemSource}"
+                                   HeightRequest="180"
+                                   Aspect="AspectFill" />
+
+                            <VerticalStackLayout Padding="10"
+                                                 Spacing="5">
+
+                                <Label Text="{Binding Nome}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center" />
+
+                            </VerticalStackLayout>
+
+                        </VerticalStackLayout>
+
+                    </Frame>
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </Grid>
+</ContentPage>

@@ -1,0 +1,39 @@
+name: Deploy Rota Livre
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish
+        # Apontando para o projeto dentro da pasta da API
+        run: dotnet publish Rota-LivreWEB-API/Rota-LivreWEB-API.csproj -c Release -o ./publish
+
+      - name: Enviar via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ssh-rotalivre.alwaysdata.net
+          username: rotalivre
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "./publish/*"
+          target: "www"
+          strip_components: 1
+
+      - name: Restart Site
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ssh-rotalivre.alwaysdata.net
+          username: rotalivre
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: touch www/restart.txt && alw-restart-site rotalivre || echo "Comando alw não disponível, mas arquivo de restart tocado."

@@ -1,0 +1,122 @@
+﻿using System.Net;
+using System.Net.Http.Headers;
+using Microsoft.Maui.Storage;
+using System.Text.Json;
+using System.Text;
+
+namespace RotaLivreMobile.Services;
+
+public class BaseApiService
+{
+    protected readonly HttpClient _httpClient;
+
+    public BaseApiService(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+
+    protected async Task<bool> AddAuthorizationHeader()
+    {
+        var token = await SecureStorage.GetAsync("auth_token");
+
+        if (string.IsNullOrEmpty(token))
+        {
+            await Shell.Current.GoToAsync("//LoginPage");
+            return false;
+        }
+
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+
+        return true;
+    }
+
+    protected async Task<HttpResponseMessage?> PostAsync(string endpoint, object data)
+    {
+        try
+        {
+            await AddAuthorizationHeader();
+
+            var json = JsonSerializer.Serialize(data);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(endpoint, content);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro POST: {ex.Message}");
+            return null;
+        }
+    }
+
+    public async Task<HttpResponseMessage?> GetAsync(string endpoint)
+    {
+        var autorizado = await AddAuthorizationHeader();
+        if (!autorizado) return null;
+
+        var response = await _httpClient.GetAsync(endpoint);
+
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            SecureStorage.Remove("auth_token");
+            await Shell.Current.GoToAsync("//LoginPage");
+            return null;
+        }
+
+        return response;
+    }
+
+    protected async Task<HttpResponseMessage?> PutAsync(string endpoint, object data)
+    {
+        await AddAuthorizationHeader();
+
+        var json = JsonSerializer.Serialize(data);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        return await _httpClient.PutAsync(endpoint, content);
+    }
+
+    protected async Task<HttpResponseMessage?> DeleteAsync(string endpoint)
+    {
+        await AddAuthorizationHeader();
+        return await _httpClient.DeleteAsync(endpoint);
+    }
+
+    public async Task<HttpResponseMessage?> GetPublicAsync(string endpoint)
+    {
+        try
+        {
+            return await _httpClient.GetAsync(endpoint);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            return null;
+        }
+    }
+
+    public async Task<HttpResponseMessage?> PostPublicAsync(
+        string endpoint,
+        object data)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(data);
+
+            var content = new StringContent(
+                json,
+                Encoding.UTF8,
+                "application/json");
+
+            return await _httpClient.PostAsync(
+                endpoint,
+                content);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            return null;
+        }
+    }
+}

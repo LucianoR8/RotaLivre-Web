@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RotaLivreMobile.Views.CadastroPage"
+             Title="Cadastro">
+    <VerticalStackLayout Padding="20">
+
+        <Entry Placeholder="Nome" Text="{Binding Nome}" />
+
+        <Entry Placeholder="Email" Text="{Binding Email}" />
+
+        <Entry Placeholder="Senha" 
+           Text="{Binding Senha}" 
+           IsPassword="True"/>
+
+        <Entry Placeholder="Confirmar Senha" 
+           Text="{Binding ConfirmarSenha}" 
+           IsPassword="True"/>
+
+        <DatePicker 
+            Date="{Binding DataSelecionada}" 
+            Format="dd/MM/yyyy" />
+
+        <Picker
+            Title="Selecione uma pergunta"
+            ItemsSource="{Binding Perguntas}"
+            SelectedItem="{Binding PerguntaSelecionada}" />
+
+            <Entry Placeholder="Resposta de Segurança"
+                Text="{Binding RespostaSeg}" />
+
+        <Button Text="Cadastrar" Command="{Binding CadastrarCommand}" />
+
+    </VerticalStackLayout>
+</ContentPage>

@@ -21,26 +21,40 @@ public partial class MapaGrupoPage : ContentPage, IQueryAttributable
 {
     private readonly LocationService _locationService;
     private readonly EnderecoService _enderecoService;
+
     private GeofencingInfo? _geofencing;
 
-    public MapaGrupoPage(LocationService locationService, EnderecoService enderecoService)
+    public MapaGrupoPage(
+        LocationService locationService,
+        EnderecoService enderecoService)
     {
         InitializeComponent();
+
         _locationService = locationService;
         _enderecoService = enderecoService;
+
         mapControl.Map.Layers.Add(OpenStreetMap.CreateTileLayer());
     }
 
-    // Recebe o idPasseio navegando para a página
+    // Recebe o idPasseio pela navegação
     public async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         try
         {
-            if (query.TryGetValue("idPasseio", out var value) && int.TryParse(value?.ToString(), out int id))
+            if (query.TryGetValue("idPasseio", out var value)
+                && int.TryParse(value?.ToString(), out int id))
             {
                 Console.WriteLine($"[GEOFENCING] idPasseio recebido: {id}");
+
                 _geofencing = await _enderecoService.GetGeofencingAsync(id);
-                Console.WriteLine($"[GEOFENCING] resultado: {(_geofencing == null ? "NULL" : $"Lat={_geofencing.Latitude}, Lon={_geofencing.Longitude}, Raio={_geofencing.RaioMetros}")}");
+
+                Console.WriteLine(
+                    $"[GEOFENCING] resultado: " +
+                    $"{(_geofencing == null
+                        ? "NULL"
+                        : $"Lat={_geofencing.Latitude}, Lon={_geofencing.Longitude}, Raio={_geofencing.RaioMetros}")}");
+
+                await AtualizarMapaAsync();
             }
             else
             {
@@ -51,25 +65,6 @@ public partial class MapaGrupoPage : ContentPage, IQueryAttributable
         {
             Console.WriteLine($"[GEOFENCING] ERRO: {ex.Message}");
         }
-
-        {
-            if (query.TryGetValue("idPasseio", out var value) && int.TryParse(value?.ToString(), out int id))
-            {
-                Console.WriteLine($"[GEOFENCING] idPasseio recebido: {id}");
-                _geofencing = await _enderecoService.GetGeofencingAsync(id);
-                Console.WriteLine($"[GEOFENCING] resultado: {(_geofencing == null ? "NULL" : $"Lat={_geofencing.Latitude}, Lon={_geofencing.Longitude}, Raio={_geofencing.RaioMetros}")}");
-            }
-            else
-            {
-                Console.WriteLine("[GEOFENCING] idPasseio NÃO recebido na query!");
-            }
-        }
-    }
-
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-        await AtualizarMapaAsync();
     }
 
     private async void OnGetLocationClicked(object sender, EventArgs e)
@@ -81,54 +76,64 @@ public partial class MapaGrupoPage : ContentPage, IQueryAttributable
     {
         try
         {
-            // Diagnóstico temporário
-            await DisplayAlert("Debug",
-                $"Geofencing: {(_geofencing == null ? "NULL" : $"Lat={_geofencing.Latitude}, Lon={_geofencing.Longitude}, Raio={_geofencing.RaioMetros}")}",
-                "OK");
-
             var location = await _locationService.GetLocationAsync();
+
             if (location == null)
             {
                 Console.WriteLine("[GEOFENCING] localização do usuário é NULL");
                 return;
             }
 
-            Console.WriteLine($"[GEOFENCING] usuário em Lat={location.Latitude}, Lon={location.Longitude}");
-            Console.WriteLine($"[GEOFENCING] _geofencing é {(_geofencing == null ? "NULL" : "OK")}");
+            Console.WriteLine(
+                $"[GEOFENCING] usuário em Lat={location.Latitude}, Lon={location.Longitude}");
 
+            // Converte posição do usuário
+            var userSpherical = SphericalMercator.FromLonLat(
+                location.Longitude,
+                location.Latitude);
 
-            // Posição do usuário
-            var userSpherical = SphericalMercator.FromLonLat(location.Longitude, location.Latitude);
-            var userCenter = new MPoint(userSpherical.x, userSpherical.y);
+            var userCenter = new MPoint(
+                userSpherical.x,
+                userSpherical.y);
 
-            // Centraliza e zoom
+            // Centraliza mapa
             mapControl.Map.Navigator.CenterOn(userCenter);
-            mapControl.Map.Navigator.ZoomTo(50);
+
+            // Zoom mais confortável
+            mapControl.Map.Navigator.ZoomTo(1000);
 
             // Remove camadas antigas
             RemoverCamada("UserPin");
             RemoverCamada("Geofencing");
 
-            // Pin do usuário
-            AdicionarPinUsuario(userCenter);
-
-            // Geofencing
-            if (_geofencing?.Latitude != null && _geofencing?.Longitude != null)
+            // Primeiro desenha o geofencing
+            if (_geofencing != null)
             {
                 bool dentroDoRaio = VerificarGeofencing(
-                    location.Latitude, location.Longitude,
-                    _geofencing.Latitude, _geofencing.Longitude,
+                    location.Latitude,
+                    location.Longitude,
+                    _geofencing.Latitude,
+                    _geofencing.Longitude,
                     _geofencing.RaioMetros);
 
-                DesenharGeofencing(_geofencing.Latitude, _geofencing.Longitude,
-                    _geofencing.RaioMetros, dentroDoRaio);
+                DesenharGeofencing(
+                    _geofencing.Latitude,
+                    _geofencing.Longitude,
+                    _geofencing.RaioMetros,
+                    dentroDoRaio);
 
-                // Banner de status
-                StatusLabel.Text = dentroDoRaio ? "✅ Você está dentro da área do passeio"
-                                                : "⚠️ Você está fora da área do passeio";
-                StatusLabel.BackgroundColor = dentroDoRaio ? MauiColor.FromArgb("#2E7D32")
-                                                           : MauiColor.FromArgb("#C62828");
+                // Status visual
+                StatusLabel.Text = dentroDoRaio
+                    ? "Você está dentro da área do passeio"
+                    : "Você está fora da área do passeio";
+
+                StatusLabel.BackgroundColor = dentroDoRaio
+                    ? MauiColor.FromArgb("#2E7D32")
+                    : MauiColor.FromArgb("#C62828");
             }
+
+            // Depois desenha o usuário POR CIMA
+            AdicionarPinUsuario(userCenter);
 
             mapControl.Map.RefreshGraphics();
         }
@@ -138,55 +143,75 @@ public partial class MapaGrupoPage : ContentPage, IQueryAttributable
         }
     }
 
-    private bool VerificarGeofencing(double userLat, double userLon,
-        double centerLat, double centerLon, int raioMetros)
+    private bool VerificarGeofencing(
+        double userLat,
+        double userLon,
+        double centerLat,
+        double centerLon,
+        int raioMetros)
     {
-        var userPoint = new NtsPoint(userLon, userLat);
-        var centerPoint = new NtsPoint(centerLon, centerLat);
+        var distanciaKm =
+            Microsoft.Maui.Devices.Sensors.Location.CalculateDistance(
+                userLat,
+                userLon,
+                centerLat,
+                centerLon,
+                DistanceUnits.Kilometers);
 
-        // Distância em graus aproximada (1 grau ≈ 111km)
-        double distanciaMetros = userPoint.Distance(centerPoint) * 111000;
+        double distanciaMetros = distanciaKm * 1000;
+
+        Console.WriteLine(
+            $"[GEOFENCING] distância: {distanciaMetros} metros");
 
         return distanciaMetros <= raioMetros;
     }
 
-    private void DesenharGeofencing(double lat, double lon, int raioMetros, bool dentro)
+    private void DesenharGeofencing(
+    double lat,
+    double lon,
+    int raioMetros,
+    bool dentro)
     {
+        // Centro convertido para coordenadas do mapa
         var spherical = SphericalMercator.FromLonLat(lon, lat);
-        var center = new MPoint(spherical.x, spherical.y);
 
-        // Gera círculo com 64 pontos
-        var pontos = new List<MPoint>();
+        // Cria pontos do círculo
+        var coordinates = new List<Coordinate>();
+
         for (int i = 0; i <= 64; i++)
         {
-            double angulo = 2 * Math.PI * i / 64;
-            pontos.Add(new MPoint(
-                center.X + raioMetros * Math.Cos(angulo),
-                center.Y + raioMetros * Math.Sin(angulo)));
+            double angle = i * Math.PI * 2 / 64;
+
+            double dx = raioMetros * Math.Cos(angle);
+            double dy = raioMetros * Math.Sin(angle);
+
+            coordinates.Add(new Coordinate(
+                spherical.x + dx,
+                spherical.y + dy));
         }
 
-        var corFundo = dentro
-            ? new MapsuiColor(46, 125, 50, 80)    // verde transparente
-            : new MapsuiColor(198, 40, 40, 80);   // vermelho transparente
-
-        var corBorda = dentro
-            ? Mapsui.Styles.Color.FromString("#2E7D32")
-            : Mapsui.Styles.Color.FromString("#C62828");
+        // Cria apenas uma linha circular
+        var lineString = new LineString(coordinates.ToArray());
 
         var feature = new MauiFeature
         {
-            Geometry = new NetTopologySuite.Geometries.Polygon(
-                new LinearRing(pontos.Select(p =>
-                    new Coordinate(p.X, p.Y)).ToArray()))
+            Geometry = lineString
         };
 
-        feature.Styles.Add(new Mapsui.Styles.VectorStyle
+        var corBorda = dentro
+            ? MapsuiColor.FromString("#66BB6A")
+            : MapsuiColor.FromString("#E57373");
+
+        feature.Styles.Add(new VectorStyle
         {
-            Fill = new MapsuiBrush(corFundo),
-            Outline = new MapsuiPen(corBorda, 2)
+            Line = new MapsuiPen(corBorda, 4)
         });
 
-        var layer = new MemoryLayer("Geofencing") { Features = new[] { feature } };
+        var layer = new MemoryLayer("Geofencing")
+        {
+            Features = new[] { feature }
+        };
+
         mapControl.Map.Layers.Add(layer);
     }
 
@@ -202,20 +227,29 @@ public partial class MapaGrupoPage : ContentPage, IQueryAttributable
                     {
                         new SymbolStyle
                         {
-                            SymbolScale = 0.7,
-                            Fill = new MapsuiBrush(MapsuiColor.FromString("#2E86AB")),
-                            Outline = new MapsuiPen(Mapsui.Styles.Color.White, 2)
+                            SymbolScale = 0.9,
+
+                            Fill = new MapsuiBrush(
+                                MapsuiColor.FromString("#2E86AB")),
+
+                            Outline = new MapsuiPen(
+                                MapsuiColor.White,
+                                3)
                         }
                     }
                 }
             }
         };
+
         mapControl.Map.Layers.Add(layer);
     }
 
     private void RemoverCamada(string nome)
     {
-        var layer = mapControl.Map.Layers.FindLayer(nome).FirstOrDefault();
+        var layer = mapControl.Map.Layers
+            .FindLayer(nome)
+            .FirstOrDefault();
+
         if (layer != null)
             mapControl.Map.Layers.Remove(layer);
     }

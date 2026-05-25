@@ -54,7 +54,12 @@ public partial class GrupoPage : ContentPage
 
     private async void OnRealizarPasseioClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync(nameof(MapaGrupoPage));
+        await Shell.Current.GoToAsync(
+            nameof(MapaGrupoPage),
+            new Dictionary<string, object>
+            {
+            { "idPasseio", _viewModel.IdPasseio }
+            });
     }
     private async void OnSairGrupoClicked(object sender, EventArgs e)
     {

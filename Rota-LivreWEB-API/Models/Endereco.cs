@@ -13,10 +13,16 @@ namespace Rota_LivreWEB_API.Models
         public string complemento { get; set; }
         public string bairro { get; set; }
         public string cep { get; set; }
+
         [Column("latitude")]
         public double? Latitude { get; set; }
+
         [Column("longitude")]
         public double? Longitude { get; set; }
+
+        [Column("raio_metros")]
+        public int RaioMetros { get; set; } = 500;
+
         public int id_passeio { get; set; }
     }
 

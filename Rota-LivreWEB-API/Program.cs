@@ -85,6 +85,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<PasseioRepository>();
 builder.Services.AddScoped<CategoriaRepository>();
+builder.Services.AddScoped<EnderecoRepository>();
 builder.Services.AddScoped<IPasseioService, PasseioService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddSignalR();

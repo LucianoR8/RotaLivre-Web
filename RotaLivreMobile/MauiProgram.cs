@@ -67,6 +67,11 @@ namespace RotaLivreMobile
                     new Uri("http://rotalivre.alwaysdata.net/api/");
             });
 
+            builder.Services.AddHttpClient<EnderecoService>(client =>
+            {
+                client.BaseAddress = new Uri("http://rotalivre.alwaysdata.net/api/");
+            });
+
 
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddSingleton<GrupoSignalRService>();
@@ -98,7 +103,7 @@ namespace RotaLivreMobile
             builder.Services.AddTransient<RecuperarSenhaPage>();
             builder.Services.AddTransient<ConfirmarRespostaPage>();
             builder.Services.AddTransient<NovaSenhaPage>();
-			      builder.Services.AddTransient<MapaGrupoPage>();
+            builder.Services.AddTransient<MapaGrupoPage>();
             builder.Services.AddTransient<ComentariosPage>();
 
 

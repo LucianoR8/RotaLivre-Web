@@ -1,0 +1,212 @@
+﻿using RotaLivreMobile.Models;
+using System.Text.Json;
+using Microsoft.Maui.Storage;
+
+namespace RotaLivreMobile.Services;
+
+public class UsuarioApiService : BaseApiService
+{
+    public UsuarioApiService(HttpClient httpClient) : base(httpClient)
+    {
+    }
+
+    public async Task<List<PerguntaSegurancaDto>> GetPerguntasAsync()
+    {
+        var response = await _httpClient.GetAsync("UsuarioApi/perguntas");
+
+        if (!response.IsSuccessStatusCode)
+            return new List<PerguntaSegurancaDto>();
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        return JsonSerializer.Deserialize<List<PerguntaSegurancaDto>>(json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    }
+
+    public async Task<(bool sucesso, string erro)> CadastrarUsuario(UsuarioCadastroDto dto)
+    {
+        var response = await PostAsync("UsuarioApi/cadastrar", dto);
+
+        if (response == null)
+            return (false, "Erro de conexão");
+
+        if (response.IsSuccessStatusCode)
+            return (true, null);
+
+        var erro = await response.Content.ReadAsStringAsync();
+
+        return (false, erro);
+    }
+
+    public async Task<UsuarioPerfilDto?> GetPerfil(int id)
+    {
+        var response = await GetAsync($"UsuarioApi/perfil/{id}");
+
+        if (response == null || !response.IsSuccessStatusCode)
+            return null;
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        return JsonSerializer.Deserialize<UsuarioPerfilDto>(json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    }
+
+    public async Task<(bool sucesso, string erro)> AtualizarPerfil(UsuarioPerfilDto dto)
+    {
+        var response = await PutAsync("UsuarioApi/editar", dto);
+
+        if (response == null)
+            return (false, "Erro de conexão");
+
+        if (response.IsSuccessStatusCode)
+            return (true, null);
+
+        var erro = await response.Content.ReadAsStringAsync();
+        return (false, erro);
+    }
+
+    public async Task<bool> DeletarConta(int id)
+    {
+        var response = await DeleteAsync($"UsuarioApi/deletar/{id}");
+
+        return response != null && response.IsSuccessStatusCode;
+    }
+
+    public async Task<string?> BuscarPerguntaSeguranca(string email)
+    {
+        var response = await GetPublicAsync(
+            $"UsuarioApi/pergunta?email={Uri.EscapeDataString(email)}");
+
+        if (response == null)
+            return null;
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        await Application.Current.MainPage.DisplayAlert(
+            "DEBUG",
+            json,
+            "OK");
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        var resultado = JsonSerializer.Deserialize<PerguntaResponse>(
+            json,
+            new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+        return resultado?.Pergunta;
+    }
+
+    public async Task<bool> VerificarRespostaAsync(
+    string email,
+    string resposta)
+    {
+        var dto = new VerificarRespostaDto
+        {
+            Email = email,
+            Resposta = resposta
+        };
+
+        var response =
+            await PostPublicAsync(
+                "UsuarioApi/verificar-resposta",
+                dto);
+
+        return response != null &&
+               response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> RedefinirSenhaAsync(
+    string email,
+    string novaSenha)
+    {
+        var dto = new RedefinirSenhaDto
+        {
+            Email = email,
+            NovaSenha = novaSenha
+        };
+
+        var response =
+            await PostPublicAsync(
+                "UsuarioApi/redefinir",
+                dto);
+
+        return response != null &&
+               response.IsSuccessStatusCode;
+    }
+
+    public async Task<(bool sucesso, string? fotoUrl, string? erro)>
+    UploadFotoPerfil(int usuarioId, FileResult foto)
+    {
+        try
+        {
+            var autorizado = await AddAuthorizationHeader();
+
+            if (!autorizado)
+                return (false, null, "Não autorizado");
+
+            using var stream = await foto.OpenReadAsync();
+
+            using var content = new MultipartFormDataContent();
+
+            var streamContent = new StreamContent(stream);
+
+            streamContent.Headers.ContentType =
+                new System.Net.Http.Headers.MediaTypeHeaderValue(foto.ContentType);
+
+            content.Add(streamContent, "foto", foto.FileName);
+
+            var response = await _httpClient.PostAsync(
+                $"UsuarioApi/upload-foto/{usuarioId}",
+                content);
+
+            var resposta = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                return (false, null, resposta);
+
+            var json = JsonDocument.Parse(resposta);
+
+            var fotoUrl = json
+                .RootElement
+                .GetProperty("fotoUrl")
+                .GetString();
+
+            return (true, fotoUrl, null);
+        }
+        catch (Exception ex)
+        {
+            return (false, null, ex.Message);
+        }
+
+    }
+
+    public async Task<(bool sucesso, string? erro)>
+    RemoverFotoPerfil(int usuarioId)
+    {
+        try
+        {
+            var autorizado = await AddAuthorizationHeader();
+
+            if (!autorizado)
+                return (false, "Não autorizado");
+
+            var response = await _httpClient.DeleteAsync(
+                $"UsuarioApi/remover-foto/{usuarioId}");
+
+            if (response.IsSuccessStatusCode)
+                return (true, null);
+
+            var erro = await response.Content.ReadAsStringAsync();
+
+            return (false, erro);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
+}

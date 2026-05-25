@@ -1,0 +1,36 @@
+<Shell
+    x:Class="RotaLivreMobile.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:RotaLivreMobile.Views">
+
+
+    <ShellContent
+        Title="Login"
+        Route="LoginPage"
+        ContentTemplate="{DataTemplate views:LoginPage}" />
+    
+    <TabBar>
+        <ShellContent
+            Title="Home"
+            Icon="bootstrap_house.svg"
+            ContentTemplate="{DataTemplate views:HomePage}"
+            Route="HomePage" />
+        <ShellContent
+            Title="Grupo"
+            Icon="bootstrap_people.svg"
+            ContentTemplate="{DataTemplate views:GrupoPage}"
+            Route="GrupoPage" />
+        <ShellContent
+            Title="Meus Passeios"
+            Icon="bootstrap_star.svg"
+            ContentTemplate="{DataTemplate views:MeusPasseiosPage}"
+            Route="MeusPasseiosPage" />
+        <ShellContent
+            Title="Perfil"
+            Icon="user_icon.svg"
+            ContentTemplate="{DataTemplate views:PerfilPage}"
+            Route="PerfilPage" />
+    </TabBar>
+
+</Shell>

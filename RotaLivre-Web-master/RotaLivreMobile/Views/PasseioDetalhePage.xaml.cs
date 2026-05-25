@@ -1,0 +1,44 @@
+﻿using RotaLivreMobile.ViewModels;
+using RotaLivreMobile.Models;
+
+namespace RotaLivreMobile.Views;
+
+public partial class PasseioDetalhePage : ContentPage, IQueryAttributable
+{
+    private readonly PasseioDetalheViewModel _viewModel;
+
+    public PasseioDetalhePage(PasseioDetalheViewModel viewModel)
+    {
+        InitializeComponent();
+        BindingContext = _viewModel = viewModel;
+    }
+
+    public async void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query.TryGetValue("PasseioId", out var value))
+        {
+            int id = (int)value;
+            await _viewModel.Carregar(id);
+        }
+
+        Console.WriteLine($"ID recebido: {value}");
+    }
+
+    private async void OnCriarGrupoClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(
+            $"grupo?nomePasseio={Uri.EscapeDataString(_viewModel.Nome)}&idPasseio={_viewModel.Id}"
+        );
+    }
+
+    private async void OnComentariosClicked(
+    object sender,
+    EventArgs e)
+    {
+        await Shell.Current.GoToAsync(
+            $"{nameof(ComentariosPage)}" +
+            $"?idPasseio={_viewModel.Id}");
+    }
+
+
+}

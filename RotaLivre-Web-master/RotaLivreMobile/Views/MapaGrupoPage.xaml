@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
+             x:Class="RotaLivreMobile.Views.MapaGrupoPage"
+             Title="Mapa do Grupo">
+
+    <Grid RowDefinitions="Auto, *, Auto">
+
+        <!-- Banner de status do geofencing -->
+        <Label x:Name="StatusLabel"
+           Grid.Row="0"
+           Text=""
+           TextColor="White"
+           FontAttributes="Bold"
+           HorizontalTextAlignment="Center"
+           Padding="10" />
+
+        <mapsui:MapControl x:Name="mapControl" Grid.Row="1" />
+
+        <!-- Botões de zoom -->
+        <VerticalStackLayout Grid.Row="1"
+                         HorizontalOptions="End"
+                         VerticalOptions="Center"
+                         Margin="0,0,12,0"
+                         Spacing="4">
+            <Border WidthRequest="44" HeightRequest="44"
+                BackgroundColor="White" StrokeShape="RoundRectangle 22" StrokeThickness="0">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnZoomInClicked" />
+                </Border.GestureRecognizers>
+                <Label Text="+" FontSize="24" FontAttributes="Bold" TextColor="Black"
+                   HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <Border WidthRequest="44" HeightRequest="44"
+                BackgroundColor="White" StrokeShape="RoundRectangle 22" StrokeThickness="0">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnZoomOutClicked" />
+                </Border.GestureRecognizers>
+                <Label Text="−" FontSize="24" FontAttributes="Bold" TextColor="Black"
+                   HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </VerticalStackLayout>
+
+        <Button Grid.Row="2"
+            Text="📍 Minha Localização"
+            Clicked="OnGetLocationClicked"
+            Margin="16"
+            BackgroundColor="#2E86AB"
+            TextColor="White"
+            CornerRadius="10" />
+
+    </Grid>
+</ContentPage>

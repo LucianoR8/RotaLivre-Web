@@ -1,0 +1,65 @@
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="RotaLivreMobile.Views.ComentariosPage"
+    Title="Comentários">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <CollectionView
+            x:Name="comentariosView"
+            Margin="10">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+
+                    <Frame
+                        Margin="0,5"
+                        Padding="12"
+                        CornerRadius="12"
+                        BorderColor="#DDD">
+
+                        <VerticalStackLayout>
+
+                            <Label
+                                Text="{Binding NomeUsuario}"
+                                FontAttributes="Bold"
+                                FontSize="16"/>
+
+                            <Label
+                                Text="{Binding Feedback}"
+                                Margin="0,6,0,0"/>
+
+                            <Label
+                                Text="{Binding Data}"
+                                FontSize="12"
+                                TextColor="Gray"/>
+
+                        </VerticalStackLayout>
+
+                    </Frame>
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+        <Grid
+            Grid.Row="1"
+            Padding="10"
+            ColumnDefinitions="*,Auto">
+
+            <Entry
+                x:Name="comentarioEntry"
+                Placeholder="Digite um comentário"/>
+
+            <Button
+                Grid.Column="1"
+                Text="Enviar"
+                Clicked="OnEnviarClicked"/>
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

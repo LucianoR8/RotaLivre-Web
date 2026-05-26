@@ -122,22 +122,33 @@ public class GrupoViewModel : BaseViewModel
             return;
         }
 
-        var grupo = await _apiService.CriarGrupo(IdPasseio);
+        try
+        {
+            IsLoading = true;
 
-        CodigoGrupo = grupo.codigo_convite;
+            var grupo = await _apiService.CriarGrupo(IdPasseio);
 
-        OnPropertyChanged(nameof(CodigoGrupo));
-        OnPropertyChanged(nameof(LinkGrupo));
-        AtualizarEstados();
+            CodigoGrupo = grupo.codigo_convite;
 
-        var nomeUsuario = await _apiService.GetNomeUsuario();
+            OnPropertyChanged(nameof(CodigoGrupo));
+            OnPropertyChanged(nameof(LinkGrupo));
 
-        await _signalR.ConectarAsync();
-        await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
+            AtualizarEstados();
 
-        await SecureStorage.SetAsync("grupo_codigo", CodigoGrupo);
-        await SecureStorage.SetAsync("grupo_nome", NomePasseio);
-        await SecureStorage.SetAsync("grupo_id", IdPasseio.ToString());
+            var nomeUsuario = await _apiService.GetNomeUsuario();
+
+            await _signalR.ConectarAsync();
+
+            await _signalR.EntrarGrupo(CodigoGrupo, nomeUsuario);
+
+            await SecureStorage.SetAsync("grupo_codigo", CodigoGrupo);
+            await SecureStorage.SetAsync("grupo_nome", NomePasseio);
+            await SecureStorage.SetAsync("grupo_id", IdPasseio.ToString());
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     public async Task EntrarGrupo()

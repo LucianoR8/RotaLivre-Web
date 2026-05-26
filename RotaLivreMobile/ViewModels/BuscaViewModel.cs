@@ -25,11 +25,20 @@ public class BuscaViewModel : BaseViewModel
 
     private async Task Buscar(string termo)
     {
-        Passeios.Clear();
+        try
+        {
+            IsLoading = true;
 
-        var resultado = await _service.BuscarPasseios(termo);
+            Passeios.Clear();
 
-        foreach (var item in resultado)
-            Passeios.Add(item);
+            var resultado = await _service.BuscarPasseios(termo);
+
+            foreach (var item in resultado)
+                Passeios.Add(item);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 }

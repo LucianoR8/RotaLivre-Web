@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
+
 <ContentPage
     x:Class="RotaLivreMobile.Views.PasseioDetalhePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Detalhes">
+
     <ContentPage.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="#FFF5F7FA" Offset="0.0" />
@@ -11,52 +13,66 @@
         </LinearGradientBrush>
     </ContentPage.Background>
 
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="10">
+    <Grid>
 
-            <Label Text="{Binding Nome}"
-                   FontSize="24"
-                   FontAttributes="Bold" />
+        <ScrollView>
 
-            <Image Source="{Binding ImagemUrl}"
-                   HeightRequest="200"
-                   Aspect="AspectFill"/>
+            <VerticalStackLayout Padding="20" Spacing="10">
 
-            <Label Text="Descrição"
-                   FontAttributes="Bold" />
+                <Label Text="{Binding Nome}"
+                       FontSize="24"
+                       FontAttributes="Bold" />
 
-            <Label Text="{Binding Descricao}" />
+                <Image Source="{Binding ImagemUrl}"
+                       HeightRequest="200"
+                       Aspect="AspectFill"/>
 
-            <Label Text="Funcionamento"
-                   FontAttributes="Bold" />
+                <Label Text="Descrição"
+                       FontAttributes="Bold" />
 
-            <Label Text="{Binding Funcionamento}" />
+                <Label Text="{Binding Descricao}" />
 
-            <Label Text="{Binding QuantidadeCurtidas, StringFormat='Curtidas: {0}'}"
-                   FontSize="14"
-                   TextColor="Gray"/>
+                <Label Text="Funcionamento"
+                       FontAttributes="Bold" />
 
-            <Button Text="{Binding TextoBotaoCurtir}"
-                    BackgroundColor="{Binding CorBotaoCurtir}"
-                    TextColor="White"
-                    Command="{Binding CurtirCommand}" />
+                <Label Text="{Binding Funcionamento}" />
 
-            <Button
-                    Text="Comentários"
-                    Clicked="OnComentariosClicked"/>    
+                <Label Text="{Binding QuantidadeCurtidas, StringFormat='Curtidas: {0}'}"
+                       FontSize="14"
+                       TextColor="Gray"/>
 
-            <Button Text="{Binding TextoBotaoPendente}"
-                    BackgroundColor="{Binding CorBotaoPendente}"
-                    TextColor="White"
-                    Command="{Binding PendenteCommand}" />  
+                <Button Text="{Binding TextoBotaoCurtir}"
+                        BackgroundColor="{Binding CorBotaoCurtir}"
+                        TextColor="White"
+                        Command="{Binding CurtirCommand}" />
 
-            
+                <Button Text="Comentários"
+                        Clicked="OnComentariosClicked"/>
 
-            <Button Text="Criar Passeio"
-                    Clicked="OnCriarGrupoClicked"/>
-            
+                <Button Text="{Binding TextoBotaoPendente}"
+                        BackgroundColor="{Binding CorBotaoPendente}"
+                        TextColor="White"
+                        Command="{Binding PendenteCommand}" />
 
-        </VerticalStackLayout>
-    </ScrollView>
+                <Button Text="Criar Passeio"
+                        Clicked="OnCriarGrupoClicked"/>
+
+            </VerticalStackLayout>
+
+        </ScrollView>
+
+
+        <Grid
+            BackgroundColor="#80000000"
+            IsVisible="{Binding IsLoading}">
+
+            <ActivityIndicator
+                IsRunning="True"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Color="White"/>
+        </Grid>
+
+    </Grid>
 
 </ContentPage>

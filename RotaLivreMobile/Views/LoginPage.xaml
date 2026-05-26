@@ -1,8 +1,11 @@
-﻿<ContentPage
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="RotaLivreMobile.Views.LoginPage"
     Title="Login">
+
     <ContentPage.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="#FFF5F7FA" Offset="0.0" />
@@ -10,30 +13,45 @@
         </LinearGradientBrush>
     </ContentPage.Background>
 
-    <VerticalStackLayout Padding="30" Spacing="15">
+    <Grid>
 
-        <Entry
-            Placeholder="Email"
-            Keyboard="Email"
-            Text="{Binding Email}" />
+        <VerticalStackLayout Padding="30" Spacing="15">
 
-        <Entry
-            Placeholder="Senha"
-            IsPassword="True"
-            Text="{Binding Senha}" />
+            <Entry
+                Placeholder="Email"
+                Keyboard="Email"
+                Text="{Binding Email}" />
 
-        <Button
-            Text="Entrar"
-            Command="{Binding LoginCommand}" />
+            <Entry
+                Placeholder="Senha"
+                IsPassword="True"
+                Text="{Binding Senha}" />
 
-        <Button
-            Text="Criar Conta"
-            Command="{Binding IrParaCadastroCommand}" />
+            <Button
+                Text="Entrar"
+                Command="{Binding LoginCommand}" />
 
-        <Button
-            Text="Esqueci minha senha"
-            Command="{Binding IrParaRecuperacaoCommand}" />
+            <Button
+                Text="Criar Conta"
+                Command="{Binding IrParaCadastroCommand}" />
 
-    </VerticalStackLayout>
+            <Button
+                Text="Esqueci minha senha"
+                Command="{Binding IrParaRecuperacaoCommand}" />
+
+        </VerticalStackLayout>
+
+        <Grid
+            BackgroundColor="#80000000"
+            IsVisible="{Binding IsLoading}">
+
+            <ActivityIndicator
+                IsRunning="True"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Color="White"/>
+        </Grid>
+
+    </Grid>
 
 </ContentPage>

@@ -5,11 +5,9 @@ using System.Windows.Input;
 
 namespace RotaLivreMobile.ViewModels;
 
-public class PasseioDetalheViewModel : INotifyPropertyChanged
+public class PasseioDetalheViewModel : BaseViewModel
 {
     private readonly PasseioApiService _service;
-
-    public event PropertyChangedEventHandler PropertyChanged;
 
     private int _id;
     public int Id
@@ -96,32 +94,34 @@ public class PasseioDetalheViewModel : INotifyPropertyChanged
 
     public async Task Carregar(int id)
     {
-        var passeio = await _service.GetByIdAsync(id);
-
-        Console.WriteLine($"Buscando passeio ID: {id}");
-
-        if (passeio == null)
+        try
         {
-            Console.WriteLine("Passeio veio NULL");
-            return;
+            IsLoading = true;
+
+            var passeio = await _service.GetByIdAsync(id);
+
+            Console.WriteLine($"Buscando passeio ID: {id}");
+
+            if (passeio == null)
+            {
+                Console.WriteLine("Passeio veio NULL");
+                return;
+            }
+
+            Id = passeio.Id;
+            Nome = passeio.Nome;
+            Descricao = passeio.Descricao;
+            Funcionamento = passeio.Funcionamento;
+            ImagemUrl = passeio.ImagemUrl;
+            Curtido = passeio.UsuarioJaCurtiu;
+            QuantidadeCurtidas = passeio.QuantidadeCurtidas;
+            Pendente = passeio.UsuarioJaPendente;
         }
-
-        if (passeio == null)
-            return;
-
-        Id = passeio.Id;
-        Nome = passeio.Nome;
-        Descricao = passeio.Descricao;
-        Funcionamento = passeio.Funcionamento;
-        ImagemUrl = passeio.ImagemUrl;
-        Curtido = passeio.UsuarioJaCurtiu;
-        QuantidadeCurtidas = passeio.QuantidadeCurtidas;
-        Pendente = passeio.UsuarioJaPendente;
-
+        finally
+        {
+            IsLoading = false;
+        }
     }
-
-    private void OnPropertyChanged([CallerMemberName] string name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
     public async Task Inicializar(int id)
     {

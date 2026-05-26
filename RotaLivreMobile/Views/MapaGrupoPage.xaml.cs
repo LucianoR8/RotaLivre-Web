@@ -76,6 +76,8 @@ public partial class MapaGrupoPage : ContentPage, IQueryAttributable
     {
         try
         {
+            LoadingOverlay.IsVisible = true;
+
             var location = await _locationService.GetLocationAsync();
 
             if (location == null)
@@ -140,6 +142,10 @@ public partial class MapaGrupoPage : ContentPage, IQueryAttributable
         catch (Exception ex)
         {
             await DisplayAlert("Erro", ex.Message, "OK");
+        }
+        finally
+        {
+            LoadingOverlay.IsVisible = false;
         }
     }
 

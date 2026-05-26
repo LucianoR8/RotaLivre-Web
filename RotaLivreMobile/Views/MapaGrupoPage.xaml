@@ -50,5 +50,17 @@
             TextColor="White"
             CornerRadius="10" />
 
+        <Grid
+            x:Name="LoadingOverlay"
+            BackgroundColor="#80000000"
+            IsVisible="False">
+
+            <ActivityIndicator
+            IsRunning="True"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
+            Color="White"/>
+        </Grid>
+
     </Grid>
 </ContentPage>

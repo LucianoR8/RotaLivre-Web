@@ -2,7 +2,7 @@
 
 ## Página Inicial
 
-[imagem]
+![Tela Inicial](../assets/images/web/web_initial.png)
 
 ## Cadastro
 
@@ -10,15 +10,15 @@
 
 ### Cadastro Concluído
 
-[imagem]
+![Cadastro](../assets/images/web/web_create.PNG)
 
 ## Login
 
-[imagem]
+![Login](../assets/images/web/login.png)
 
 ### Redefinir Senha
 
-[imagem]
+![Solicitar Email](../assets/images/web/solicitar_email.png)
 
 ## Home 
 

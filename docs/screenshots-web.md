@@ -6,11 +6,11 @@
 
 ## Cadastro
 
-[imagem]
+![Cadastro](../assets/images/web/web_create.PNG)
 
 ### Cadastro Concluído
 
-![Cadastro](../assets/images/web/web_create.PNG)
+![Cadastro](../assets/images/web/cadastro_concluido.PNG)
 
 ## Login
 
@@ -19,27 +19,33 @@
 ### Redefinir Senha
 
 ![Solicitar Email](../assets/images/web/solicitar_email.png)
+![Confirmar Resposta](../assets/images/web/confirmar_resposta.png)
+![Definir Senha](../assets/images/web/definir_senha.png)
+![Senha Alterada](../assets/images/web/senha_alterada.png)
 
 ## Home 
 
-[imagem]
+![Home](../assets/images/web/home.png)
 
 ### Passeios por Categoria
 
-[imagem]
+![Museus](../assets/images/web/museus.png)
+![Parques](../assets/images/web/parques.png)
 
 ### Detalhes de Passeio
 
-[imagem]
+![Detalhes](../assets/images/web/passeios_detalhes.png)
 
 ### Avaliações
 
-[imagem]
+![Comentários](../assets/images/web/avaliacao.png)
 
 ## Meus Passeios
 
-[imagem]
+![Curtidos](../assets/images/web/passeios_curtidos.png)
+![Pendentes](../assets/images/web/passeios_pendentes.png)
 
 ## Perfil
 
-[imagem]
+![Perfil](../assets/images/web/perfil.png)
+![Editar Perfil](../assets/images/web/editar_perfil.png)

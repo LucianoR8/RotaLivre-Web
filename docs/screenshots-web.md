@@ -49,3 +49,8 @@
 
 ![Perfil](../assets/images/web/perfil.png)
 ![Editar Perfil](../assets/images/web/editar_perfil.png)
+
+#### Desenvolvedores
+
+FrontEnd: [Breno Estevo](https://github.com/Bxnog), [Cauã Macedo](https://github.com/cauamacedo497), Giovanna Alves, [Iara Laeber](https://github.com/iaralae), [Luciano Ribeiro](https://github.com/LucianoR8), [Samira Camargo](https://github.com/SamiraCamargo)
+BackEnd: [Breno Estevo](https://github.com/Bxnog), [Iara Laeber](https://github.com/iaralae), [Luciano Ribeiro](https://github.com/LucianoR8)

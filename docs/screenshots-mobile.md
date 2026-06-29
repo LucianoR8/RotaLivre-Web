@@ -2,46 +2,52 @@
 
 ## Login
 
-![Login](../assets/images/mobile/login.jpg)
+<img src="../assets/images/mobile/login.png" width="300">
 
 ## Cadastro
 
-![Cadastro](../assets/images/mobile/cadastro.jpg)
+<img src="../assets/images/mobile/cadastro.png" width="300">
 
 
 ### Redefinir Senha
 
-![Solicitar Email](../assets/images/mobile/solicitar_email.jpg)
-![Confirmar Resposta](../assets/images/mobile/responder_pergunta.jpg)
-![Definir Senha](../assets/images/mobile/redefinir_senha.jpg)
+<img src="../assets/images/mobile/solicitar_email.png" width="300">
+<img src="../assets/images/mobile/responder_pergunta.png" width="300">
+<img src="../assets/images/mobile/redefinir_senha.png" width="300">
 
 ## Home 
 
-![Home](../assets/images/mobile/home.jpg)
+<img src="../assets/images/mobile/home.png" width="300">
 
 ### Passeios por Categoria
 
-![Museus](../assets/images/mobile/museus.jpg)
-![Parques](../assets/images/mobile/parques.jpg)
+<img src="../assets/images/mobile/museus.png" width="300">
+<img src="../assets/images/mobile/parques.png" width="300">
 
 ### Detalhes de Passeio
 
-![Detalhes](../assets/images/mobile/passeios_detalhes.jpg)
+<img src="../assets/images/mobile/passeios_detalhes.png" width="300">
 
 ### Avaliações
 
-![Comentários](../assets/images/mobile/avaliacoes.jpg)
+<img src="../assets/images/mobile/avaliacoes.png" width="300">
 
-## Meus Passeios
+### Meus Passeios
 
-![Meus Passeios](../assets/images/mobile/meus_passeios.jpg)
+<img src="../assets/images/mobile/meus_passeios.png" width="300">
 
 ## Perfil
 
-![Perfil](../assets/images/mobile/perfil.jpg)
-![Editar Perfil](../assets/images/mobile/editar_perfil.jpg)
+<img src="../assets/images/mobile/perfil.png" width="300">
+<img src="../assets/images/mobile/editar_perfil.png" width="300">
 
 ## Grupo
 
-![Criar Grupo](../assets/images/mobile/criar_grupo.jpg)
-![Grupo Criado](../assets/images/mobile/grupo_criado.jpg)
+<img src="../assets/images/mobile/criar_grupo.png" width="300">
+<img src="../assets/images/mobile/grupo_criado.png" width="300">
+
+
+#### Desenvolvedores:
+
+FrontEnd: [Iara Laeber](https://github.com/iaralae), [Luciano Ribeiro](https://github.com/LucianoR8)
+BackEnd: [Iara Laeber](https://github.com/iaralae), [Luciano Ribeiro](https://github.com/LucianoR8)

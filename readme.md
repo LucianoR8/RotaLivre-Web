@@ -2,6 +2,12 @@
 
 Plataforma web e mobile para gerenciamento de passeios turísticos na cidade de São Paulo.
 
+## Demonstração
+
+Capturas de tela:
+- [Versão Web](docs/screenshots-web.md)
+- [Versão Mobile](docs/screenshots-mobile.md)
+
 Site disponível em: [Rota Livre](https://rotalivre-web.onrender.com/)
 
 ## Sobre o Projeto

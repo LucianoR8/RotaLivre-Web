@@ -2,14 +2,6 @@
 
 Plataforma web e mobile para gerenciamento de passeios turísticos na cidade de São Paulo.
 
-## Demonstração
-
-Capturas de tela:
-- [Versão Web](docs/screenshots-web.md)
-- [Versão Mobile](docs/screenshots-mobile.md)
-
-Site disponível em: [Rota Livre](https://rotalivre-web.onrender.com/)
-
 ## Sobre o Projeto
 
 O Rota Livre é uma plataforma desenvolvida para auxiliar usuários na descoberta, organização e participação em passeios turísticos.
@@ -107,6 +99,14 @@ PostgreSQL
 
 * Gerenciamento de categorias
 * Gerenciamento de endereços
+
+### Demonstração
+
+Capturas de tela:
+- [Versão Web](docs/screenshots-web.md)
+- [Versão Mobile](docs/screenshots-mobile.md)
+
+Site disponível em: [Rota Livre](https://rotalivre-web.onrender.com/)
 
 ---
 

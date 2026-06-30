@@ -2,53 +2,75 @@
 
 ## Página Inicial
 
-![Tela Inicial](../assets/images/web/web_initial.png)
+<p align = "center">
+<img src="../assets/images/web/web_initial.png" alt = "Inicial" width="900">
+</p>
 
 ## Cadastro
 
-![Cadastro](../assets/images/web/web_create.PNG)
+<p align = "center">
+<img src="../assets/images/web/web_create.PNG" alt = "Cadastro" width="900">
+</p>
 
 ### Cadastro Concluído
 
-![Cadastro](../assets/images/web/cadastro_concluido.PNG)
+<p align = "center">
+<img src="../assets/images/web/cadastro_concluido.PNG" alt = "Cadastro Concluido" width="900">
+</p>
 
 ## Login
 
-![Login](../assets/images/web/login.png)
+<p align = "center">
+<img src="../assets/images/web/login.png" alt = "Login" width="900">
+</p>
 
 ### Redefinir Senha
 
-![Solicitar Email](../assets/images/web/solicitar_email.png)
-![Confirmar Resposta](../assets/images/web/confirmar_resposta.png)
-![Definir Senha](../assets/images/web/definir_senha.png)
-![Senha Alterada](../assets/images/web/senha_alterada.png)
+<p align = "center">
+<img src="../assets/images/web/solicitar_email.png" alt = "Solicitar Email" width="900">
+<img src="../assets/images/web/confirmar_resposta.png" alt = "Confirmar Resposta" width="900">
+<img src="../assets/images/web/definir_senha.png" alt = "Definir Senha" width="900">
+<img src="../assets/images/web/senha_alterada.png" alt = "Senha Alterada" width="900">
+</p>
 
 ## Home 
 
-![Home](../assets/images/web/home.png)
+<p align = "center">
+<img src="../assets/images/web/home.png" alt = "Home" width="900">
+</p>
 
 ### Passeios por Categoria
 
-![Museus](../assets/images/web/museus.png)
-![Parques](../assets/images/web/parques.png)
+<p align = "center">
+<img src="../assets/images/web/museus.png" alt = "Museus" width="900">
+<img src="../assets/images/web/parques.png" alt = "Parques" width="900">
+</p>
 
 ### Detalhes de Passeio
 
-![Detalhes](../assets/images/web/passeios_detalhes.png)
+<p align = "center">
+<img src="../assets/images/web/passeios_detalhes.png" alt = "Detalhes" width="900">
+</p>
 
 ### Avaliações
 
-![Comentários](../assets/images/web/avaliacao.png)
+<p align = "center">
+<img src="../assets/images/web/avaliacao.png" alt = "Avaliacao" width="900">
+</p>
 
 ## Meus Passeios
 
-![Curtidos](../assets/images/web/passeios_curtidos.png)
-![Pendentes](../assets/images/web/passeios_pendentes.png)
+<p align = "center">
+<img src="../assets/images/web/passeios_curtidos.png" alt = "Curtidos" width="900">
+<img src="../assets/images/web/passeios_pendentes.png" alt = "Pendentes" width="900">
+</p>
 
 ## Perfil
 
-![Perfil](../assets/images/web/perfil.png)
-![Editar Perfil](../assets/images/web/editar_perfil.png)
+<p align = "center">
+<img src="../assets/images/web/perfil.png" alt = "Perfil" width="900">
+<img src="../assets/images/web/editar_perfil.png" alt = "Editar Perfil" width="900">
+</p>
 
 #### Desenvolvedores
 

@@ -35,7 +35,7 @@
 ### Detalhes de Passeio
 
 <p align = "center">
-<img src="https://github.com/LucianoR8/RotaLivre-Web/blob/master/assets/images/mobile/passeios_detalhes.jpg" alt = "Detalhes" width="300">
+<img src="https://github.com/LucianoR8/RotaLivre-Web/blob/master/assets/images/mobile/passeio_detalhes.jpg" alt = "Detalhes" width="300">
 </p>
 
 ### Avaliações

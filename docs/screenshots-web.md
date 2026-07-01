@@ -36,40 +36,40 @@
 ## Home 
 
 <p align = "center">
-<img src="../assets/images/web/home.png" alt = "Home" width="450">
+<img src="../assets/images/web/home.png" alt = "Home" width="350">
 </p>
 
 ### Passeios por Categoria
 
 <p align = "center">
-<img src="../assets/images/web/museus.png" alt = "Museus" width="450">
-<img src="../assets/images/web/parques.png" alt = "Parques" width="450">
+<img src="../assets/images/web/museus.png" alt = "Museus" width="350">
+<img src="../assets/images/web/parques.png" alt = "Parques" width="350">
 </p>
 
 ### Detalhes de Passeio
 
 <p align = "center">
-<img src="../assets/images/web/passeios_detalhes.png" alt = "Detalhes" width="450">
+<img src="../assets/images/web/passeios_detalhes.png" alt = "Detalhes" width="350">
 </p>
 
 ### Avaliações
 
 <p align = "center">
-<img src="../assets/images/web/avaliacao.png" alt = "Avaliacao" width="450">
+<img src="../assets/images/web/avaliacao.png" alt = "Avaliacao" width="350">
 </p>
 
 ## Meus Passeios
 
 <p align = "center">
-<img src="../assets/images/web/passeios_curtidos.png" alt = "Curtidos" width="450">
-<img src="../assets/images/web/passeios_pendentes.png" alt = "Pendentes" width="450">
+<img src="../assets/images/web/passeios_curtidos.png" alt = "Curtidos" width="350">
+<img src="../assets/images/web/passeios_pendentes.png" alt = "Pendentes" width="350">
 </p>
 
 ## Perfil
 
 <p align = "center">
 <img src="../assets/images/web/perfil.png" alt = "Perfil" width="450">
-<img src="../assets/images/web/editar_perfil.png" alt = "Editar Perfil" width="450">
+<img src="../assets/images/web/editar_perfil.png" alt = "Editar Perfil" width="300">
 </p>
 
 #### Desenvolvedores

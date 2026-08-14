@@ -6,7 +6,7 @@ Plataforma web e mobile para gerenciamento de passeios turísticos na cidade de 
 
 O Rota Livre é uma plataforma desenvolvida para auxiliar usuários na descoberta, organização e participação em passeios turísticos.
 
-A solução é composta por uma API desenvolvida em ASP.NET Core, um aplicativo mobile desenvolvido em .NET MAUI e um banco de dados PostgreSQL.
+A solução é composta por uma API desenvolvida em ASP.NET Core, um aplicativo mobile desenvolvido em .NET MAUI(em breve migração para TypeScript e React) e o banco de dados utilizando PostgreSQL com hospedagem no Supabase.
 
 A plataforma permite o gerenciamento de usuários, passeios, grupos e avaliações, centralizando informações e facilitando a interação entre participantes.
 

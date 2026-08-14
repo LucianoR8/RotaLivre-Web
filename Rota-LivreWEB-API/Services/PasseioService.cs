@@ -133,18 +133,51 @@ namespace Rota_LivreWEB_API.Services
                 return null;
 
             var jaCurtiu = await _context.CurtidaPasseio
-                .AnyAsync(c => c.id_usuario == usuarioId && c.id_passeio == id);
+                .AnyAsync(c =>
+                    c.id_usuario == usuarioId &&
+                    c.id_passeio == id);
+
+            var jaPendente = await _context.PasseioPendente
+                .AnyAsync(p =>
+                    p.id_usuario == usuarioId &&
+                    p.id_passeio == id);
+
+            var quantidadeCurtidas = await _context.CurtidaPasseio
+                .CountAsync(c =>
+                    c.id_passeio == passeio.id_passeio);
 
             return new PasseioDto
             {
                 Id = passeio.id_passeio,
+
                 Nome = passeio.nome_passeio,
+
                 Descricao = passeio.descricao,
+
                 Funcionamento = passeio.funcionamento,
-                ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{passeio.img_url}",
-                QuantidadeCurtidas = await _context.CurtidaPasseio
-                    .CountAsync(c => c.id_passeio == passeio.id_passeio),
-                UsuarioJaCurtiu = jaCurtiu
+
+                ImagemUrl =
+                    $"https://rotalivre-web.onrender.com/img/passeios/{passeio.img_url}",
+
+                QuantidadeCurtidas =
+                    quantidadeCurtidas,
+
+                UsuarioJaCurtiu =
+                    jaCurtiu,
+
+                UsuarioJaPendente =
+                    jaPendente,
+
+                Endereco = passeio.Endereco != null
+                    ? new EnderecoDto
+                    {
+                        NomeRua = passeio.Endereco.nome_rua,
+                        NumeroRua = passeio.Endereco.numero_rua,
+                        Complemento = passeio.Endereco.complemento,
+                        Bairro = passeio.Endereco.bairro,
+                        Cep = passeio.Endereco.cep
+                    }
+                    : null
             };
         }
 

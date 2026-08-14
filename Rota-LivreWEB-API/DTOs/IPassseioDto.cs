@@ -9,6 +9,7 @@ namespace Rota_LivreWEB_API.DTOs
         public EnderecoDto Endereco { get; set; }
         public string ImagemUrl { get; set; }
         public bool UsuarioJaCurtiu { get; set; }
+        public bool UsuarioJaPendente { get; set; }
         public int QuantidadeCurtidas { get; set; }
     }
 }

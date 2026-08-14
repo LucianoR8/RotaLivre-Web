@@ -7,6 +7,7 @@ namespace Rota_LivreWEB_API.DTOs
         public string NomeUsuario { get; set; }
         public List<CategoriaDto> Categorias { get; set; }
         public IEnumerable<PasseioDto> Destaques { get; set; }
+        public IEnumerable<PasseioDto> Favoritados { get; set; }
 
     }
 }

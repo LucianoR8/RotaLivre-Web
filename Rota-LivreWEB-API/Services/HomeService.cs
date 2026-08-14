@@ -45,11 +45,33 @@ namespace Rota_LivreWEB_API.Services
                 .Take(5)
                 .ToListAsync();
 
+            var favoritados = await _context.CurtidaPasseio
+                .Where(c => c.id_usuario == usuarioId)
+                .Select(c => new PasseioDto
+                {
+                    Id = c.Passeio.id_passeio,
+                    Nome = c.Passeio.nome_passeio,
+                    Descricao = c.Passeio.descricao,
+                    Funcionamento = c.Passeio.funcionamento,
+
+                    ImagemUrl =
+                        $"https://rotalivre-web.onrender.com/img/passeios/{c.Passeio.img_url}",
+
+                    QuantidadeCurtidas =
+                        _context.CurtidaPasseio
+                            .Count(cp =>
+                                cp.id_passeio == c.id_passeio),
+
+                    UsuarioJaCurtiu = true
+                })
+                .ToListAsync();
+
             return new HomeDto
             {
                 NomeUsuario = usuario?.nome_completo,
                 Destaques = destaques,
-                Categorias = categorias
+                Categorias = categorias,
+                Favoritados = favoritados
             };
 
         }

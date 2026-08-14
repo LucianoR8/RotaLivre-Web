@@ -61,15 +61,15 @@
 ## Meus Passeios
 
 <p align = "center">
-<img src="../assets/images/web/passeios_curtidos.png" alt = "Curtidos" width="350">
-<img src="../assets/images/web/passeios_pendentes.png" alt = "Pendentes" width="350">
+<img src="../assets/images/web/passeios_curtidos.png" alt = "Curtidos" width="275">
+<img src="../assets/images/web/passeios_pendentes.png" alt = "Pendentes" width="275">
 </p>
 
 ## Perfil
 
 <p align = "center">
-<img src="../assets/images/web/perfil.png" alt = "Perfil" width="450">
-<img src="../assets/images/web/editar_perfil.png" alt = "Editar Perfil" width="300">
+<img src="../assets/images/web/perfil.png" alt = "Perfil" width="275">
+<img src="../assets/images/web/editar_perfil.png" alt = "Editar Perfil" width="150">
 </p>
 
 #### Desenvolvedores

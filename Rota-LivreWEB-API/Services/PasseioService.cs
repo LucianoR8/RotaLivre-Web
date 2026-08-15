@@ -58,7 +58,10 @@ namespace Rota_LivreWEB_API.Services
                     NumeroRua = passeio.Endereco.numero_rua,
                     Complemento = passeio.Endereco.complemento,
                     Bairro = passeio.Endereco.bairro,
-                    Cep = passeio.Endereco.cep
+                    Cep = passeio.Endereco.cep,
+                    Latitude = passeio.Endereco.Latitude,
+                    Longitude = passeio.Endereco.Longitude,
+                    RaioMetros = passeio.Endereco.RaioMetros
                 } : null
             };
         }
@@ -175,7 +178,10 @@ namespace Rota_LivreWEB_API.Services
                         NumeroRua = passeio.Endereco.numero_rua,
                         Complemento = passeio.Endereco.complemento,
                         Bairro = passeio.Endereco.bairro,
-                        Cep = passeio.Endereco.cep
+                        Cep = passeio.Endereco.cep,
+                        Latitude = passeio.Endereco.Latitude,
+                        Longitude = passeio.Endereco.Longitude,
+                        RaioMetros = passeio.Endereco.RaioMetros
                     }
                     : null
             };

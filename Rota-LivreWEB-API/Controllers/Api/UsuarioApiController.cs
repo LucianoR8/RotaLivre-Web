@@ -203,11 +203,36 @@ namespace Rota_LivreWEB_API.Controllers.Api
             if (foto == null || foto.Length == 0)
                 return BadRequest("Imagem inválida");
 
+            // Validação básica do tipo da imagem
+            var tiposPermitidos = new[]
+            {
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    };
+
+            if (!tiposPermitidos.Contains(foto.ContentType.ToLower()))
+                return BadRequest("Formato de imagem não permitido.");
+
+            // Limite de 5 MB
+            if (foto.Length > 5 * 1024 * 1024)
+                return BadRequest("A imagem deve ter no máximo 5 MB.");
+
             var supabaseUrl = _config["Supabase:Url"];
             var supabaseKey = _config["Supabase:Key"];
             var bucket = _config["Supabase:Bucket"];
 
-            var fileName = $"usuario_{id}_{Guid.NewGuid()}.jpg";
+            // Guarda a URL antiga antes de alterar
+            var fotoAntiga = usuario.FotoPerfilUrl;
+
+            var extensao = foto.ContentType.ToLower() switch
+            {
+                "image/png" => ".png",
+                "image/webp" => ".webp",
+                _ => ".jpg"
+            };
+
+            var fileName = $"usuario_{id}_{Guid.NewGuid()}{extensao}";
 
             using var httpClient = new HttpClient();
 
@@ -236,9 +261,16 @@ namespace Rota_LivreWEB_API.Controllers.Api
             var urlPublica =
                 $"{supabaseUrl}/storage/v1/object/public/{bucket}/{fileName}";
 
+            
             usuario.FotoPerfilUrl = urlPublica;
 
             await _repo.AtualizarUsuarioAsync(usuario);
+
+            
+            if (!string.IsNullOrWhiteSpace(fotoAntiga))
+            {
+                await RemoverArquivoSupabaseAsync(fotoAntiga);
+            }
 
             return Ok(new
             {
@@ -252,15 +284,39 @@ namespace Rota_LivreWEB_API.Controllers.Api
             var usuario = await _repo.BuscarPorIdAsync(id);
 
             if (usuario == null)
-                return NotFound();
+                return NotFound("Usuário não encontrado");
 
-            if (string.IsNullOrEmpty(usuario.FotoPerfilUrl))
+            if (string.IsNullOrWhiteSpace(usuario.FotoPerfilUrl))
                 return BadRequest("Usuário não possui foto.");
 
-            var uri = new Uri(usuario.FotoPerfilUrl);
+            var fotoRemovida = await RemoverArquivoSupabaseAsync(
+                usuario.FotoPerfilUrl
+            );
 
-            var fileName =
-                Path.GetFileName(uri.LocalPath);
+            if (!fotoRemovida)
+                return BadRequest("Não foi possível remover a foto do armazenamento.");
+
+            usuario.FotoPerfilUrl = null;
+
+            await _repo.AtualizarUsuarioAsync(usuario);
+
+            return Ok(new
+            {
+                sucesso = true
+            });
+        }
+
+        private async Task<bool> RemoverArquivoSupabaseAsync(string fileUrl)
+        {
+            if (string.IsNullOrWhiteSpace(fileUrl))
+                return true;
+
+            var uri = new Uri(fileUrl);
+
+            var fileName = Path.GetFileName(uri.LocalPath);
+
+            if (string.IsNullOrWhiteSpace(fileName))
+                return false;
 
             var supabaseUrl = _config["Supabase:Url"];
             var supabaseKey = _config["Supabase:Key"];
@@ -279,19 +335,7 @@ namespace Rota_LivreWEB_API.Controllers.Api
 
             var response = await client.SendAsync(request);
 
-            var responseContent =
-                await response.Content.ReadAsStringAsync();
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return BadRequest(responseContent);
-            }
-
-            usuario.FotoPerfilUrl = null;
-
-            await _repo.AtualizarUsuarioAsync(usuario);
-
-            return Ok();
+            return response.IsSuccessStatusCode;
         }
 
     }

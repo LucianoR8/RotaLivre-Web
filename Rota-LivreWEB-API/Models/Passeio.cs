@@ -13,7 +13,7 @@ namespace Rota_LivreWEB_API.Models
         public string descricao { get; set; }
         public string img_url { get; set; }
         public Endereco? Endereco { get; set; }         
-
+        public Categoria Categoria { get; set; }
 
         public int QuantidadeCurtidas { get; set; }
 

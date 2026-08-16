@@ -11,5 +11,6 @@ namespace Rota_LivreWEB_API.DTOs
         public bool UsuarioJaCurtiu { get; set; }
         public bool UsuarioJaPendente { get; set; }
         public int QuantidadeCurtidas { get; set; }
+        public string CategoriaNome { get; set; }
     }
 }

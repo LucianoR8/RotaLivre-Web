@@ -73,7 +73,12 @@ namespace Rota_LivreWEB_API.Data
                 .HasOne(p => p.Endereco)
                 .WithOne()
                 .HasForeignKey<Endereco>(e => e.id_passeio);
-        
+
+            modelBuilder.Entity<Passeio>()
+                .HasOne(p => p.Categoria)
+                .WithMany()
+                .HasForeignKey(p => p.id_categoria);
+
         }
 
     }

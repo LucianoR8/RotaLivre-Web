@@ -95,9 +95,15 @@ namespace Rota_LivreWEB_API.Services
                     Nome = p.nome_passeio,
                     Descricao = p.descricao,
                     Funcionamento = p.funcionamento,
-                    ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{p.img_url}",
-                    QuantidadeCurtidas = _context.CurtidaPasseio
-                        .Count(c => c.id_passeio == p.id_passeio)
+
+                    ImagemUrl =
+                        $"https://rotalivre-web.onrender.com/img/passeios/{p.img_url}",
+
+                    QuantidadeCurtidas =
+                        _context.CurtidaPasseio
+                            .Count(c => c.id_passeio == p.id_passeio),
+
+                    CategoriaNome = p.Categoria.tipo_categoria
                 })
                 .ToListAsync();
         }

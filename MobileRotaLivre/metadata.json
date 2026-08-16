@@ -1,0 +1,10 @@
+{
+  "name": "Remix RotaLivre-Web",
+  "description": "Imported from GitHub: LucianoR8/RotaLivre-Web",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

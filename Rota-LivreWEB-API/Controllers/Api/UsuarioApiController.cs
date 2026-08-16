@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.DTOs;
@@ -192,6 +193,7 @@ namespace Rota_LivreWEB_API.Controllers.Api
             });
         }
 
+        [Authorize]
         [HttpPost("upload-foto/{id}")]
         public async Task<ActionResult> UploadFoto(int id, IFormFile foto)
         {
@@ -201,9 +203,8 @@ namespace Rota_LivreWEB_API.Controllers.Api
                 return NotFound("Usuário não encontrado");
 
             if (foto == null || foto.Length == 0)
-                return BadRequest("Imagem inválida");
+                return BadRequest("Imagem inválida.");
 
-            // Validação básica do tipo da imagem
             var tiposPermitidos = new[]
             {
         "image/jpeg",
@@ -212,27 +213,25 @@ namespace Rota_LivreWEB_API.Controllers.Api
     };
 
             if (!tiposPermitidos.Contains(foto.ContentType.ToLower()))
-                return BadRequest("Formato de imagem não permitido.");
-
-            // Limite de 5 MB
-            if (foto.Length > 5 * 1024 * 1024)
-                return BadRequest("A imagem deve ter no máximo 5 MB.");
+            {
+                return StatusCode(415, "Formato de imagem não suportado. Use JPG, PNG ou WEBP.");
+            }
 
             var supabaseUrl = _config["Supabase:Url"];
             var supabaseKey = _config["Supabase:Key"];
             var bucket = _config["Supabase:Bucket"];
 
-            // Guarda a URL antiga antes de alterar
-            var fotoAntiga = usuario.FotoPerfilUrl;
+            // Descobre a extensão original
+            var extensao = Path.GetExtension(foto.FileName)
+                .ToLowerInvariant();
 
-            var extensao = foto.ContentType.ToLower() switch
+            if (string.IsNullOrEmpty(extensao))
             {
-                "image/png" => ".png",
-                "image/webp" => ".webp",
-                _ => ".jpg"
-            };
+                return BadRequest("Não foi possível identificar a extensão da imagem.");
+            }
 
-            var fileName = $"usuario_{id}_{Guid.NewGuid()}{extensao}";
+            var fileName =
+                $"usuario_{id}_{Guid.NewGuid()}{extensao}";
 
             using var httpClient = new HttpClient();
 
@@ -243,7 +242,7 @@ namespace Rota_LivreWEB_API.Controllers.Api
 
             using var stream = foto.OpenReadStream();
 
-            var content = new StreamContent(stream);
+            using var content = new StreamContent(stream);
 
             content.Headers.ContentType =
                 new MediaTypeHeaderValue(foto.ContentType);
@@ -255,21 +254,24 @@ namespace Rota_LivreWEB_API.Controllers.Api
             if (!response.IsSuccessStatusCode)
             {
                 var erro = await response.Content.ReadAsStringAsync();
+
                 return BadRequest(erro);
             }
 
             var urlPublica =
                 $"{supabaseUrl}/storage/v1/object/public/{bucket}/{fileName}";
 
-            
+            // Guarda a URL antiga antes de substituir
+            var fotoAntiga = usuario.FotoPerfilUrl;
+
             usuario.FotoPerfilUrl = urlPublica;
 
             await _repo.AtualizarUsuarioAsync(usuario);
 
-            
-            if (!string.IsNullOrWhiteSpace(fotoAntiga))
+            // Remove a foto antiga do Storage, se existir
+            if (!string.IsNullOrEmpty(fotoAntiga))
             {
-                await RemoverArquivoSupabaseAsync(fotoAntiga);
+                await RemoverArquivoSupabase(fotoAntiga);
             }
 
             return Ok(new
@@ -278,23 +280,26 @@ namespace Rota_LivreWEB_API.Controllers.Api
             });
         }
 
+        [Authorize]
         [HttpDelete("remover-foto/{id}")]
         public async Task<IActionResult> RemoverFoto(int id)
         {
             var usuario = await _repo.BuscarPorIdAsync(id);
 
             if (usuario == null)
-                return NotFound("Usuário não encontrado");
+                return NotFound("Usuário não encontrado.");
 
-            if (string.IsNullOrWhiteSpace(usuario.FotoPerfilUrl))
+            if (string.IsNullOrEmpty(usuario.FotoPerfilUrl))
                 return BadRequest("Usuário não possui foto.");
 
-            var fotoRemovida = await RemoverArquivoSupabaseAsync(
-                usuario.FotoPerfilUrl
-            );
+            var fotoUrl = usuario.FotoPerfilUrl;
 
-            if (!fotoRemovida)
-                return BadRequest("Não foi possível remover a foto do armazenamento.");
+            var removida = await RemoverArquivoSupabase(fotoUrl);
+
+            if (!removida)
+            {
+                return BadRequest("Não foi possível remover a foto do Storage.");
+            }
 
             usuario.FotoPerfilUrl = null;
 
@@ -306,36 +311,38 @@ namespace Rota_LivreWEB_API.Controllers.Api
             });
         }
 
-        private async Task<bool> RemoverArquivoSupabaseAsync(string fileUrl)
+        private async Task<bool> RemoverArquivoSupabase(string urlFoto)
         {
-            if (string.IsNullOrWhiteSpace(fileUrl))
-                return true;
+            try
+            {
+                var uri = new Uri(urlFoto);
 
-            var uri = new Uri(fileUrl);
+                var fileName = Path.GetFileName(uri.LocalPath);
 
-            var fileName = Path.GetFileName(uri.LocalPath);
+                var supabaseUrl = _config["Supabase:Url"];
+                var supabaseKey = _config["Supabase:Key"];
+                var bucket = _config["Supabase:Bucket"];
 
-            if (string.IsNullOrWhiteSpace(fileName))
+                using var client = new HttpClient();
+
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", supabaseKey);
+
+                client.DefaultRequestHeaders.Add("apikey", supabaseKey);
+
+                var request = new HttpRequestMessage(
+                    HttpMethod.Delete,
+                    $"{supabaseUrl}/storage/v1/object/{bucket}/{fileName}"
+                );
+
+                var response = await client.SendAsync(request);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
                 return false;
-
-            var supabaseUrl = _config["Supabase:Url"];
-            var supabaseKey = _config["Supabase:Key"];
-            var bucket = _config["Supabase:Bucket"];
-
-            using var client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", supabaseKey);
-
-            client.DefaultRequestHeaders.Add("apikey", supabaseKey);
-
-            var request = new HttpRequestMessage(
-                HttpMethod.Delete,
-                $"{supabaseUrl}/storage/v1/object/{bucket}/{fileName}");
-
-            var response = await client.SendAsync(request);
-
-            return response.IsSuccessStatusCode;
+            }
         }
 
     }

@@ -2,3 +2,4 @@
 bin/ 
 obj/ 
 Rota-LivreWEB-API/appsettings.Development.json
+MobileRotaLivre/node_modules

@@ -132,6 +132,8 @@ Utilidades/
 * Geofencing
 * Melhorias de usabilidade
 * Novas funcionalidades para gerenciamento de passeios
+* Implementação de painel admnistrativo
+* Mudança de escopo para funcionalidade de passeios pendentes
 
 ---
 

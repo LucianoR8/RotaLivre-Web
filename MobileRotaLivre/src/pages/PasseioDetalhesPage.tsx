@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { PasseioDto, Avaliacao } from '../types';
+import { PasseioDto, AvaliacaoDto } from '../types';
 import { passeioService } from '../services/passeioService';
+import { avaliacaoService } from '../services/avaliacaoService';
 import {
   ArrowLeft,
   Heart,
@@ -24,11 +25,10 @@ export const PasseioDetalhesPage: React.FC = () => {
   const { usuario, getAuthHeader } = useAuth();
 
   const [passeio, setPasseio] = useState<PasseioDto | null>(null);
-  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
+  const [avaliacoes, setAvaliacoes] = useState<AvaliacaoDto[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Avaliação Form State
-  const [nota, setNota] = useState(5);
   const [feedback, setFeedback] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewMsg, setReviewMsg] = useState('');
@@ -38,31 +38,53 @@ export const PasseioDetalhesPage: React.FC = () => {
   const leafletMap = useRef<L.Map | null>(null);
 
  useEffect(() => {
-  const carregarPasseio = async () => {
+  const carregarDados = async () => {
     if (!id) {
       setLoading(false);
       return;
     }
 
     try {
-      console.log('Buscando passeio com ID:', id);
+      const idPasseio = Number(id);
 
-      const data = await passeioService.buscarPorId(Number(id));
+      console.log('Buscando passeio com ID:', idPasseio);
+
+      const data = await passeioService.buscarPorId(idPasseio);
 
       console.log('Dados recebidos do passeio:', data);
 
       setPasseio(data);
+
+      console.log(
+        'Buscando avaliações do passeio:',
+        idPasseio
+      );
+
+      const avaliacoesData =
+        await avaliacaoService.listarPorPasseio(idPasseio);
+
+      console.log(
+        'Avaliações recebidas:',
+        avaliacoesData
+      );
+
+      setAvaliacoes(avaliacoesData || []);
+
     } catch (err) {
       console.error(
-        'Erro ao buscar detalhes do passeio:',
+        'Erro ao carregar dados do passeio:',
         err
       );
+
+      setAvaliacoes([]);
+
     } finally {
       setLoading(false);
     }
   };
 
-  carregarPasseio();
+  carregarDados();
+
 }, [id]);
 
   // Leaflet Map Initialization
@@ -127,37 +149,78 @@ export const PasseioDetalhesPage: React.FC = () => {
   }
 };
 
-  const handleCriarAvaliacao = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!feedback.trim()) return;
+  const handleCriarAvaliacao = async (
+  e: React.FormEvent
+) => {
+
+  e.preventDefault();
+
+  if (!feedback.trim()) {
+    return;
+  }
+
+  if (!id || !usuario) {
+    setReviewMsg('É necessário estar logado para avaliar.');
+    return;
+  }
+
+  try {
 
     setSubmittingReview(true);
-    try {
-      const res = await fetch('/api/avaliacao', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        },
-        body: JSON.stringify({
-          id_passeio: Number(id),
-          nota,
-          feedback
-        })
-      });
-      const data = await res.json();
-      if (data.sucesso) {
-        setAvaliacoes(prev => [data.avaliacao, ...prev]);
-        setFeedback('');
-        setReviewMsg('Avaliação enviada com sucesso!');
-        setTimeout(() => setReviewMsg(''), 4000);
-      }
-    } catch (err) {
-      console.error('Erro ao enviar avaliação:', err);
-    } finally {
-      setSubmittingReview(false);
-    }
-  };
+    setReviewMsg('');
+
+    const novaAvaliacao = {
+      idPasseio: Number(id),
+      idUsuario: usuario.id,
+      feedback: feedback.trim()
+    };
+
+    console.log(
+      'Enviando avaliação:',
+      novaAvaliacao
+    );
+
+    await avaliacaoService.comentar(
+      novaAvaliacao
+    );
+
+    setFeedback('');
+
+    setReviewMsg(
+      'Avaliação enviada com sucesso!'
+    );
+
+    // Recarrega as avaliações diretamente da API
+    const avaliacoesAtualizadas =
+      await avaliacaoService.listarPorPasseio(
+        Number(id)
+      );
+
+    setAvaliacoes(
+      avaliacoesAtualizadas
+    );
+
+    setTimeout(() => {
+      setReviewMsg('');
+    }, 4000);
+
+  } catch (err) {
+
+    console.error(
+      'Erro ao enviar avaliação:',
+      err
+    );
+
+    setReviewMsg(
+      'Não foi possível enviar a avaliação.'
+    );
+
+  } finally {
+
+    setSubmittingReview(false);
+
+  }
+};
 
   const handleCriarGrupo = () => {
   if (passeio) {
@@ -325,31 +388,6 @@ export const PasseioDetalhesPage: React.FC = () => {
         <form onSubmit={handleCriarAvaliacao} className="bg-[#f5f7fa] p-6 rounded-2xl mb-8 border border-slate-200">
           <h4 className="font-bold text-[#1a535c] mb-3 text-sm">Deixe sua avaliação</h4>
 
-          {reviewMsg && (
-            <div className="mb-4 p-3 bg-emerald-100 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2">
-              <Check className="w-4 h-4" />
-              <span>{reviewMsg}</span>
-            </div>
-          )}
-
-          {/* Star Selection */}
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-xs font-semibold text-slate-600">Sua Nota:</span>
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map(star => (
-                <button
-                  type="button"
-                  key={star}
-                  onClick={() => setNota(star)}
-                  className="p-1 hover:scale-125 transition text-amber-400"
-                >
-                  <Star className={`w-6 h-6 ${star <= nota ? 'fill-current text-amber-400' : 'text-slate-300'}`} />
-                </button>
-              ))}
-            </div>
-            <span className="text-xs font-bold text-[#1a535c] ml-2">{nota} de 5 estrelas</span>
-          </div>
-
           <textarea
             value={feedback}
             onChange={e => setFeedback(e.target.value)}
@@ -370,42 +408,54 @@ export const PasseioDetalhesPage: React.FC = () => {
         </form>
 
         {/* Reviews List */}
-        <div className="space-y-4 divide-y divide-slate-100">
-          {avaliacoes.length > 0 ? (
-            avaliacoes.map(a => (
-              <div key={a.id_avaliacao} className="pt-4 first:pt-0">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 rounded-full bg-[#1a535c] text-white font-bold flex items-center justify-center text-xs">
-                      {a.nome_completo.charAt(0)}
-                    </div>
-                    <div>
-                      <h5 className="font-bold text-sm text-[#1a535c]">{a.nome_completo}</h5>
-                      <span className="text-[11px] text-slate-400">
-                        {new Date(a.data_feedback).toLocaleDateString('pt-BR')}
-                      </span>
-                    </div>
-                  </div>
+<div className="space-y-4 divide-y divide-slate-100">
 
-                  <div className="flex items-center gap-1 text-amber-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${i < a.nota ? 'fill-current' : 'text-slate-200'}`}
-                      />
-                    ))}
-                  </div>
-                </div>
+  {avaliacoes.length > 0 ? (
 
-                <p className="text-sm text-slate-600 leading-relaxed pl-11">{a.feedback}</p>
-              </div>
-            ))
-          ) : (
-            <p className="text-center py-6 text-sm text-slate-400">
-              Seja o primeiro a avaliar este passeio!
-            </p>
-          )}
+    avaliacoes.map((a, index) => (
+
+      <div
+        key={`${a.nomeUsuario}-${a.data}-${index}`}
+        className="pt-4 first:pt-0"
+      >
+
+        <div className="flex items-center gap-2 mb-2">
+
+          <div className="w-9 h-9 rounded-full bg-[#1a535c] text-white font-bold flex items-center justify-center text-xs">
+            {a.nomeUsuario.charAt(0).toUpperCase()}
+          </div>
+
+          <div>
+
+            <h5 className="font-bold text-sm text-[#1a535c]">
+              {a.nomeUsuario}
+            </h5>
+
+            <span className="text-[11px] text-slate-400">
+              {new Date(a.data).toLocaleDateString('pt-BR')}
+            </span>
+
+          </div>
+
         </div>
+
+        <p className="text-sm text-slate-600 leading-relaxed pl-11">
+          {a.feedback}
+        </p>
+
+      </div>
+
+    ))
+
+  ) : (
+
+    <p className="text-center py-6 text-sm text-slate-400">
+      Seja o primeiro a avaliar este passeio!
+    </p>
+
+  )}
+
+</div>
       </section>
     </div>
   );

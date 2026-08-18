@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Mail, Shield, Lock, CheckCircle, ArrowRight } from 'lucide-react';
+import { usuarioService } from '../services/usuarioService';
 
 export const RecuperarSenhaPage: React.FC = () => {
-  const navigate = useNavigate();
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [email, setEmail] = useState('');
@@ -15,79 +15,103 @@ export const RecuperarSenhaPage: React.FC = () => {
 
   // Step 1: Request Password Reset
   const handleSolicitar = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg('');
+  e.preventDefault();
+  setLoading(true);
+  setErrorMsg('');
 
-    try {
-      const res = await fetch('/api/auth/solicitar-redefinicao', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      const data = await res.json();
-      if (data.sucesso) {
-        setPergunta(data.pergunta);
-        setStep(2);
-      } else {
-        setErrorMsg(data.mensagem || 'E-mail não encontrado.');
-      }
-    } catch (err) {
-      setErrorMsg('Erro de comunicação com o servidor.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    const pergunta =
+      await usuarioService.buscarPerguntaRecuperacao(email);
+
+    setPergunta(pergunta);
+    setStep(2);
+
+  } catch (err: any) {
+
+    console.error(
+      '[RecuperarSenhaPage] Erro ao buscar pergunta:',
+      err
+    );
+
+    setErrorMsg(
+      err?.response?.data?.mensagem ||
+      'E-mail não encontrado.'
+    );
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Step 2: Verify Security Answer
-  const handleVerificarResposta = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg('');
+  const handleVerificarResposta = async (
+  e: React.FormEvent
+) => {
 
-    try {
-      const res = await fetch('/api/auth/verificar-resposta', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, resposta_seg: resposta })
-      });
-      const data = await res.json();
-      if (data.sucesso) {
-        setStep(3);
-      } else {
-        setErrorMsg(data.mensagem || 'Resposta incorreta.');
-      }
-    } catch (err) {
-      setErrorMsg('Erro de comunicação com o servidor.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
+  setLoading(true);
+  setErrorMsg('');
+
+  try {
+
+    await usuarioService.verificarRespostaRecuperacao(
+      email,
+      resposta
+    );
+
+    setStep(3);
+
+  } catch (err: any) {
+
+    console.error(
+      '[RecuperarSenhaPage] Erro ao verificar resposta:',
+      err
+    );
+
+    setErrorMsg(
+      err?.response?.data?.mensagem ||
+      'Resposta incorreta.'
+    );
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Step 3: Set New Password
-  const handleRedefinirSenha = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg('');
+  const handleRedefinirSenha = async (
+  e: React.FormEvent
+) => {
 
-    try {
-      const res = await fetch('/api/auth/redefinir-senha', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, novaSenha })
-      });
-      const data = await res.json();
-      if (data.sucesso) {
-        setStep(4);
-      } else {
-        setErrorMsg(data.mensagem || 'Falha ao alterar senha.');
-      }
-    } catch (err) {
-      setErrorMsg('Erro de comunicação com o servidor.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
+  setLoading(true);
+  setErrorMsg('');
+
+  try {
+
+    await usuarioService.redefinirSenha(
+      email,
+      novaSenha
+    );
+
+    setStep(4);
+
+  } catch (err: any) {
+
+    console.error(
+      '[RecuperarSenhaPage] Erro ao redefinir senha:',
+      err
+    );
+
+    setErrorMsg(
+      err?.response?.data?.mensagem ||
+      'Falha ao alterar senha.'
+    );
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="pt-20 pb-24 px-4 flex items-center justify-center max-w-md mx-auto">

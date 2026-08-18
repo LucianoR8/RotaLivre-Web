@@ -60,6 +60,50 @@ export const usuarioService = {
     return response.data.fotoUrl;
   },
 
+  buscarPerguntaRecuperacao: async (
+    email: string
+  ): Promise<string> => {
+
+    const response = await api.get<{ pergunta: string }>(
+      '/UsuarioApi/pergunta',
+      {
+        params: {
+          email
+        }
+      }
+    );
+
+    return response.data.pergunta;
+  },
+
+  verificarRespostaRecuperacao: async (
+    email: string,
+    resposta: string
+  ): Promise<void> => {
+
+    await api.post(
+      '/UsuarioApi/verificar-resposta',
+      {
+        email,
+        resposta
+      }
+    );
+  },
+
+  redefinirSenha: async (
+    email: string,
+    novaSenha: string
+  ): Promise<void> => {
+
+    await api.post(
+      '/UsuarioApi/redefinir',
+      {
+        email,
+        novaSenha
+      }
+    );
+  },
+
   removerFoto: async (
     id: number
   ): Promise<void> => {

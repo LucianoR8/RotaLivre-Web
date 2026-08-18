@@ -36,20 +36,6 @@ export interface Usuario {
   fotoPerfilUrl?: string | null;
 }
 
-export interface Avaliacao {
-  id_avaliacao: number;
-  id_passeio: number;
-  id_usuario: number;
-  nome_completo: string;
-  nota: number;
-  feedback: string;
-  data_feedback: string;
-}
-
-export interface PerguntaSeguranca {
-  id_pergunta: number;
-  pergunta_seg: string;
-}
 
 export interface MembroGrupo {
   id_usuario: number;
@@ -144,3 +130,14 @@ export interface UsuarioPerfilDto {
   fotoPerfilUrl?: string | null;
 }
 
+export interface CriarAvaliacaoDto {
+  idPasseio: number;
+  idUsuario: number;
+  feedback: string;
+}
+
+export interface AvaliacaoDto {
+  nomeUsuario: string;
+  feedback: string;
+  data: string;
+}

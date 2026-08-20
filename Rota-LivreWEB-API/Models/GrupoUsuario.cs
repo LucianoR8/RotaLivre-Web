@@ -17,6 +17,9 @@ namespace Rota_LivreWEB_API.Models
         public bool ativo { get; set; } = true;
 
         public DateTime data_entrada { get; set; } = DateTime.UtcNow;
+        public bool iniciou_passeio { get; set; } = false;
+        public DateTime? data_inicio_passeio { get; set; }
+        public DateTime? ultima_atividade { get; set; }
 
         public Grupo? Grupo { get; set; }
         public Usuario? Usuario { get; set; }

@@ -26,6 +26,6 @@ namespace Rota_LivreWEB_API.Models
         public int id_passeio { get; set; }
         [ForeignKey(nameof(id_passeio))]
         public Passeio? Passeio { get; set; }
-        public ICollection<GrupoUsuario>? Usuarios { get; set; }
+        public ICollection<GrupoUsuario> Usuarios { get; set; } = new List<GrupoUsuario>();
     }
 }

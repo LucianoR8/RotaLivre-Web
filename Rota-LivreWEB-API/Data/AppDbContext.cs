@@ -79,6 +79,31 @@ namespace Rota_LivreWEB_API.Data
                 .WithMany()
                 .HasForeignKey(p => p.id_categoria);
 
+            modelBuilder.Entity<GrupoUsuario>()
+                .HasOne(gu => gu.Grupo)
+                .WithMany(g => g.Usuarios)
+                .HasForeignKey(gu => gu.id_grupo);
+
+            modelBuilder.Entity<GrupoUsuario>()
+                .HasOne(gu => gu.Usuario)
+                .WithMany()
+                .HasForeignKey(gu => gu.id_usuario);
+
+            modelBuilder.Entity<PasseioPendente>()
+                .HasOne(pp => pp.Usuario)
+                .WithMany()
+                .HasForeignKey(pp => pp.id_usuario);
+
+            modelBuilder.Entity<PasseioPendente>()
+                .HasOne(pp => pp.Passeio)
+                .WithMany()
+                .HasForeignKey(pp => pp.id_passeio);
+
+            modelBuilder.Entity<PasseioPendente>()
+                .HasOne(pp => pp.Grupo)
+                .WithMany()
+                .HasForeignKey(pp => pp.id_grupo);
+
         }
 
     }

@@ -265,9 +265,12 @@ namespace Rota_LivreWEB_API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(
-                    500,
-                    $"Erro ao criar grupo: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    erro = ex.Message,
+                    inner = ex.InnerException?.Message,
+                    inner2 = ex.InnerException?.InnerException?.Message
+                });
             }
         }
 

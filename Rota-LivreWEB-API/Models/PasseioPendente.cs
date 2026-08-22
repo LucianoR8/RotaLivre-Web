@@ -18,7 +18,7 @@ namespace Rota_LivreWEB_API.Models
         [ForeignKey("Grupo")]
         public int id_grupo { get; set; }
 
-        public DateTime data_adicao { get; set; } = DateTime.Now;
+        public DateTime data_adicao { get; set; } = DateTime.UtcNow;
 
         public Usuario Usuario { get; set; }
         public Passeio Passeio { get; set; }

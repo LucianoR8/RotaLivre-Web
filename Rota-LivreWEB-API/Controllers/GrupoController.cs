@@ -421,6 +421,54 @@ namespace Rota_LivreWEB_API.Controllers
             });
         }
 
+        // =========================================================
+        // MEUS PASSEIOS PENDENTES
+        // =========================================================
+
+        [Authorize]
+        [HttpGet("meus-pendentes")]
+        public async Task<ActionResult> MeusPendentes()
+        {
+            var userIdClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            var userId = int.Parse(userIdClaim);
+
+            var pendentes = await _context.PasseioPendente
+                .Include(p => p.Passeio)
+                .Include(p => p.Grupo)
+                .Where(p => p.id_usuario == userId)
+                .OrderByDescending(p => p.data_adicao)
+                .Select(p => new
+                {
+                    idGrupo = p.id_grupo,
+
+                    idPasseio = p.id_passeio,
+
+                    nomeGrupo = p.Grupo.nome,
+
+                    codigoConvite = p.Grupo.codigo_convite,
+
+                    status = p.Grupo.status,
+
+                    dataInicio = p.Grupo.data_inicio,
+
+                    passeio = new
+                    {
+                        id = p.Passeio.id_passeio,
+                        nome = p.Passeio.nome_passeio,
+                        descricao = p.Passeio.descricao,
+                        imagemUrl = p.Passeio.img_url
+                    }
+                })
+                .ToListAsync();
+
+            return Ok(pendentes);
+        }
+
 
         // =========================================================
         // DETALHES DO GRUPO

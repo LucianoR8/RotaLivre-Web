@@ -8,6 +8,7 @@ using Rota_LivreWEB_API.Repositories;
 using Rota_LivreWEB_API.Services;
 using Rota_LivreWEB_API.Hubs;
 using System.Text;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,6 +104,12 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                       ForwardedHeaders.XForwardedProto
+});
 
 
 app.MapOpenApi(); 

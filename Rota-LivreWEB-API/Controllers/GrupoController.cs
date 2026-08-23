@@ -194,6 +194,29 @@ namespace Rota_LivreWEB_API.Controllers
                 // CRIA GRUPO
                 // -------------------------------------------------
 
+                // -------------------------------------------------
+                // CONVERTE DATA/HORA DE SÃO PAULO PARA UTC
+                // -------------------------------------------------
+
+                var horarioSaoPaulo =
+                    TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
+
+                var dataInicioLocal = DateTime.SpecifyKind(
+                    dto.DataInicio,
+                    DateTimeKind.Unspecified
+                );
+
+                var dataInicioUtc =
+                    TimeZoneInfo.ConvertTimeToUtc(
+                        dataInicioLocal,
+                        horarioSaoPaulo
+                    );
+
+
+                // -------------------------------------------------
+                // CRIA GRUPO
+                // -------------------------------------------------
+
                 var grupo = new Grupo
                 {
                     nome = string.IsNullOrWhiteSpace(dto.Nome)
@@ -210,7 +233,7 @@ namespace Rota_LivreWEB_API.Controllers
 
                     data_criacao = DateTime.UtcNow,
 
-                    data_inicio = dto.DataInicio
+                    data_inicio = dataInicioUtc
                 };
 
                 _context.Grupo.Add(grupo);

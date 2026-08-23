@@ -1,345 +1,1248 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
+import React, {
+  useEffect,
+  useRef,
+  useState
+} from 'react';
+
+import {
+  useNavigate,
+  useParams,
+  useSearchParams,
+  Link
+} from 'react-router-dom';
+
 import { useAuth } from '../context/AuthContext';
-import { Grupo, Passeio } from '../types';
-import { ArrowLeft, Users, Copy, Check, MapPin, RefreshCw, Radio, Play, ShieldAlert, Navigation, Power } from 'lucide-react';
+
+import {
+  GrupoDetalhesDto,
+  buscarGrupo,
+  iniciarPasseio
+} from '../services/grupoService';
+
+import {
+  ArrowLeft,
+  Users,
+  Copy,
+  Check,
+  MapPin,
+  RefreshCw,
+  Radio,
+  Play,
+  Power,
+  Clock,
+  UserCheck,
+  UserX,
+  ChevronRight,
+  CalendarDays
+} from 'lucide-react';
+
 import L from 'leaflet';
 
-interface GrupoComPasseio extends Grupo {
-  passeio?: Passeio | null;
+const API_BASE_URL = 'https://rotalivre-web.onrender.com';
+
+// =========================================================
+// TIPOS
+// =========================================================
+
+interface PasseioPendenteDto {
+  idGrupo: number;
+  idPasseio: number;
+  nomeGrupo: string;
+  codigoConvite: string;
+  status: string;
+  dataInicio?: string | null;
+
+  passeio: {
+    id: number;
+    nome: string;
+    descricao?: string | null;
+    imagemUrl?: string | null;
+  };
 }
+
+// =========================================================
+// COMPONENTE
+// =========================================================
 
 export const MapaGrupoPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+
   const [searchParams] = useSearchParams();
+
   const navigate = useNavigate();
-  const { usuario, getAuthHeader } = useAuth();
 
-  const [grupo, setGrupo] = useState<GrupoComPasseio | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const { getAuthHeader } = useAuth();
 
-  // Modal confirmation state
-  const [isStarted, setIsStarted] = useState(false);
+  // =======================================================
+  // ESTADOS
+  // =======================================================
 
-  const mapRef = useRef<HTMLDivElement>(null);
-  const leafletMap = useRef<L.Map | null>(null);
-  const markersRef = useRef<{ [key: number]: L.Marker }>({});
+  const [gruposAoVivo, setGruposAoVivo] = useState<
+    PasseioPendenteDto[]
+  >([]);
 
-  const loadGrupoData = async () => {
-    setLoading(true);
+  const [grupo, setGrupo] =
+    useState<GrupoDetalhesDto | null>(null);
 
-    // Only load if an active ride was explicitly initiated or ID provided in URL/sessionStorage
-    const activeSessionId = sessionStorage.getItem('activeLiveGrupoId');
-    const paramGrupoId = id || searchParams.get('grupoId') || activeSessionId;
+  const [loading, setLoading] =
+    useState(true);
 
-    if (!paramGrupoId) {
+  const [loadingGrupos, setLoadingGrupos] =
+    useState(true);
+
+  const [starting, setStarting] =
+    useState(false);
+
+  const [copied, setCopied] =
+    useState(false);
+
+  const [errorMsg, setErrorMsg] =
+    useState('');
+
+  const mapRef =
+    useRef<HTMLDivElement>(null);
+
+  const leafletMap =
+    useRef<L.Map | null>(null);
+
+  // =======================================================
+  // ID DO GRUPO
+  // =======================================================
+
+  const getGrupoId = (): number | null => {
+    const activeSessionId =
+      sessionStorage.getItem(
+        'activeLiveGrupoId'
+      );
+
+    const paramId =
+      id ||
+      searchParams.get('grupoId') ||
+      activeSessionId;
+
+    if (!paramId) {
+      return null;
+    }
+
+    const numero = Number(paramId);
+
+    return Number.isFinite(numero)
+      ? numero
+      : null;
+  };
+
+  // =======================================================
+  // BUSCAR GRUPOS AO VIVO DO USUÁRIO
+  // =======================================================
+
+  const carregarGruposAoVivo = async () => {
+    console.log('====================================');
+    console.log('[AoVivo] BUSCANDO GRUPOS DO USUÁRIO');
+    console.log('====================================');
+
+    setLoadingGrupos(true);
+    setErrorMsg('');
+
+    try {
+      const headers = getAuthHeader();
+
+      console.log(
+        '[AoVivo] GET:',
+        `${API_BASE_URL}/api/grupo/meus-pendentes`
+      );
+
+      console.log(
+        '[AoVivo] Headers:',
+        headers
+      );
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/grupo/meus-pendentes`,
+        {
+          method: 'GET',
+          headers
+        }
+      );
+
+      console.log(
+        '[AoVivo] Status:',
+        response.status
+      );
+
+      console.log(
+        '[AoVivo] OK:',
+        response.ok
+      );
+
+      const text =
+        await response.text();
+
+      console.log(
+        '[AoVivo] Resposta bruta:',
+        text
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Erro HTTP ${response.status}: ${text}`
+        );
+      }
+
+      let data: PasseioPendenteDto[];
+
+      try {
+        data = text
+          ? JSON.parse(text)
+          : [];
+      } catch (error) {
+        console.error(
+          '[AoVivo] Erro ao converter JSON:',
+          error
+        );
+
+        throw new Error(
+          'A API retornou uma resposta inválida.'
+        );
+      }
+
+      console.log(
+        '[AoVivo] Todos os grupos/passeios recebidos:',
+        data
+      );
+
+      const lista =
+        Array.isArray(data)
+          ? data
+          : [];
+
+      const ativos =
+        lista.filter(
+          item =>
+            item.status ===
+            'EM_ANDAMENTO'
+        );
+
+      console.log(
+        '[AoVivo] Grupos EM_ANDAMENTO:',
+        ativos
+      );
+
+      setGruposAoVivo(ativos);
+
+      return ativos;
+
+    } catch (error) {
+      console.error(
+        '[AoVivo] ERRO AO BUSCAR GRUPOS:',
+        error
+      );
+
+      setGruposAoVivo([]);
+
+      setErrorMsg(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível carregar os grupos ao vivo.'
+      );
+
+      return [];
+
+    } finally {
+      setLoadingGrupos(false);
+
+      console.log(
+        '[AoVivo] FINALIZOU BUSCA DOS GRUPOS'
+      );
+    }
+  };
+
+  // =======================================================
+  // BUSCAR DETALHES DE UM GRUPO
+  // =======================================================
+
+  const carregarGrupo = async (
+    grupoId?: number
+  ) => {
+    const idFinal =
+      grupoId ?? getGrupoId();
+
+    console.log(
+      '[AoVivo] ID selecionado:',
+      idFinal
+    );
+
+    if (!idFinal) {
       setGrupo(null);
       setLoading(false);
       return;
     }
 
+    setLoading(true);
+    setErrorMsg('');
+
     try {
-      const res = await fetch(`/api/grupo/${paramGrupoId}`, { headers: getAuthHeader() });
-      const data = await res.json();
-      if (data && data.id_grupo) {
-        setGrupo(data);
-      } else {
-        setGrupo(null);
-        sessionStorage.removeItem('activeLiveGrupoId');
-      }
-    } catch (err) {
-      console.error('Erro ao buscar grupo:', err);
+      console.log(
+        '[AoVivo] Buscando detalhes do grupo:',
+        idFinal
+      );
+
+      const data =
+        await buscarGrupo(
+          idFinal,
+          getAuthHeader
+        );
+
+      console.log(
+        '[AoVivo] Detalhes recebidos:',
+        data
+      );
+
+      setGrupo(data);
+
+      sessionStorage.setItem(
+        'activeLiveGrupoId',
+        String(idFinal)
+      );
+
+    } catch (error) {
+      console.error(
+        '[AoVivo] ERRO AO BUSCAR GRUPO:',
+        error
+      );
+
       setGrupo(null);
-      sessionStorage.removeItem('activeLiveGrupoId');
+
+      setErrorMsg(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível carregar os dados do grupo.'
+      );
+
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEncerrarPasseio = () => {
-    sessionStorage.removeItem('activeLiveGrupoId');
-    setGrupo(null);
-    setIsStarted(false);
-    navigate('/ao-vivo');
-  };
+  // =======================================================
+  // CARREGAMENTO INICIAL
+  // =======================================================
 
   useEffect(() => {
-    loadGrupoData();
-  }, [id, searchParams]);
-
-  // Polling for live updates ONLY after started
-  useEffect(() => {
-    if (!isStarted || !grupo) return;
-
-    const interval = setInterval(() => {
-      fetch(`/api/grupo/${grupo.id_grupo}`, { headers: getAuthHeader() })
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.id_grupo) setGrupo(data);
-        })
-        .catch(err => console.error('Erro ao atualizar posições:', err));
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isStarted, grupo?.id_grupo]);
-
-  // Track user geolocation ONLY after user clicks "Iniciar"
-  useEffect(() => {
-    if (!isStarted || !grupo) return;
-
-    if ('geolocation' in navigator) {
-      const watchId = navigator.geolocation.watchPosition(
-        pos => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          setUserLocation({ lat, lng });
-
-          // Send coordinates to server
-          fetch(`/api/grupo/${grupo.id_grupo}/localizacao`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-            body: JSON.stringify({ lat, lng })
-          });
-        },
-        err => console.log('Geolocalização indisponível:', err),
-        { enableHighAccuracy: true }
+    const inicializar = async () => {
+      console.log(
+        '[AoVivo] INICIANDO TELA'
       );
-      return () => navigator.geolocation.clearWatch(watchId);
-    }
-  }, [isStarted, grupo?.id_grupo]);
 
-  // Initialize and Update Leaflet Map ONLY after started
+      const ativos =
+        await carregarGruposAoVivo();
+
+      const grupoId =
+        getGrupoId();
+
+      /*
+       * Se veio um grupo específico pela URL
+       * ou pelo sessionStorage, abrimos ele.
+       */
+
+      if (grupoId) {
+        await carregarGrupo(
+          grupoId
+        );
+
+        return;
+      }
+
+      /*
+       * Se não veio grupo específico,
+       * selecionamos automaticamente o
+       * primeiro grupo EM_ANDAMENTO.
+       */
+
+      if (ativos.length > 0) {
+        await carregarGrupo(
+          ativos[0].idGrupo
+        );
+      } else {
+        setLoading(false);
+      }
+    };
+
+    inicializar();
+  }, [id]);
+
+  // =======================================================
+  // ATUALIZAÇÃO AUTOMÁTICA
+  // =======================================================
+
   useEffect(() => {
-    if (!isStarted || !grupo) return;
+    const intervalo =
+      setInterval(async () => {
+        console.log(
+          '[AoVivo] Atualizando grupos...'
+        );
 
-    if (mapRef.current && !leafletMap.current) {
-      // Center map around São Paulo default or group location
-      const map = L.map(mapRef.current).setView([-23.5874, -46.6576], 14);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
-      }).addTo(map);
+        const ativos =
+          await carregarGruposAoVivo();
 
-      leafletMap.current = map;
-    }
-
-    if (leafletMap.current && grupo) {
-      grupo.membros.forEach(m => {
-        if (m.lat && m.lng) {
-          if (markersRef.current[m.id_usuario]) {
-            markersRef.current[m.id_usuario].setLatLng([m.lat, m.lng]);
-          } else {
-            const marker = L.marker([m.lat, m.lng])
-              .addTo(leafletMap.current!)
-              .bindPopup(`<b>${m.nome}</b><br/>Última atualização: ${new Date().toLocaleTimeString('pt-BR')}`);
-            markersRef.current[m.id_usuario] = marker;
+        if (!grupo) {
+          if (ativos.length > 0) {
+            await carregarGrupo(
+              ativos[0].idGrupo
+            );
           }
+
+          return;
         }
-      });
+
+        /*
+         * Verifica se o grupo atual
+         * ainda está em andamento.
+         */
+
+        const grupoAindaAtivo =
+          ativos.some(
+            item =>
+              item.idGrupo ===
+              grupo.idGrupo
+          );
+
+        if (!grupoAindaAtivo) {
+          console.log(
+            '[AoVivo] Grupo atual não está mais em andamento.'
+          );
+
+          setGrupo(null);
+
+          sessionStorage.removeItem(
+            'activeLiveGrupoId'
+          );
+
+          return;
+        }
+
+        try {
+          const atualizado =
+            await buscarGrupo(
+              grupo.idGrupo,
+              getAuthHeader
+            );
+
+          setGrupo(atualizado);
+
+        } catch (error) {
+          console.error(
+            '[AoVivo] Erro ao atualizar detalhes:',
+            error
+          );
+        }
+
+      }, 5000);
+
+    return () =>
+      clearInterval(intervalo);
+
+  }, [grupo?.idGrupo]);
+
+  // =======================================================
+  // MAPA
+  // =======================================================
+
+  useEffect(() => {
+    if (
+      !grupo ||
+      !mapRef.current ||
+      leafletMap.current
+    ) {
+      return;
     }
-  }, [isStarted, grupo]);
 
-  const handleCopyCode = () => {
-    if (!grupo) return;
-    navigator.clipboard.writeText(grupo.codigo_grupo);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    console.log(
+      '[AoVivo] Inicializando mapa.'
+    );
 
-  if (loading) {
+    const map =
+      L.map(mapRef.current)
+        .setView(
+          [-23.5874, -46.6576],
+          13
+        );
+
+    L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        attribution:
+          '&copy; OpenStreetMap'
+      }
+    ).addTo(map);
+
+    leafletMap.current = map;
+
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+
+    return () => {
+      if (leafletMap.current) {
+        leafletMap.current.remove();
+        leafletMap.current = null;
+      }
+    };
+
+  }, [grupo?.idGrupo]);
+
+  // =======================================================
+  // INICIAR PASSEIO
+  // =======================================================
+
+  const handleIniciarPasseio =
+    async () => {
+      if (!grupo) {
+        return;
+      }
+
+      setStarting(true);
+      setErrorMsg('');
+
+      console.log(
+        '[AoVivo] Iniciando grupo:',
+        grupo.idGrupo
+      );
+
+      try {
+        const resposta =
+          await iniciarPasseio(
+            grupo.idGrupo,
+            getAuthHeader
+          );
+
+        console.log(
+          '[AoVivo] Resposta iniciar:',
+          resposta
+        );
+
+        const grupoAtualizado =
+          await buscarGrupo(
+            grupo.idGrupo,
+            getAuthHeader
+          );
+
+        console.log(
+          '[AoVivo] Grupo após iniciar:',
+          grupoAtualizado
+        );
+
+        setGrupo(
+          grupoAtualizado
+        );
+
+        sessionStorage.setItem(
+          'activeLiveGrupoId',
+          String(grupo.idGrupo)
+        );
+
+        await carregarGruposAoVivo();
+
+      } catch (error) {
+        console.error(
+          '[AoVivo] ERRO AO INICIAR:',
+          error
+        );
+
+        setErrorMsg(
+          error instanceof Error
+            ? error.message
+            : 'Não foi possível iniciar o passeio.'
+        );
+
+      } finally {
+        setStarting(false);
+      }
+    };
+
+  // =======================================================
+  // COPIAR CÓDIGO
+  // =======================================================
+
+  const handleCopyCode =
+    async () => {
+      if (!grupo) {
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(
+          grupo.codigoConvite
+        );
+
+        setCopied(true);
+
+        setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+
+      } catch (error) {
+        console.error(
+          '[AoVivo] Erro ao copiar código:',
+          error
+        );
+      }
+    };
+
+  // =======================================================
+  // VOLTAR
+  // =======================================================
+
+  const handleVoltar =
+    () => {
+      sessionStorage.removeItem(
+        'activeLiveGrupoId'
+      );
+
+      if (leafletMap.current) {
+        leafletMap.current.remove();
+        leafletMap.current = null;
+      }
+
+      navigate('/grupos');
+    };
+
+  // =======================================================
+  // FORMATADORES
+  // =======================================================
+
+  const formatarData =
+    (
+      data?: string | null
+    ) => {
+      if (!data) {
+        return 'Não definida';
+      }
+
+      const date =
+        new Date(data);
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return data;
+      }
+
+      return date.toLocaleDateString(
+        'pt-BR'
+      );
+    };
+
+  const formatarDataHora =
+    (
+      data?: string | null
+    ) => {
+      if (!data) {
+        return 'Não iniciado';
+      }
+
+      const date =
+        new Date(data);
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return data;
+      }
+
+      return date.toLocaleString(
+        'pt-BR'
+      );
+    };
+
+  // =======================================================
+  // LOADING
+  // =======================================================
+
+  if (
+    loading &&
+    loadingGrupos
+  ) {
     return (
-      <div className="pt-32 pb-28 flex justify-center items-center">
+      <div className="pt-32 pb-28 flex justify-center items-center min-h-[60vh]">
         <div className="w-12 h-12 border-4 border-[#4ecdc4] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  if (!grupo) {
+  // =======================================================
+  // NENHUM GRUPO AO VIVO
+  // =======================================================
+
+  if (
+    !loadingGrupos &&
+    gruposAoVivo.length === 0 &&
+    !grupo
+  ) {
     return (
-      <div className="pt-32 pb-28 max-w-lg mx-auto text-center px-4">
-        <Navigation className="w-12 h-12 text-[#4ecdc4] mx-auto mb-4" />
-        <h2 className="text-2xl font-extrabold text-[#1a535c] mb-2">Nenhum passeio ao vivo ativo</h2>
-        <p className="text-sm text-slate-500 mb-6">
-          Inicie um passeio para ver a localização do seu grupo em tempo real.
-        </p>
-        <Link
-          to="/grupos"
-          className="inline-flex items-center gap-2 bg-[#1a535c] text-white px-6 py-3 rounded-full font-bold text-sm shadow-md hover:bg-[#4ecdc4] transition"
-        >
-          <Users className="w-4 h-4" />
-          <span>Ir para Meus Grupos</span>
-        </Link>
+      <div className="pt-24 pb-28 max-w-lg mx-auto px-4">
+
+        <div className="flex items-center gap-3 mb-8">
+
+          <button
+            onClick={() =>
+              navigate('/grupos')
+            }
+            className="p-3 bg-white rounded-full text-[#1a535c] shadow-md hover:bg-[#4ecdc4] hover:text-white transition"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#ff6b6b]">
+              Rota Livre
+            </span>
+
+            <h1 className="text-3xl font-extrabold text-[#1a535c]">
+              Ao Vivo
+            </h1>
+          </div>
+
+        </div>
+
+        {errorMsg && (
+          <div className="mb-6 p-4 bg-rose-100 border border-rose-200 text-rose-700 rounded-2xl text-xs font-semibold">
+            {errorMsg}
+          </div>
+        )}
+
+        <div className="bg-white rounded-3xl p-10 text-center shadow-xl border border-slate-100">
+
+          <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-[#4ecdc4]/15 flex items-center justify-center">
+            <Radio className="w-8 h-8 text-[#4ecdc4]" />
+          </div>
+
+          <h2 className="text-xl font-extrabold text-[#1a535c] mb-2">
+            Nenhum passeio ao vivo
+          </h2>
+
+          <p className="text-sm text-slate-500 mb-6">
+            Você não possui nenhum grupo com passeio em andamento neste momento.
+          </p>
+
+          <button
+            onClick={() =>
+              navigate('/grupos')
+            }
+            className="inline-flex items-center gap-2 bg-[#1a535c] text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-[#4ecdc4] transition"
+          >
+            <Users className="w-4 h-4" />
+            Ver meus grupos
+          </button>
+
+        </div>
+
       </div>
     );
   }
 
+  // =======================================================
+  // TELA
+  // =======================================================
+
   return (
-    <div className="pt-20 pb-24 max-w-md mx-auto px-4 relative">
-      {/* CONFIRMATION MODAL POP-UP BEFORE STARTING LIVE MAP */}
-      {!isStarted && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100 p-8 text-center animate-scaleUp">
-            <div className="w-16 h-16 bg-[#4ecdc4]/20 text-[#4ecdc4] rounded-3xl flex items-center justify-center mx-auto mb-4">
-              <Radio className="w-8 h-8 animate-pulse" />
-            </div>
+    <div className="pt-20 pb-24 max-w-2xl mx-auto px-4">
 
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#ff6b6b] bg-[#ff6b6b]/10 px-3 py-1 rounded-full">
-              Confirmação de Transmissão
-            </span>
+      {/* ===================================================
+          CABEÇALHO
+      =================================================== */}
 
-            <h2 className="text-2xl font-extrabold text-[#1a535c] mt-3 mb-2">
-              Iniciar Passeio Ao Vivo?
-            </h2>
+      <div className="flex items-center justify-between gap-3 mb-6">
 
-            <p className="text-xs text-slate-600 leading-relaxed mb-6">
-              Você está prestes a entrar na transmissão ao vivo do grupo{' '}
-              <strong className="text-[#1a535c] font-bold">{grupo.nome_grupo}</strong>.
-              Sua localização via GPS será compartilhada em tempo real no mapa com os participantes.
-            </p>
-
-            <div className="bg-[#f5f7fa] p-4 rounded-2xl mb-6 text-left border border-slate-200 text-xs space-y-2">
-              <div className="flex justify-between">
-                <span className="text-slate-400 font-semibold">Código do Grupo:</span>
-                <span className="font-extrabold text-[#1a535c]">{grupo.codigo_grupo}</span>
-              </div>
-              {grupo.data_passeio && (
-                <div className="flex justify-between">
-                  <span className="text-slate-400 font-semibold">Data:</span>
-                  <span className="font-bold text-[#1a535c]">{new Date(grupo.data_passeio + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
-                </div>
-              )}
-              {grupo.horario_passeio && (
-                <div className="flex justify-between">
-                  <span className="text-slate-400 font-semibold">Horário:</span>
-                  <span className="font-bold text-[#1a535c]">{grupo.horario_passeio}</span>
-                </div>
-              )}
-            </div>
-
-            <button
-              onClick={() => setIsStarted(true)}
-              className="w-full bg-[#4ecdc4] hover:bg-[#4ecdc4]/90 text-white font-extrabold py-4 rounded-2xl text-sm transition shadow-xl flex items-center justify-center gap-2 hover:scale-[1.02]"
-            >
-              <Play className="w-5 h-5 fill-current" />
-              <span>Iniciar</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Top Navigation & Code Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <button
-          onClick={() => navigate('/grupos')}
+          onClick={handleVoltar}
           className="p-3 bg-white rounded-full text-[#1a535c] hover:bg-[#4ecdc4] hover:text-white transition shadow-md flex items-center gap-2 font-semibold text-sm"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Voltar para Grupos</span>
+          <span>Grupos</span>
         </button>
 
-        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md border border-slate-100">
-          <span className="text-xs text-slate-500 font-bold uppercase">Código do Grupo:</span>
-          <span className="font-extrabold text-[#1a535c] tracking-widest">{grupo.codigo_grupo}</span>
-          <button
-            onClick={handleCopyCode}
-            className="p-1.5 text-slate-400 hover:text-[#4ecdc4] rounded-full transition"
-            title="Copiar código"
-          >
-            {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-          </button>
-        </div>
+        <button
+          onClick={() =>
+            carregarGruposAoVivo()
+          }
+          className="p-3 bg-white rounded-full text-[#1a535c] hover:bg-[#4ecdc4] hover:text-white transition shadow-md"
+          title="Atualizar"
+        >
+          <RefreshCw className="w-5 h-5" />
+        </button>
+
       </div>
 
-      {/* Group Header Banner */}
-      <div className="bg-gradient-to-r from-[#1a535c] to-[#236c78] rounded-3xl p-6 text-white shadow-xl mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <span className="bg-[#4ecdc4] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1 mb-2">
-            <Radio className="w-3.5 h-3.5 animate-pulse" /> Ao Vivo
-          </span>
-          <h1 className="text-2xl font-extrabold">{grupo.nome_grupo}</h1>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-200 mt-1">
-            <span>{grupo.membros.length} membro(s) participando neste mapa.</span>
-            {grupo.data_passeio && (
-              <span className="bg-white/15 px-2.5 py-0.5 rounded-full font-semibold">
-                Data: {new Date(grupo.data_passeio + 'T00:00:00').toLocaleDateString('pt-BR')}
-              </span>
-            )}
-            {grupo.horario_passeio && (
-              <span className="bg-white/15 px-2.5 py-0.5 rounded-full font-semibold">
-                Horário: {grupo.horario_passeio}
-              </span>
-            )}
-          </div>
-        </div>
+      {/* ===================================================
+          LISTA DE GRUPOS AO VIVO
+      =================================================== */}
 
-        <div className="flex items-center gap-2">
-          {isStarted && (
-            <button
-              onClick={loadGrupoData}
-              className="bg-white/20 hover:bg-white/30 text-white font-bold px-4 py-2 rounded-full text-xs transition flex items-center gap-2"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span>Atualizar</span>
-            </button>
-          )}
+      {gruposAoVivo.length > 0 && (
+        <div className="mb-6">
 
-          <button
-            onClick={handleEncerrarPasseio}
-            className="bg-rose-500/80 hover:bg-rose-600 text-white font-bold px-4 py-2 rounded-full text-xs transition flex items-center gap-1.5 shadow-md"
-          >
-            <Power className="w-4 h-4" />
-            <span>Encerrar Transmissão</span>
-          </button>
-        </div>
-      </div>
+          <div className="flex items-center justify-between mb-3 px-1">
 
-      {/* Map & Member List Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Map View Container */}
-        <div className="lg:col-span-2 bg-white rounded-3xl p-4 shadow-lg border border-slate-100 relative">
-          {!isStarted && (
-            <div className="absolute inset-0 bg-slate-100/70 backdrop-blur-sm rounded-3xl z-20 flex flex-col items-center justify-center p-6 text-center">
-              <ShieldAlert className="w-12 h-12 text-[#ff6b6b] mb-3 animate-bounce-slow" />
-              <p className="text-sm font-bold text-[#1a535c] max-w-xs">
-                Aguardando confirmação para iniciar o mapa ao vivo...
+            <div>
+              <h2 className="font-extrabold text-[#1a535c]">
+                Passeios ao vivo
+              </h2>
+
+              <p className="text-xs text-slate-400">
+                Grupos em andamento dos quais você participa
               </p>
             </div>
-          )}
-          <div className="w-full h-96 sm:h-[450px] rounded-2xl overflow-hidden shadow-inner relative z-10" ref={mapRef} />
-        </div>
 
-        {/* Member Sidebar */}
-        <div className="bg-white rounded-3xl p-6 shadow-lg border border-slate-100">
-          <h3 className="font-bold text-[#1a535c] text-base mb-4 flex items-center gap-2">
-            <Users className="w-5 h-5 text-[#4ecdc4]" />
-            Membros no Grupo
-          </h3>
+            <span className="bg-emerald-100 text-emerald-700 text-xs font-extrabold px-3 py-1 rounded-full">
+              {gruposAoVivo.length}
+            </span>
 
-          <div className="space-y-3 divide-y divide-slate-100">
-            {grupo.membros.map(m => (
-              <div key={m.id_usuario} className="pt-3 first:pt-0 flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-[#1a535c] text-white font-bold flex items-center justify-center text-xs">
-                    {m.nome.charAt(0)}
-                  </div>
-                  <div>
-                    <h5 className="font-bold text-xs text-[#1a535c]">{m.nome}</h5>
-                    <span className="text-[10px] text-slate-400 block">
-                      {isStarted && m.lat && m.lng ? 'Localização ativa' : 'Aguardando início do passeio'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1 text-[10px] font-bold text-[#4ecdc4] bg-[#4ecdc4]/10 px-2 py-0.5 rounded-full">
-                  <MapPin className="w-3 h-3 text-[#ff6b6b]" />
-                  <span>{isStarted && m.lat ? 'Ao Vivo' : 'Off-line'}</span>
-                </div>
-              </div>
-            ))}
           </div>
+
+          <div className="space-y-3">
+
+            {gruposAoVivo.map(item => {
+
+              const selecionado =
+                grupo?.idGrupo ===
+                item.idGrupo;
+
+              return (
+                <button
+                  key={item.idGrupo}
+                  onClick={() =>
+                    carregarGrupo(
+                      item.idGrupo
+                    )
+                  }
+                  className={`w-full text-left bg-white rounded-2xl p-4 border shadow-sm transition ${
+                    selecionado
+                      ? 'border-[#4ecdc4] shadow-md'
+                      : 'border-slate-100 hover:border-[#4ecdc4]/50'
+                  }`}
+                >
+
+                  <div className="flex items-center gap-3">
+
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center shrink-0">
+                      <Radio className="w-6 h-6 text-emerald-500" />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+
+                      <div className="flex items-center gap-2 mb-1">
+
+                        <h3 className="font-extrabold text-sm text-[#1a535c] truncate">
+                          {item.nomeGrupo}
+                        </h3>
+
+                        <span className="shrink-0 w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+
+                      </div>
+
+                      <p className="text-xs text-slate-500 truncate">
+                        {item.passeio?.nome}
+                      </p>
+
+                    </div>
+
+                    <ChevronRight className="w-5 h-5 text-slate-300 shrink-0" />
+
+                  </div>
+
+                </button>
+              );
+            })}
+
+          </div>
+
         </div>
-      </div>
+      )}
+
+      {/* ===================================================
+          LOADING GRUPO
+      =================================================== */}
+
+      {loading && !grupo && (
+        <div className="py-10 flex justify-center">
+          <div className="w-10 h-10 border-4 border-[#4ecdc4] border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+
+      {/* ===================================================
+          ERRO
+      =================================================== */}
+
+      {errorMsg && grupo && (
+        <div className="mb-6 p-4 bg-rose-100 border border-rose-200 text-rose-700 rounded-2xl text-xs font-semibold">
+          {errorMsg}
+        </div>
+      )}
+
+      {/* ===================================================
+          GRUPO SELECIONADO
+      =================================================== */}
+
+      {grupo && (
+        <>
+
+          {/* Banner */}
+          <div className="bg-gradient-to-r from-[#1a535c] to-[#236c78] rounded-3xl p-6 text-white shadow-xl mb-6">
+
+            <div className="flex items-center justify-between gap-3 mb-3">
+
+              <span className="bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1">
+                <Radio className="w-3.5 h-3.5 animate-pulse" />
+                Ao Vivo
+              </span>
+
+              <span className="text-xs text-slate-200 font-semibold">
+                Grupo #{grupo.idGrupo}
+              </span>
+
+            </div>
+
+            <h1 className="text-2xl font-extrabold">
+              {grupo.nome}
+            </h1>
+
+            <p className="text-sm text-slate-200 mt-1">
+              {grupo.passeio?.nome}
+            </p>
+
+            <div className="flex items-center gap-2 mt-4">
+
+              <div className="bg-white/15 rounded-xl px-3 py-2">
+
+                <span className="block text-[9px] uppercase text-slate-300 font-bold">
+                  Convite
+                </span>
+
+                <span className="font-extrabold tracking-widest">
+                  {grupo.codigoConvite}
+                </span>
+
+              </div>
+
+              <button
+                onClick={handleCopyCode}
+                className="bg-white/15 hover:bg-white/25 p-3 rounded-xl transition"
+                title="Copiar código"
+              >
+                {copied ? (
+                  <Check className="w-5 h-5 text-emerald-300" />
+                ) : (
+                  <Copy className="w-5 h-5" />
+                )}
+              </button>
+
+            </div>
+
+          </div>
+
+          {/* Informações */}
+          <div className="bg-white rounded-3xl p-5 shadow-lg border border-slate-100 mb-6">
+
+            <div className="flex items-center gap-3 mb-4">
+
+              <div className="w-12 h-12 rounded-2xl bg-[#4ecdc4]/15 flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-[#4ecdc4]" />
+              </div>
+
+              <div>
+
+                <span className="text-[10px] font-bold uppercase text-slate-400">
+                  Passeio
+                </span>
+
+                <h2 className="font-extrabold text-[#1a535c]">
+                  {grupo.passeio?.nome}
+                </h2>
+
+              </div>
+
+            </div>
+
+            {grupo.passeio?.descricao && (
+              <p className="text-xs text-slate-500 leading-relaxed mb-4">
+                {grupo.passeio.descricao}
+              </p>
+            )}
+
+            <div className="grid grid-cols-2 gap-3">
+
+              <div className="bg-[#f5f7fa] rounded-2xl p-3">
+
+                <CalendarDays className="w-4 h-4 text-[#4ecdc4]" />
+
+                <span className="block text-[9px] uppercase text-slate-400 font-bold mt-1">
+                  Data
+                </span>
+
+                <span className="text-xs font-bold text-[#1a535c]">
+                  {formatarData(
+                    grupo.dataInicio
+                  )}
+                </span>
+
+              </div>
+
+              <div className="bg-[#f5f7fa] rounded-2xl p-3">
+
+                <Radio className="w-4 h-4 text-emerald-500" />
+
+                <span className="block text-[9px] uppercase text-slate-400 font-bold mt-1">
+                  Status
+                </span>
+
+                <span className="text-xs font-bold text-emerald-600">
+                  Em andamento
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* =================================================
+              MAPA
+          ================================================= */}
+
+          <div className="bg-white rounded-3xl p-4 shadow-lg border border-slate-100 mb-6">
+
+            <div className="flex items-center justify-between mb-3 px-1">
+
+              <div>
+
+                <h3 className="font-extrabold text-[#1a535c]">
+                  Mapa do Grupo
+                </h3>
+
+                <p className="text-[10px] text-slate-400">
+                  Localização em tempo real
+                </p>
+
+              </div>
+
+              <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+
+                AO VIVO
+
+              </span>
+
+            </div>
+
+            <div
+              ref={mapRef}
+              className="w-full h-80 rounded-2xl overflow-hidden shadow-inner"
+            />
+
+            <div className="mt-3 bg-amber-50 border border-amber-100 rounded-2xl p-3">
+
+              <p className="text-[10px] text-amber-700 leading-relaxed">
+                O mapa já está conectado ao grupo. A API atual ainda não fornece latitude e longitude individuais dos integrantes, portanto os marcadores dos participantes serão adicionados quando essa informação estiver disponível.
+              </p>
+
+            </div>
+
+          </div>
+
+          {/* =================================================
+              INTEGRANTES
+          ================================================= */}
+
+          <div className="bg-white rounded-3xl p-5 shadow-lg border border-slate-100 mb-6">
+
+            <h3 className="font-extrabold text-[#1a535c] flex items-center gap-2 mb-4">
+              <Users className="w-5 h-5 text-[#4ecdc4]" />
+              Integrantes ({grupo.integrantes?.length ?? 0})
+            </h3>
+
+            <div className="space-y-3">
+
+              {(grupo.integrantes ?? []).map(
+                integrante => (
+
+                  <div
+                    key={integrante.idUsuario}
+                    className="flex items-center justify-between gap-3 p-3 bg-[#f5f7fa] rounded-2xl"
+                  >
+
+                    <div className="flex items-center gap-3">
+
+                      <div className="w-10 h-10 rounded-full bg-[#1a535c] text-white flex items-center justify-center font-extrabold">
+                        {integrante.nome
+                          .charAt(0)
+                          .toUpperCase()}
+                      </div>
+
+                      <div>
+
+                        <h4 className="text-xs font-extrabold text-[#1a535c]">
+                          {integrante.nome}
+                        </h4>
+
+                        <div className="flex items-center gap-1 mt-1">
+
+                          {integrante.online ? (
+                            <>
+                              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+
+                              <span className="text-[9px] text-emerald-600 font-bold">
+                                Online
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="w-2 h-2 rounded-full bg-slate-300" />
+
+                              <span className="text-[9px] text-slate-400 font-bold">
+                                Offline
+                              </span>
+                            </>
+                          )}
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    <div>
+
+                      {integrante.iniciouPasseio ? (
+                        <div className="flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-1 rounded-full">
+
+                          <UserCheck className="w-3.5 h-3.5" />
+
+                          <span className="text-[9px] font-bold">
+                            Iniciou
+                          </span>
+
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1 bg-slate-100 text-slate-400 px-2 py-1 rounded-full">
+
+                          <UserX className="w-3.5 h-3.5" />
+
+                          <span className="text-[9px] font-bold">
+                            Aguardando
+                          </span>
+
+                        </div>
+                      )}
+
+                    </div>
+
+                  </div>
+
+                )
+              )}
+
+            </div>
+
+          </div>
+
+          {/* =================================================
+              ATIVIDADE
+          ================================================= */}
+
+          <div className="bg-white rounded-3xl p-5 shadow-lg border border-slate-100 mb-6">
+
+            <h3 className="font-extrabold text-[#1a535c] flex items-center gap-2 mb-4">
+              <Clock className="w-5 h-5 text-[#ff6b6b]" />
+              Atividade
+            </h3>
+
+            <div className="space-y-2">
+
+              {(grupo.integrantes ?? []).map(
+                integrante => (
+
+                  <div
+                    key={integrante.idUsuario}
+                    className="flex justify-between items-center text-xs"
+                  >
+
+                    <span className="font-semibold text-slate-600">
+                      {integrante.nome}
+                    </span>
+
+                    <span className="text-slate-400">
+                      {integrante.ultimaAtividade
+                        ? formatarDataHora(
+                            integrante.ultimaAtividade
+                          )
+                        : 'Sem atividade'}
+                    </span>
+
+                  </div>
+
+                )
+              )}
+
+            </div>
+
+          </div>
+
+          {/* =================================================
+              BOTÕES
+          ================================================= */}
+
+          <div className="space-y-3">
+
+            {!grupo.integrantes?.some(
+              integrante =>
+                integrante.iniciouPasseio
+            ) && (
+              <button
+                onClick={
+                  handleIniciarPasseio
+                }
+                disabled={starting}
+                className="w-full bg-[#4ecdc4] hover:bg-[#4ecdc4]/90 disabled:opacity-60 text-white font-extrabold py-4 rounded-2xl text-sm transition shadow-lg flex items-center justify-center gap-2"
+              >
+
+                {starting ? (
+                  <>
+                    <RefreshCw className="w-5 h-5 animate-spin" />
+                    <span>
+                      Iniciando...
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-5 h-5 fill-current" />
+                    <span>
+                      Iniciar Passeio
+                    </span>
+                  </>
+                )}
+
+              </button>
+            )}
+
+            <button
+              onClick={handleVoltar}
+              className="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold py-3 rounded-2xl text-xs transition flex items-center justify-center gap-2"
+            >
+              <Power className="w-4 h-4" />
+              <span>
+                Voltar para Meus Grupos
+              </span>
+            </button>
+
+          </div>
+
+        </>
+      )}
+
     </div>
   );
 };

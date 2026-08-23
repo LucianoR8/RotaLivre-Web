@@ -479,6 +479,8 @@ namespace Rota_LivreWEB_API.Controllers
 
                     dataInicio = p.Grupo.data_inicio,
 
+                    criadorId = p.Grupo.id_criador,
+
                     passeio = new
                     {
                         id = p.Passeio.id_passeio,
@@ -685,6 +687,250 @@ namespace Rota_LivreWEB_API.Controllers
 
                 dataInicioGrupo =
                     grupo.data_inicio
+            });
+        }
+
+        // =========================================================
+        // SAIR DO GRUPO
+        // =========================================================
+
+        [Authorize]
+        [HttpPost("{idGrupo}/sair")]
+        public async Task<ActionResult> SairDoGrupo(int idGrupo)
+        {
+            var userIdClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            var userId = int.Parse(userIdClaim);
+
+            var grupo = await _context.Grupo
+                .FirstOrDefaultAsync(g => g.id_grupo == idGrupo);
+
+            if (grupo == null)
+                return NotFound(new
+                {
+                    mensagem = "Grupo não encontrado."
+                });
+
+            // O criador não deve sair simplesmente.
+            // Ele deve cancelar o grupo ou transferir a criação
+            // futuramente, caso implementemos essa funcionalidade.
+            if (grupo.id_criador == userId)
+            {
+                return BadRequest(new
+                {
+                    mensagem =
+                        "O criador do grupo não pode sair diretamente. " +
+                        "Use a opção de cancelar o passeio."
+                });
+            }
+
+            var membro = await _context.GrupoUsuario
+                .FirstOrDefaultAsync(gu =>
+                    gu.id_grupo == idGrupo &&
+                    gu.id_usuario == userId &&
+                    gu.ativo);
+
+            if (membro == null)
+            {
+                return BadRequest(new
+                {
+                    mensagem = "Você não participa deste grupo."
+                });
+            }
+
+            // Desativa a participação.
+            // Não apagamos o registro do banco.
+            membro.ativo = false;
+
+            membro.ultima_atividade = DateTime.UtcNow;
+
+            // Remove o pendente desse usuário.
+            var pendente = await _context.PasseioPendente
+                .FirstOrDefaultAsync(pp =>
+                    pp.id_usuario == userId &&
+                    pp.id_grupo == idGrupo);
+
+            if (pendente != null)
+            {
+                _context.PasseioPendente.Remove(pendente);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                mensagem = "Você saiu do grupo.",
+                idGrupo = idGrupo
+            });
+        }
+
+
+        // =========================================================
+        // CANCELAR GRUPO / PASSEIO
+        // SOMENTE O CRIADOR
+        // =========================================================
+
+        [Authorize]
+        [HttpPost("{idGrupo}/cancelar")]
+        public async Task<ActionResult> CancelarGrupo(int idGrupo)
+        {
+            var userIdClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            var userId = int.Parse(userIdClaim);
+
+            var grupo = await _context.Grupo
+                .FirstOrDefaultAsync(g => g.id_grupo == idGrupo);
+
+            if (grupo == null)
+            {
+                return NotFound(new
+                {
+                    mensagem = "Grupo não encontrado."
+                });
+            }
+
+            // SOMENTE O CRIADOR
+            if (grupo.id_criador != userId)
+            {
+                return Forbid();
+            }
+
+            if (grupo.status == "FINALIZADO")
+            {
+                return BadRequest(new
+                {
+                    mensagem = "Este passeio já foi finalizado."
+                });
+            }
+
+            // Não apagamos o grupo.
+            // Apenas alteramos o estado.
+            grupo.status = "CANCELADO";
+
+            // Todos deixam de ser participantes ativos.
+            var integrantes = await _context.GrupoUsuario
+                .Where(gu =>
+                    gu.id_grupo == idGrupo &&
+                    gu.ativo)
+                .ToListAsync();
+
+            foreach (var integrante in integrantes)
+            {
+                integrante.ativo = false;
+                integrante.ultima_atividade = DateTime.UtcNow;
+            }
+
+            // Remove os pendentes do grupo.
+            var pendentes = await _context.PasseioPendente
+                .Where(pp => pp.id_grupo == idGrupo)
+                .ToListAsync();
+
+            if (pendentes.Count > 0)
+            {
+                _context.PasseioPendente.RemoveRange(pendentes);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                mensagem = "Passeio cancelado com sucesso.",
+                idGrupo = idGrupo,
+                status = grupo.status
+            });
+        }
+
+
+        // =========================================================
+        // FINALIZAR PASSEIO
+        // SOMENTE O CRIADOR
+        // =========================================================
+
+        [Authorize]
+        [HttpPost("{idGrupo}/finalizar")]
+        public async Task<ActionResult> FinalizarPasseio(int idGrupo)
+        {
+            var userIdClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            var userId = int.Parse(userIdClaim);
+
+            var grupo = await _context.Grupo
+                .FirstOrDefaultAsync(g => g.id_grupo == idGrupo);
+
+            if (grupo == null)
+            {
+                return NotFound(new
+                {
+                    mensagem = "Grupo não encontrado."
+                });
+            }
+
+            // SOMENTE O CRIADOR
+            if (grupo.id_criador != userId)
+            {
+                return Forbid();
+            }
+
+            if (grupo.status == "CANCELADO")
+            {
+                return BadRequest(new
+                {
+                    mensagem = "Este passeio foi cancelado."
+                });
+            }
+
+            if (grupo.status == "FINALIZADO")
+            {
+                return BadRequest(new
+                {
+                    mensagem = "Este passeio já foi finalizado."
+                });
+            }
+
+            grupo.status = "FINALIZADO";
+
+            // Encerra todos os integrantes ativos.
+            var integrantes = await _context.GrupoUsuario
+                .Where(gu =>
+                    gu.id_grupo == idGrupo &&
+                    gu.ativo)
+                .ToListAsync();
+
+            foreach (var integrante in integrantes)
+            {
+                integrante.ativo = false;
+                integrante.ultima_atividade = DateTime.UtcNow;
+            }
+
+            // Remove os pendentes.
+            var pendentes = await _context.PasseioPendente
+                .Where(pp => pp.id_grupo == idGrupo)
+                .ToListAsync();
+
+            if (pendentes.Count > 0)
+            {
+                _context.PasseioPendente.RemoveRange(pendentes);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                mensagem = "Passeio finalizado com sucesso.",
+                idGrupo = idGrupo,
+                status = grupo.status
             });
         }
     }

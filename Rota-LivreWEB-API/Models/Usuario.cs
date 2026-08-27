@@ -33,6 +33,8 @@ namespace Rota_LivreWEB_API.Models
         public PerguntaSeguranca? PerguntaSeguranca { get; set; }
         public string? FotoPerfilUrl { get; set; }
 
+        public bool is_admin { get; set; } = false;
+
 
         public Usuario()
         {

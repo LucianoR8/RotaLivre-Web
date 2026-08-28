@@ -51,12 +51,28 @@ namespace Rota_LivreWEB_API.Controllers.Api
             return Ok(passeio);
         }
 
-        // POST ORIGINAL (Mantido para compatibilidade com o app atual)
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] PasseioDto dto)
+        public async Task<ActionResult> Post([FromBody] CriarPasseioDto dto)
         {
-            var novo = await _service.CreateAsync(dto);
-            return CreatedAtAction(nameof(Get), new { id = novo.Id }, novo);
+            var passeio = new Rota_LivreWEB_API.Models.Passeio
+            {
+                id_categoria = dto.CategoriaId,
+                nome_passeio = dto.Nome,
+                descricao = dto.Descricao,
+                funcionamento = dto.Funcionamento,
+                img_url = dto.ImagemUrl,
+                status = "ativo"
+            };
+
+            _context.Passeio.Add(passeio);
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(
+                nameof(Get),
+                new { id = passeio.id_passeio },
+                passeio
+            );
         }
 
         [Authorize]

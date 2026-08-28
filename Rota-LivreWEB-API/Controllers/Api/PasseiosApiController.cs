@@ -5,6 +5,9 @@ using Rota_LivreWEB_API.Interfaces;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Rota_LivreWEB_API.Repositories;
+using Rota_LivreWEB_API.Data; // Adicionado para acessar o banco
+using System;
+using System.Linq;
 
 namespace Rota_LivreWEB_API.Controllers.Api
 {
@@ -15,11 +18,13 @@ namespace Rota_LivreWEB_API.Controllers.Api
     {
         private readonly IPasseioService _service;
         private readonly PasseioRepository _repo;
+        private readonly AppDbContext _context; // Injetado para os métodos de Admin
 
-        public PasseiosApiController(IPasseioService service, PasseioRepository repo)
+        public PasseiosApiController(IPasseioService service, PasseioRepository repo, AppDbContext context)
         {
             _service = service;
             _repo = repo;
+            _context = context;
         }
 
         [HttpGet]
@@ -46,6 +51,7 @@ namespace Rota_LivreWEB_API.Controllers.Api
             return Ok(passeio);
         }
 
+        // POST ORIGINAL (Mantido para compatibilidade com o app atual)
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] PasseioDto dto)
         {
@@ -130,5 +136,49 @@ namespace Rota_LivreWEB_API.Controllers.Api
             return Ok(resultado);
         }
 
+        // =========================================================================
+        // MÉTODOS ADMINISTRATIVOS (CRUD COMPLETO DO REACT)
+        // =========================================================================
+
+        [Authorize] // O ideal é proteger para que só logados mexam
+        [HttpPut("{id}")]
+        public async Task<IActionResult> AtualizarPasseio(int id, [FromBody] Rota_LivreWEB_API.Models.Passeio passeioAtualizado)
+        {
+            var passeio = await _context.Passeio.FindAsync(id);
+            if (passeio == null) return NotFound(new { mensagem = "Passeio não encontrado." });
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            passeio.nome_passeio = passeioAtualizado.nome_passeio;
+            passeio.id_categoria = passeioAtualizado.id_categoria;
+            passeio.descricao = passeioAtualizado.descricao;
+            passeio.funcionamento = passeioAtualizado.funcionamento;
+            passeio.img_url = passeioAtualizado.img_url;
+            passeio.status = passeioAtualizado.status ?? "ativo";
+
+            passeio.atualizado_por = userId != null ? int.Parse(userId) : null;
+            passeio.atualizado_em = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return Ok(passeio);
+        }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletarPasseio(int id)
+        {
+            var passeio = await _context.Passeio.FindAsync(id);
+            if (passeio == null) return NotFound(new { mensagem = "Passeio não encontrado." });
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            // Soft delete: Apenas desativa para não quebrar tabelas dependentes (avaliações, etc)
+            passeio.status = "inativo";
+            passeio.atualizado_por = userId != null ? int.Parse(userId) : null;
+            passeio.atualizado_em = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { mensagem = "Passeio desativado com sucesso." });
+        }
     }
 }

@@ -19,8 +19,22 @@ namespace Rota_LivreWEB_API.Controllers.Api
         [HttpGet]
         public async Task<IActionResult> GetCategorias()
         {
-            // Traz apenas as ativas para não quebrar o app
-            var categorias = await _context.Categoria.Where(c => c.ativo).ToListAsync();
+            var categorias = await _context.Categoria
+                .Where(c => c.ativo)
+                .Select(c => new
+                {
+                    id = c.id_categoria,
+                    tipo_categoria = c.tipo_categoria,
+                    img = c.img,
+                    ativo = c.ativo,
+                    atualizado_por = c.atualizado_por,
+                    atualizado_em = c.atualizado_em,
+
+                    tourCount = _context.Passeio
+                        .Count(p => p.id_categoria == c.id_categoria)
+                })
+                .ToListAsync();
+
             return Ok(categorias);
         }
 

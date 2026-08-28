@@ -24,11 +24,39 @@ namespace Rota_LivreWEB_API.Services
                 .Select(p => new PasseioDto
                 {
                     Id = p.id_passeio,
+
                     Nome = p.nome_passeio,
+
                     Descricao = p.descricao,
+
                     Funcionamento = p.funcionamento,
-                    ImagemUrl = $"https://rotalivre-web.onrender.com/img/passeios/{p.img_url}",
-                    QuantidadeCurtidas = p.QuantidadeCurtidas
+
+                    CategoriaId = p.id_categoria,
+
+                    CategoriaNome = p.Categoria != null
+                        ? p.Categoria.tipo_categoria
+                        : null,
+
+                    ImagemUrl =
+                        $"https://rotalivre-web.onrender.com/img/passeios/{p.img_url}",
+
+                    QuantidadeCurtidas =
+                        _context.CurtidaPasseio
+                            .Count(c => c.id_passeio == p.id_passeio),
+
+                    Endereco = p.Endereco != null
+                        ? new EnderecoDto
+                        {
+                            NomeRua = p.Endereco.nome_rua,
+                            NumeroRua = p.Endereco.numero_rua,
+                            Complemento = p.Endereco.complemento,
+                            Bairro = p.Endereco.bairro,
+                            Cep = p.Endereco.cep,
+                            Latitude = p.Endereco.Latitude,
+                            Longitude = p.Endereco.Longitude,
+                            RaioMetros = p.Endereco.RaioMetros
+                        }
+                        : null
                 })
                 .ToListAsync();
         }
@@ -71,17 +99,20 @@ namespace Rota_LivreWEB_API.Services
         {
             var passeio = new Passeio
             {
+                id_categoria = dto.CategoriaId,
                 nome_passeio = dto.Nome,
                 descricao = dto.Descricao,
                 funcionamento = dto.Funcionamento,
                 img_url = dto.ImagemUrl,
-                QuantidadeCurtidas = dto.QuantidadeCurtidas
+                status = "ativo"
             };
 
             _context.Passeio.Add(passeio);
+
             await _context.SaveChangesAsync();
 
             dto.Id = passeio.id_passeio;
+
             return dto;
         }
 

@@ -140,28 +140,44 @@ namespace Rota_LivreWEB_API.Controllers.Api
         // MÉTODOS ADMINISTRATIVOS (CRUD COMPLETO DO REACT)
         // =========================================================================
 
-        [Authorize] // O ideal é proteger para que só logados mexam
+        [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> AtualizarPasseio(int id, [FromBody] Rota_LivreWEB_API.Models.Passeio passeioAtualizado)
-        {
-            var passeio = await _context.Passeio.FindAsync(id);
-            if (passeio == null) return NotFound(new { mensagem = "Passeio não encontrado." });
+        public async Task<IActionResult> AtualizarPasseio(
+        int id,
+        [FromBody] AtualizarPasseioDto dto)
+            {
+                var passeio = await _context.Passeio.FindAsync(id);
 
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (passeio == null)
+                {
+                    return NotFound(new
+                    {
+                        mensagem = "Passeio não encontrado."
+                    });
+                }
 
-            passeio.nome_passeio = passeioAtualizado.nome_passeio;
-            passeio.id_categoria = passeioAtualizado.id_categoria;
-            passeio.descricao = passeioAtualizado.descricao;
-            passeio.funcionamento = passeioAtualizado.funcionamento;
-            passeio.img_url = passeioAtualizado.img_url;
-            passeio.status = passeioAtualizado.status ?? "ativo";
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            passeio.atualizado_por = userId != null ? int.Parse(userId) : null;
-            passeio.atualizado_em = DateTime.UtcNow;
+                passeio.nome_passeio = dto.Nome;
+                passeio.id_categoria = dto.CategoriaId;
+                passeio.descricao = dto.Descricao;
+                passeio.funcionamento = dto.Funcionamento;
+                passeio.img_url = dto.ImagemUrl;
+                passeio.status = string.IsNullOrWhiteSpace(dto.Status)
+                    ? "ativo"
+                    : dto.Status;
 
-            await _context.SaveChangesAsync();
-            return Ok(passeio);
-        }
+                passeio.atualizado_por =
+                    userId != null
+                        ? int.Parse(userId)
+                        : null;
+
+                passeio.atualizado_em = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(passeio);
+            }
 
         [Authorize]
         [HttpDelete("{id}")]

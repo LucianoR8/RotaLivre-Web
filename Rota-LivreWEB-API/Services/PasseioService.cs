@@ -15,7 +15,7 @@ namespace Rota_LivreWEB_API.Services
         public PasseioService(AppDbContext context, IConfiguration config)
         {
             _context = context;
-            _config = config;
+            _config = config; //teste
         }
 
         // =========================================================

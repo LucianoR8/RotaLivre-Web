@@ -2,27 +2,27 @@
 using Microsoft.AspNetCore.Mvc;
 using Rota_LivreWEB_API.DTOs;
 using Rota_LivreWEB_API.Interfaces;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Rota_LivreWEB_API.Repositories;
-using Rota_LivreWEB_API.Data; // Adicionado para acessar o banco
-using System;
-using System.Linq;
+using Rota_LivreWEB_API.Data;
+using System.Security.Claims;
 using System.Net.Http.Headers;
 
 namespace Rota_LivreWEB_API.Controllers.Api
 {
-    // [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class PasseiosApiController : ControllerBase
     {
         private readonly IPasseioService _service;
         private readonly PasseioRepository _repo;
-        private readonly AppDbContext _context; // Injetado para os métodos de Admin
+        private readonly AppDbContext _context;
         private readonly IConfiguration _config;
 
-        public PasseiosApiController(IPasseioService service, PasseioRepository repo, AppDbContext context, IConfiguration config)
+        public PasseiosApiController(
+            IPasseioService service,
+            PasseioRepository repo,
+            AppDbContext context,
+            IConfiguration config)
         {
             _service = service;
             _repo = repo;
@@ -30,23 +30,36 @@ namespace Rota_LivreWEB_API.Controllers.Api
             _config = config;
         }
 
+        // =========================================================
+        // LISTAR PASSEIOS
+        // =========================================================
+
         [HttpGet]
         public async Task<ActionResult> Get()
         {
             var passeios = await _service.GetAllAsync();
+
             return Ok(passeios);
         }
+
+        // =========================================================
+        // BUSCAR PASSEIO POR ID
+        // =========================================================
 
         [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(int id)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (userId == null)
                 return Unauthorized();
 
-            var passeio = await _service.GetByIdComUsuarioAsync(id, int.Parse(userId));
+            var passeio =
+                await _service.GetByIdComUsuarioAsync(
+                    id,
+                    int.Parse(userId));
 
             if (passeio == null)
                 return NotFound();
@@ -54,8 +67,13 @@ namespace Rota_LivreWEB_API.Controllers.Api
             return Ok(passeio);
         }
 
+        // =========================================================
+        // CRIAR PASSEIO
+        // =========================================================
+
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] CriarPasseioDto dto)
+        public async Task<ActionResult> Post(
+            [FromBody] CriarPasseioDto dto)
         {
             var passeio = new Rota_LivreWEB_API.Models.Passeio
             {
@@ -78,25 +96,39 @@ namespace Rota_LivreWEB_API.Controllers.Api
             );
         }
 
+        // =========================================================
+        // PASSEIOS POR CATEGORIA
+        // =========================================================
+
         [Authorize]
         [HttpGet("categoria/{categoriaId}")]
-        public async Task<ActionResult> GetByCategoria(int categoriaId)
+        public async Task<ActionResult> GetByCategoria(
+            int categoriaId)
         {
-            var passeios = await _service.GetByCategoriaAsync(categoriaId);
+            var passeios =
+                await _service.GetByCategoriaAsync(categoriaId);
+
             return Ok(passeios);
         }
+
+        // =========================================================
+        // CURTIR
+        // =========================================================
 
         [Authorize]
         [HttpPost("{id}/curtir")]
         public async Task<ActionResult> Curtir(int id)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (userId == null)
                 return Unauthorized();
 
             var (curtiu, totalCurtidas) =
-                await _service.AlternarCurtidaComTotalAsync(int.Parse(userId), id);
+                await _service.AlternarCurtidaComTotalAsync(
+                    int.Parse(userId),
+                    id);
 
             return Ok(new
             {
@@ -105,31 +137,48 @@ namespace Rota_LivreWEB_API.Controllers.Api
             });
         }
 
+        // =========================================================
+        // PENDENTE
+        // =========================================================
+
         [Authorize]
         [HttpPost("{id}/pendente")]
         public async Task<ActionResult> AlternarPendente(int id)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (userId == null)
                 return Unauthorized();
 
-            var pendente = await _service.AlternarPendenteAsync(int.Parse(userId), id);
+            var pendente =
+                await _service.AlternarPendenteAsync(
+                    int.Parse(userId),
+                    id);
 
-            return Ok(new { pendente });
+            return Ok(new
+            {
+                pendente
+            });
         }
+
+        // =========================================================
+        // MEUS PASSEIOS
+        // =========================================================
 
         [Authorize]
         [HttpGet("meus")]
         public async Task<ActionResult> MeusPasseios()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (userId == null)
                 return Unauthorized();
 
             var (curtidos, pendentes) =
-                await _service.GetMeusPasseiosAsync(int.Parse(userId));
+                await _service.GetMeusPasseiosAsync(
+                    int.Parse(userId));
 
             return Ok(new
             {
@@ -138,65 +187,83 @@ namespace Rota_LivreWEB_API.Controllers.Api
             });
         }
 
-        [HttpGet("buscar")]
-        public async Task<ActionResult> Buscar([FromQuery] string termo)
-        {
-            var passeios = await _repo.BuscarPasseioPorNomeAsync(termo);
+        // =========================================================
+        // BUSCAR
+        // =========================================================
 
-            var resultado = passeios.Select(p => new PasseioDto
-            {
-                Id = p.id_passeio,
-                Nome = p.nome_passeio,
-                Descricao = p.descricao,
-                ImagemUrl = $"{Request.Scheme}://{Request.Host}/img/passeios/{p.img_url}",
-                QuantidadeCurtidas = p.QuantidadeCurtidas
-            });
+        [HttpGet("buscar")]
+        public async Task<ActionResult> Buscar(
+            [FromQuery] string termo)
+        {
+            var passeios =
+                await _repo.BuscarPasseioPorNomeAsync(termo);
+
+            var resultado = passeios.Select(p =>
+                new PasseioDto
+                {
+                    Id = p.id_passeio,
+                    Nome = p.nome_passeio,
+                    Descricao = p.descricao,
+                    ImagemUrl =
+                        $"{Request.Scheme}://{Request.Host}/img/passeios/{p.img_url}",
+                    QuantidadeCurtidas =
+                        p.QuantidadeCurtidas
+                });
 
             return Ok(resultado);
         }
 
-        // =========================================================================
-        // MÉTODOS ADMINISTRATIVOS (CRUD COMPLETO DO REACT)
-        // =========================================================================
+        // =========================================================
+        // ATUALIZAR PASSEIO
+        // =========================================================
 
         [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> AtualizarPasseio(
-        int id,
-        [FromBody] AtualizarPasseioDto dto)
+            int id,
+            [FromBody] AtualizarPasseioDto dto)
+        {
+            var passeio =
+                await _context.Passeio.FindAsync(id);
+
+            if (passeio == null)
             {
-                var passeio = await _context.Passeio.FindAsync(id);
-
-                if (passeio == null)
+                return NotFound(new
                 {
-                    return NotFound(new
-                    {
-                        mensagem = "Passeio não encontrado."
-                    });
-                }
+                    mensagem = "Passeio não encontrado."
+                });
+            }
 
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                passeio.nome_passeio = dto.Nome;
-                passeio.id_categoria = dto.CategoriaId;
-                passeio.descricao = dto.Descricao;
-                passeio.funcionamento = dto.Funcionamento;
-                passeio.img_url = dto.ImagemUrl;
-                passeio.status = string.IsNullOrWhiteSpace(dto.Status)
+            passeio.nome_passeio = dto.Nome;
+            passeio.id_categoria = dto.CategoriaId;
+            passeio.descricao = dto.Descricao;
+            passeio.funcionamento = dto.Funcionamento;
+            passeio.img_url = dto.ImagemUrl;
+
+            passeio.status =
+                string.IsNullOrWhiteSpace(dto.Status)
                     ? "ativo"
                     : dto.Status;
 
-                passeio.atualizado_por =
-                    userId != null
-                        ? int.Parse(userId)
-                        : null;
+            passeio.atualizado_por =
+                userId != null
+                    ? int.Parse(userId)
+                    : null;
 
-                passeio.atualizado_em = DateTime.UtcNow;
+            passeio.atualizado_em =
+                DateTime.UtcNow;
 
-                await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-                return Ok(passeio);
-            }
+            return Ok(passeio);
+        }
+
+        // =========================================================
+        // EXCLUIR PASSEIO
+        // =========================================================
 
         [Authorize]
         [HttpDelete("{id}")]
@@ -204,34 +271,45 @@ namespace Rota_LivreWEB_API.Controllers.Api
         {
             try
             {
-                var excluido = await _service.DeletarPasseioAsync(id);
+                var excluido =
+                    await _service.DeletarAsync(id);
 
                 if (!excluido)
                 {
                     return NotFound(new
                     {
-                        mensagem = "Passeio não encontrado."
+                        mensagem =
+                            "Passeio não encontrado."
                     });
                 }
 
                 return Ok(new
                 {
-                    mensagem = "Passeio e todos os dados relacionados foram excluídos com sucesso."
+                    mensagem =
+                        "Passeio excluído com sucesso."
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    mensagem = "Erro ao excluir o passeio.",
-                    erro = ex.Message
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        mensagem =
+                            "Erro ao excluir o passeio.",
+                        erro = ex.Message
+                    });
             }
         }
 
+        // =========================================================
+        // UPLOAD DE IMAGEM
+        // =========================================================
+
         [Authorize]
         [HttpPost("upload-imagem")]
-        public async Task<ActionResult> UploadImagem(IFormFile imagem)
+        public async Task<ActionResult> UploadImagem(
+            IFormFile imagem)
         {
             if (imagem == null || imagem.Length == 0)
             {
@@ -240,12 +318,13 @@ namespace Rota_LivreWEB_API.Controllers.Api
 
             var tiposPermitidos = new[]
             {
-        "image/jpeg",
-        "image/png",
-        "image/webp"
-    };
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            };
 
-            if (!tiposPermitidos.Contains(imagem.ContentType.ToLower()))
+            if (!tiposPermitidos.Contains(
+                    imagem.ContentType.ToLower()))
             {
                 return StatusCode(
                     415,
@@ -253,9 +332,14 @@ namespace Rota_LivreWEB_API.Controllers.Api
                 );
             }
 
-            var supabaseUrl = _config["Supabase:Url"];
-            var supabaseKey = _config["Supabase:Key"];
-            var bucket = _config["Supabase:Bucket"];
+            var supabaseUrl =
+                _config["Supabase:Url"];
+
+            var supabaseKey =
+                _config["Supabase:Key"];
+
+            var bucket =
+                _config["Supabase:Bucket"];
 
             if (string.IsNullOrWhiteSpace(supabaseUrl) ||
                 string.IsNullOrWhiteSpace(supabaseKey) ||
@@ -267,8 +351,9 @@ namespace Rota_LivreWEB_API.Controllers.Api
                 );
             }
 
-            var extensao = Path.GetExtension(imagem.FileName)
-                .ToLowerInvariant();
+            var extensao =
+                Path.GetExtension(imagem.FileName)
+                    .ToLowerInvariant();
 
             if (string.IsNullOrEmpty(extensao))
             {
@@ -280,31 +365,37 @@ namespace Rota_LivreWEB_API.Controllers.Api
             var fileName =
                 $"fotos-passeios/passeio_{Guid.NewGuid()}{extensao}";
 
-            using var httpClient = new HttpClient();
+            using var httpClient =
+                new HttpClient();
 
             httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", supabaseKey);
+                new AuthenticationHeaderValue(
+                    "Bearer",
+                    supabaseKey);
 
             httpClient.DefaultRequestHeaders.Add(
                 "apikey",
-                supabaseKey
-            );
+                supabaseKey);
 
-            using var stream = imagem.OpenReadStream();
+            using var stream =
+                imagem.OpenReadStream();
 
-            using var content = new StreamContent(stream);
+            using var content =
+                new StreamContent(stream);
 
             content.Headers.ContentType =
-                new MediaTypeHeaderValue(imagem.ContentType);
+                new MediaTypeHeaderValue(
+                    imagem.ContentType);
 
-            var response = await httpClient.PostAsync(
-                $"{supabaseUrl}/storage/v1/object/{bucket}/{fileName}",
-                content
-            );
+            var response =
+                await httpClient.PostAsync(
+                    $"{supabaseUrl}/storage/v1/object/{bucket}/{fileName}",
+                    content);
 
             if (!response.IsSuccessStatusCode)
             {
-                var erro = await response.Content.ReadAsStringAsync();
+                var erro =
+                    await response.Content.ReadAsStringAsync();
 
                 return BadRequest(erro);
             }

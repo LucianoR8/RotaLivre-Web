@@ -3,16 +3,19 @@ using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.DTOs;
 using Rota_LivreWEB_API.Interfaces;
 using Rota_LivreWEB_API.Models;
+using System.Net.Http.Headers;
 
 namespace Rota_LivreWEB_API.Services
 {
     public class PasseioService : IPasseioService
     {
         private readonly AppDbContext _context;
+        private readonly IConfiguration _config;
 
-        public PasseioService(AppDbContext context)
+        public PasseioService(AppDbContext context, IConfiguration config)
         {
             _context = context;
+            _config = config;
         }
 
         // =========================================================
@@ -585,15 +588,22 @@ namespace Rota_LivreWEB_API.Services
                 pendentes);
         }
 
-        public async Task<bool> DeletarPasseioAsync(int id)
+        public async Task<bool> DeletarAsync(int id)
         {
-            // Busca o passeio
+            // =========================================================
+            // BUSCAR PASSEIO
+            // =========================================================
+
             var passeio = await _context.Passeio
                 .Include(p => p.Endereco)
                 .FirstOrDefaultAsync(p => p.id_passeio == id);
 
             if (passeio == null)
                 return false;
+
+            // Guardamos a URL antes de excluir o passeio
+            var imagemUrl = passeio.img_url;
+
 
             // =========================================================
             // 1. EXCLUIR AVALIAÇÕES
@@ -608,6 +618,7 @@ namespace Rota_LivreWEB_API.Services
                 _context.Avaliacao.RemoveRange(avaliacoes);
             }
 
+
             // =========================================================
             // 2. EXCLUIR CURTIDAS
             // =========================================================
@@ -621,8 +632,9 @@ namespace Rota_LivreWEB_API.Services
                 _context.CurtidaPasseio.RemoveRange(curtidas);
             }
 
+
             // =========================================================
-            // 3. EXCLUIR PENDENTES
+            // 3. EXCLUIR PASSEIOS PENDENTES
             // =========================================================
 
             var pendentes = await _context.PasseioPendente
@@ -634,8 +646,27 @@ namespace Rota_LivreWEB_API.Services
                 _context.PasseioPendente.RemoveRange(pendentes);
             }
 
+
             // =========================================================
-            // 4. EXCLUIR ENDEREÇO
+            // 4. ENCERRAR OS GRUPOS
+            // =========================================================
+
+            var grupos = await _context.Grupo
+                .Where(g => g.id_passeio == id)
+                .ToListAsync();
+
+            foreach (var grupo in grupos)
+            {
+                grupo.status = "ENCERRADO";
+
+                // Remove a ligação com o passeio
+                grupo.id_passeio = null;
+                grupo.Passeio = null;
+            }
+
+
+            // =========================================================
+            // 5. EXCLUIR ENDEREÇO
             // =========================================================
 
             if (passeio.Endereco != null)
@@ -643,19 +674,144 @@ namespace Rota_LivreWEB_API.Services
                 _context.Endereco.Remove(passeio.Endereco);
             }
 
+
             // =========================================================
-            // 5. EXCLUIR O PASSEIO
+            // 6. EXCLUIR O PASSEIO
             // =========================================================
 
             _context.Passeio.Remove(passeio);
 
+
             // =========================================================
-            // SALVAR TUDO
+            // 7. SALVAR ALTERAÇÕES DO BANCO
             // =========================================================
 
             await _context.SaveChangesAsync();
 
+
+            // =========================================================
+            // 8. EXCLUIR IMAGEM DO SUPABASE
+            // =========================================================
+
+            if (!string.IsNullOrWhiteSpace(imagemUrl))
+            {
+                try
+                {
+                    await ExcluirImagemSupabaseAsync(imagemUrl);
+                }
+                catch (Exception ex)
+                {
+                    // A exclusão do passeio já aconteceu.
+                    // Se o Storage falhar, não desfazemos a exclusão do banco.
+
+                    Console.WriteLine(
+                        $"⚠️ Não foi possível excluir a imagem do Supabase: {ex.Message}"
+                    );
+                }
+            }
+
+
             return true;
+        }
+
+        private async Task ExcluirImagemSupabaseAsync(string imagemUrl)
+        {
+            // =========================================================
+            // CONFIGURAÇÕES DO SUPABASE
+            // =========================================================
+
+            var supabaseUrl = _config["Supabase:Url"];
+            var supabaseKey = _config["Supabase:Key"];
+            var bucket = _config["Supabase:Bucket"];
+
+            if (string.IsNullOrWhiteSpace(supabaseUrl) ||
+                string.IsNullOrWhiteSpace(supabaseKey) ||
+                string.IsNullOrWhiteSpace(bucket))
+            {
+                throw new Exception(
+                    "Configuração do Supabase não encontrada."
+                );
+            }
+
+
+            // =========================================================
+            // EXEMPLO DA URL:
+            //
+            // https://xxxxx.supabase.co/storage/v1/object/public/bucket/fotos-passeios/passeio_x.jpg
+            // =========================================================
+
+            var marcador =
+                $"/storage/v1/object/public/{bucket}/";
+
+            var indice =
+                imagemUrl.IndexOf(
+                    marcador,
+                    StringComparison.OrdinalIgnoreCase);
+
+            if (indice < 0)
+            {
+                Console.WriteLine(
+                    "⚠️ A imagem não pertence ao bucket configurado."
+                );
+
+                return;
+            }
+
+
+            // Pega somente:
+            //
+            // fotos-passeios/passeio_x.jpg
+            //
+
+            var caminhoArquivo =
+                imagemUrl.Substring(
+                    indice + marcador.Length);
+
+
+            if (string.IsNullOrWhiteSpace(caminhoArquivo))
+            {
+                return;
+            }
+
+
+            // =========================================================
+            // DELETAR ARQUIVO
+            // =========================================================
+
+            using var httpClient = new HttpClient();
+
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue(
+                    "Bearer",
+                    supabaseKey);
+
+            httpClient.DefaultRequestHeaders.Add(
+                "apikey",
+                supabaseKey);
+
+
+            var url =
+                $"{supabaseUrl}/storage/v1/object/{bucket}/{caminhoArquivo}";
+
+
+            var response =
+                await httpClient.DeleteAsync(url);
+
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var erro =
+                    await response.Content.ReadAsStringAsync();
+
+                throw new Exception(
+                    $"Supabase retornou {(int)response.StatusCode}: {erro}"
+                );
+            }
+
+
+            Console.WriteLine(
+                $"✅ Imagem removida do Supabase: {caminhoArquivo}"
+            );
         }
     }
 }

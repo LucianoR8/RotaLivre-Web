@@ -920,7 +920,7 @@
                                 <a href="@Url.Action("PasseiosPorCategoria", "HomeBase", new { id = categoria.id_categoria })"
                                    style="text-decoration: none; display: block; height: 100%;">
                                     <div class="card">
-                                        <img src="@Url.Content("~/img/categorias/" + categoria.img)"
+                                        <img src="@categoria.img"
                                              class="card-img-top"
                                              alt="@categoria.tipo_categoria">
 
@@ -976,7 +976,7 @@
 
                     <div class="produto"
                          onclick="window.location.href='@Url.Action("Detalhes", "Passeios", new { id = passeio.id_passeio })'">
-                        <img src="@Url.Content("~/img/passeios/" + passeio.img_url)"
+                        <img src="@passeio.img_url"
                              class="imagem_produto"
                              alt="@passeio.nome_passeio" />
                         <div class="museu_conteudo">

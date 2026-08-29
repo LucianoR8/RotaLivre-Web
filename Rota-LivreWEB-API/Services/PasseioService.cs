@@ -16,31 +16,6 @@ namespace Rota_LivreWEB_API.Services
         }
 
         // =========================================================
-        // MONTAR URL DA IMAGEM
-        // =========================================================
-
-        private string MontarImagemUrl(string imgUrl)
-        {
-            if (string.IsNullOrWhiteSpace(imgUrl))
-                return "";
-
-            // Imagem armazenada no Supabase Storage
-            if (imgUrl.StartsWith(
-                    "http://",
-                    StringComparison.OrdinalIgnoreCase) ||
-                imgUrl.StartsWith(
-                    "https://",
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                return imgUrl;
-            }
-
-            // Compatibilidade com imagens antigas
-            // armazenadas no Render
-            return $"https://rotalivre-web.onrender.com/img/passeios/{imgUrl}";
-        }
-
-        // =========================================================
         // LISTAR TODOS OS PASSEIOS
         // =========================================================
 
@@ -63,31 +38,32 @@ namespace Rota_LivreWEB_API.Services
                         ? p.Categoria.tipo_categoria
                         : null,
 
+                    // =================================================
+                    // IMAGEM
+                    // A URL já está armazenada no Supabase.
+                    // Não montamos mais URL do Render.
+                    // =================================================
+
                     ImagemUrl = p.img_url,
 
                     QuantidadeCurtidas =
                         _context.CurtidaPasseio
                             .Count(c =>
-                                c.id_passeio ==
-                                p.id_passeio),
+                                c.id_passeio == p.id_passeio),
 
                     Endereco = p.Endereco != null
                         ? new EnderecoDto
                         {
-                            NomeRua =
-                                p.Endereco.nome_rua,
+                            NomeRua = p.Endereco.nome_rua,
 
-                            NumeroRua =
-                                p.Endereco.numero_rua,
+                            NumeroRua = p.Endereco.numero_rua,
 
                             Complemento =
                                 p.Endereco.complemento,
 
-                            Bairro =
-                                p.Endereco.bairro,
+                            Bairro = p.Endereco.bairro,
 
-                            Cep =
-                                p.Endereco.cep,
+                            Cep = p.Endereco.cep,
 
                             Latitude =
                                 p.Endereco.Latitude,
@@ -102,6 +78,7 @@ namespace Rota_LivreWEB_API.Services
                 })
                 .ToListAsync();
         }
+
 
         // =========================================================
         // BUSCAR PASSEIO POR ID
@@ -128,9 +105,8 @@ namespace Rota_LivreWEB_API.Services
                 Funcionamento =
                     passeio.funcionamento,
 
-                ImagemUrl =
-                    MontarImagemUrl(
-                        passeio.img_url),
+                // URL direta do Supabase
+                ImagemUrl = passeio.img_url,
 
                 QuantidadeCurtidas =
                     await _context.CurtidaPasseio
@@ -173,6 +149,7 @@ namespace Rota_LivreWEB_API.Services
             };
         }
 
+
         // =========================================================
         // CRIAR PASSEIO
         // =========================================================
@@ -194,11 +171,11 @@ namespace Rota_LivreWEB_API.Services
                 funcionamento =
                     dto.Funcionamento,
 
+                // A URL recebida já é do Supabase
                 img_url =
                     dto.ImagemUrl,
 
-                status =
-                    "ativo"
+                status = "ativo"
             };
 
             _context.Passeio.Add(passeio);
@@ -211,6 +188,7 @@ namespace Rota_LivreWEB_API.Services
             return dto;
         }
 
+
         // =========================================================
         // PASSEIOS POR CATEGORIA
         // =========================================================
@@ -218,52 +196,47 @@ namespace Rota_LivreWEB_API.Services
         public async Task<IEnumerable<PasseioDto>>
             GetByCategoriaAsync(int categoriaId)
         {
-            var passeios = await _context.Passeio
+            return await _context.Passeio
                 .Where(p =>
                     p.id_categoria ==
                     categoriaId)
-                .Select(p => new
+
+                .Select(p => new PasseioDto
                 {
-                    Passeio = p,
+                    Id =
+                        p.id_passeio,
+
+                    Nome =
+                        p.nome_passeio,
+
+                    Descricao =
+                        p.descricao,
+
+                    Funcionamento =
+                        p.funcionamento,
+
+                    // URL direta do Supabase
+                    ImagemUrl =
+                        p.img_url,
 
                     QuantidadeCurtidas =
                         _context.CurtidaPasseio
                             .Count(c =>
                                 c.id_passeio ==
-                                p.id_passeio)
-                })
-                .ToListAsync();
-
-            return passeios.Select(x =>
-                new PasseioDto
-                {
-                    Id =
-                        x.Passeio.id_passeio,
-
-                    Nome =
-                        x.Passeio.nome_passeio,
-
-                    Descricao =
-                        x.Passeio.descricao,
-
-                    Funcionamento =
-                        x.Passeio.funcionamento,
-
-                    ImagemUrl =
-                        MontarImagemUrl(
-                            x.Passeio.img_url),
-
-                    QuantidadeCurtidas =
-                        x.QuantidadeCurtidas,
+                                p.id_passeio),
 
                     CategoriaNome =
-                        x.Passeio.Categoria
-                            ?.tipo_categoria
-                });
+                        p.Categoria != null
+                            ? p.Categoria.tipo_categoria
+                            : null
+                })
+
+                .ToListAsync();
         }
 
+
         // =========================================================
-        // CURTIDA
+        // ALTERNAR CURTIDA
         // =========================================================
 
         public async Task<bool> AlternarCurtidaAsync(
@@ -306,6 +279,7 @@ namespace Rota_LivreWEB_API.Services
             return true;
         }
 
+
         // =========================================================
         // BUSCAR PASSEIO COM DADOS DO USUÁRIO
         // =========================================================
@@ -319,6 +293,7 @@ namespace Rota_LivreWEB_API.Services
                 await _context.Passeio
                     .Include(p =>
                         p.Endereco)
+
                     .FirstOrDefaultAsync(
                         p =>
                             p.id_passeio ==
@@ -363,9 +338,9 @@ namespace Rota_LivreWEB_API.Services
                 Funcionamento =
                     passeio.funcionamento,
 
+                // URL direta do Supabase
                 ImagemUrl =
-                    MontarImagemUrl(
-                        passeio.img_url),
+                    passeio.img_url,
 
                 QuantidadeCurtidas =
                     quantidadeCurtidas,
@@ -408,8 +383,9 @@ namespace Rota_LivreWEB_API.Services
             };
         }
 
+
         // =========================================================
-        // CURTIR / DESCURTIR COM TOTAL
+        // CURTIR / DESCURTIR + TOTAL
         // =========================================================
 
         public async Task<(
@@ -482,8 +458,9 @@ namespace Rota_LivreWEB_API.Services
                 total);
         }
 
+
         // =========================================================
-        // PENDENTE
+        // ALTERNAR PENDENTE
         // =========================================================
 
         public async Task<bool> AlternarPendenteAsync(
@@ -544,6 +521,7 @@ namespace Rota_LivreWEB_API.Services
             return true;
         }
 
+
         // =========================================================
         // MEUS PASSEIOS
         // =========================================================
@@ -556,69 +534,128 @@ namespace Rota_LivreWEB_API.Services
         {
             var curtidos =
                 await _context.CurtidaPasseio
+
                     .Where(c =>
                         c.id_usuario ==
                         userId)
+
                     .Select(c =>
                         new PasseioDto
                         {
                             Id =
-                                c.Passeio
-                                    .id_passeio,
+                                c.Passeio.id_passeio,
 
                             Nome =
-                                c.Passeio
-                                    .nome_passeio,
+                                c.Passeio.nome_passeio,
 
+                            // URL direta do Supabase
                             ImagemUrl =
-                                c.Passeio
-                                    .img_url
+                                c.Passeio.img_url
                         })
+
                     .ToListAsync();
+
 
             var pendentes =
                 await _context.PasseioPendente
+
                     .Where(p =>
                         p.id_usuario ==
                         userId)
+
                     .Select(p =>
                         new PasseioDto
                         {
                             Id =
-                                p.Passeio
-                                    .id_passeio,
+                                p.Passeio.id_passeio,
 
                             Nome =
-                                p.Passeio
-                                    .nome_passeio,
+                                p.Passeio.nome_passeio,
 
+                            // URL direta do Supabase
                             ImagemUrl =
-                                p.Passeio
-                                    .img_url
+                                p.Passeio.img_url
                         })
+
                     .ToListAsync();
 
-            // Corrige URLs das imagens
-            // mantendo compatibilidade
-            // com imagens antigas.
-
-            foreach (var passeio in curtidos)
-            {
-                passeio.ImagemUrl =
-                    MontarImagemUrl(
-                        passeio.ImagemUrl);
-            }
-
-            foreach (var passeio in pendentes)
-            {
-                passeio.ImagemUrl =
-                    MontarImagemUrl(
-                        passeio.ImagemUrl);
-            }
 
             return (
                 curtidos,
                 pendentes);
+        }
+
+        public async Task<bool> DeletarPasseioAsync(int id)
+        {
+            // Busca o passeio
+            var passeio = await _context.Passeio
+                .Include(p => p.Endereco)
+                .FirstOrDefaultAsync(p => p.id_passeio == id);
+
+            if (passeio == null)
+                return false;
+
+            // =========================================================
+            // 1. EXCLUIR AVALIAÇÕES
+            // =========================================================
+
+            var avaliacoes = await _context.Avaliacao
+                .Where(a => a.id_passeio == id)
+                .ToListAsync();
+
+            if (avaliacoes.Any())
+            {
+                _context.Avaliacao.RemoveRange(avaliacoes);
+            }
+
+            // =========================================================
+            // 2. EXCLUIR CURTIDAS
+            // =========================================================
+
+            var curtidas = await _context.CurtidaPasseio
+                .Where(c => c.id_passeio == id)
+                .ToListAsync();
+
+            if (curtidas.Any())
+            {
+                _context.CurtidaPasseio.RemoveRange(curtidas);
+            }
+
+            // =========================================================
+            // 3. EXCLUIR PENDENTES
+            // =========================================================
+
+            var pendentes = await _context.PasseioPendente
+                .Where(p => p.id_passeio == id)
+                .ToListAsync();
+
+            if (pendentes.Any())
+            {
+                _context.PasseioPendente.RemoveRange(pendentes);
+            }
+
+            // =========================================================
+            // 4. EXCLUIR ENDEREÇO
+            // =========================================================
+
+            if (passeio.Endereco != null)
+            {
+                _context.Endereco.Remove(passeio.Endereco);
+            }
+
+            // =========================================================
+            // 5. EXCLUIR O PASSEIO
+            // =========================================================
+
+            _context.Passeio.Remove(passeio);
+
+            // =========================================================
+            // SALVAR TUDO
+            // =========================================================
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

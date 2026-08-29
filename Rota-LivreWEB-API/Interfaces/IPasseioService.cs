@@ -15,5 +15,6 @@ namespace Rota_LivreWEB_API.Interfaces
         Task<(bool curtiu, int totalCurtidas)> AlternarCurtidaComTotalAsync(int usuarioId, int passeioId);
         Task<bool> AlternarPendenteAsync(int usuarioId, int passeioId);
         Task<(List<PasseioDto> curtidos, List<PasseioDto> pendentes)> GetMeusPasseiosAsync(int userId);
+        Task<bool> DeletarPasseioAsync(int id);
     }
 }

@@ -640,10 +640,6 @@
                 <a href="/" class="d-flex align-items-center text-decoration-none">
                     <h1 class="name-pj">Rota Livre</h1>
                 </a>
-                <div class="text-end">
-                    <button class="opc1 opcA btn btn-primary" type="button" onclick="window.location.href='/Login/Login'">Entrar</button>
-                    <button class="opc1 opcA btn btn-primary" type="button" onclick="window.location.href='/RotaLivre/Create'">Cadastrar</button>
-                </div>
             </div>
         </div>
     </header>
@@ -681,7 +677,7 @@
                         {
                             <div class="produto" onclick="window.location.href='@Url.Action("Detalhes", "Passeios", new { id = passeio.id_passeio })'">
                                 <div class="imagem-container">
-                                    <img src="@Url.Content("~/img/passeios/" + passeio.img_url)" class="imagem_produto" alt="@passeio.nome_passeio" />
+                                    <img src="@passeio.img_url" class="imagem_produto" alt="@passeio.nome_passeio" />
                                     <div class="imagem-overlay">
                                         <div class="ver-detalhes">
                                             <i class="fas fa-eye"></i> Ver detalhes
@@ -736,7 +732,7 @@
                         {
                             <div class="produto" onclick="window.location.href='@Url.Action("Detalhes", "Passeios", new { id = passeio.id_passeio })'">
                                 <div class="imagem-container">
-                                    <img src="@Url.Content("~/img/passeios/" + passeio.img_url)" class="imagem_produto" alt="@passeio.nome_passeio" />
+                                    <img src="@passeio.img_url" class="imagem_produto" alt="@passeio.nome_passeio" />
                                     <div class="imagem-overlay">
                                         <div class="ver-detalhes">
                                             <i class="fas fa-eye"></i> Ver detalhes

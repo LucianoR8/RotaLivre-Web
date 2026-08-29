@@ -202,25 +202,31 @@ namespace Rota_LivreWEB_API.Controllers.Api
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletarPasseio(int id)
         {
-            var passeio = await _context.Passeio
-                .FindAsync(id);
-
-            if (passeio == null)
+            try
             {
-                return NotFound(new
+                var excluido = await _service.DeletarPasseioAsync(id);
+
+                if (!excluido)
                 {
-                    mensagem = "Passeio não encontrado."
+                    return NotFound(new
+                    {
+                        mensagem = "Passeio não encontrado."
+                    });
+                }
+
+                return Ok(new
+                {
+                    mensagem = "Passeio e todos os dados relacionados foram excluídos com sucesso."
                 });
             }
-
-            _context.Passeio.Remove(passeio);
-
-            await _context.SaveChangesAsync();
-
-            return Ok(new
+            catch (Exception ex)
             {
-                mensagem = "Passeio excluído com sucesso."
-            });
+                return StatusCode(500, new
+                {
+                    mensagem = "Erro ao excluir o passeio.",
+                    erro = ex.Message
+                });
+            }
         }
 
         [Authorize]

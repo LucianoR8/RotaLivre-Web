@@ -584,5 +584,78 @@ namespace Rota_LivreWEB_API.Services
                 curtidos,
                 pendentes);
         }
+
+        public async Task<bool> DeletarPasseioAsync(int id)
+        {
+            // Busca o passeio
+            var passeio = await _context.Passeio
+                .Include(p => p.Endereco)
+                .FirstOrDefaultAsync(p => p.id_passeio == id);
+
+            if (passeio == null)
+                return false;
+
+            // =========================================================
+            // 1. EXCLUIR AVALIAÇÕES
+            // =========================================================
+
+            var avaliacoes = await _context.Avaliacao
+                .Where(a => a.id_passeio == id)
+                .ToListAsync();
+
+            if (avaliacoes.Any())
+            {
+                _context.Avaliacao.RemoveRange(avaliacoes);
+            }
+
+            // =========================================================
+            // 2. EXCLUIR CURTIDAS
+            // =========================================================
+
+            var curtidas = await _context.CurtidaPasseio
+                .Where(c => c.id_passeio == id)
+                .ToListAsync();
+
+            if (curtidas.Any())
+            {
+                _context.CurtidaPasseio.RemoveRange(curtidas);
+            }
+
+            // =========================================================
+            // 3. EXCLUIR PENDENTES
+            // =========================================================
+
+            var pendentes = await _context.PasseioPendente
+                .Where(p => p.id_passeio == id)
+                .ToListAsync();
+
+            if (pendentes.Any())
+            {
+                _context.PasseioPendente.RemoveRange(pendentes);
+            }
+
+            // =========================================================
+            // 4. EXCLUIR ENDEREÇO
+            // =========================================================
+
+            if (passeio.Endereco != null)
+            {
+                _context.Endereco.Remove(passeio.Endereco);
+            }
+
+            // =========================================================
+            // 5. EXCLUIR O PASSEIO
+            // =========================================================
+
+            _context.Passeio.Remove(passeio);
+
+            // =========================================================
+            // SALVAR TUDO
+            // =========================================================
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

@@ -202,18 +202,25 @@ namespace Rota_LivreWEB_API.Controllers.Api
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletarPasseio(int id)
         {
-            var passeio = await _context.Passeio.FindAsync(id);
-            if (passeio == null) return NotFound(new { mensagem = "Passeio não encontrado." });
+            var passeio = await _context.Passeio
+                .FindAsync(id);
 
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (passeio == null)
+            {
+                return NotFound(new
+                {
+                    mensagem = "Passeio não encontrado."
+                });
+            }
 
-            // Soft delete: Apenas desativa para não quebrar tabelas dependentes (avaliações, etc)
-            passeio.status = "inativo";
-            passeio.atualizado_por = userId != null ? int.Parse(userId) : null;
-            passeio.atualizado_em = DateTime.UtcNow;
+            _context.Passeio.Remove(passeio);
 
             await _context.SaveChangesAsync();
-            return Ok(new { mensagem = "Passeio desativado com sucesso." });
+
+            return Ok(new
+            {
+                mensagem = "Passeio excluído com sucesso."
+            });
         }
 
         [Authorize]

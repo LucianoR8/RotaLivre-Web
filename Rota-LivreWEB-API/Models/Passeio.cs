@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Rota_LivreWEB_API.Models
 {
@@ -22,6 +24,13 @@ namespace Rota_LivreWEB_API.Models
         public bool UsuarioJaCurtiu { get; set; }
         public bool UsuarioJaPendente { get; set; }
 
+        
+        public string status { get; set; } = "ativo";
+        public int? atualizado_por { get; set; }
+        public DateTime? atualizado_em { get; set; }
+
+        [ForeignKey("atualizado_por")]
+        public Usuario? AdminAtualizacao { get; set; }
 
 
         public Passeio()

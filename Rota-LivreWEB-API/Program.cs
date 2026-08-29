@@ -103,6 +103,16 @@ builder.Services.AddCors(options =>
     );
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PainelAdminPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "https://seu-painel-rotalivre.pages.dev") // URL do Cloudflare
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -124,6 +134,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseSession();
+
+app.UseCors("PainelAdminPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();

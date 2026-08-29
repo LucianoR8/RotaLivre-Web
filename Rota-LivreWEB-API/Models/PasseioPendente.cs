@@ -16,13 +16,13 @@ namespace Rota_LivreWEB_API.Models
         public int id_passeio { get; set; }
 
         [ForeignKey("Grupo")]
-        public int id_grupo { get; set; }
+        public int? id_grupo { get; set; }
 
         public DateTime data_adicao { get; set; } = DateTime.UtcNow;
 
         public Usuario Usuario { get; set; }
         public Passeio Passeio { get; set; }
-        public Grupo Grupo { get; set; }
+        public Grupo? Grupo { get; set; }
 
     }
 }

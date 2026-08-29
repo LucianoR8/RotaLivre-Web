@@ -411,14 +411,23 @@ namespace Rota_LivreWEB_API.Controllers
             _context.GrupoUsuario.Add(novoMembro);
 
 
-            // O passeio também passa a aparecer
-            // como pendente para esse usuário.
+            // Se o passeio foi excluído, o grupo continua existindo,
+            // mas não é mais possível entrar nele.
+            if (!grupo.id_passeio.HasValue)
+            {
+                return BadRequest(new
+                {
+                    mensagem = "O passeio deste grupo não está mais disponível."
+                });
+            }
+
+            var idPasseio = grupo.id_passeio.Value;
 
             var pendenteExistente =
                 await _context.PasseioPendente
                     .AnyAsync(pp =>
                         pp.id_usuario == userId &&
-                        pp.id_passeio == grupo.id_passeio &&
+                        pp.id_passeio == idPasseio &&
                         pp.id_grupo == grupo.id_grupo);
 
             if (!pendenteExistente)
@@ -427,7 +436,7 @@ namespace Rota_LivreWEB_API.Controllers
                     new PasseioPendente
                     {
                         id_usuario = userId,
-                        id_passeio = grupo.id_passeio,
+                        id_passeio = idPasseio,
                         id_grupo = grupo.id_grupo,
                         data_adicao = DateTime.UtcNow
                     });

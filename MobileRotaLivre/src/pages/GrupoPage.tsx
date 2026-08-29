@@ -26,7 +26,8 @@ import {
   buscarGrupo,
   iniciarPasseio,
   sairDoGrupo,
-  cancelarGrupo
+  cancelarGrupo,
+  alterarDataGrupo
 } from '../services/grupoService';
 
 export const GrupoPage: React.FC = () => {
@@ -75,6 +76,21 @@ export const GrupoPage: React.FC = () => {
 
   const [starting, setStarting] =
     useState(false);
+
+  const [editandoData, setEditandoData] =
+    useState(false);
+
+  const [novaData, setNovaData] =
+    useState('');
+
+  const [novoHorario, setNovoHorario] =
+    useState('');
+
+  const [alterandoData, setAlterandoData] =
+    useState(false);
+
+  const [errorData, setErrorData] =
+    useState('');
 
 
   // =========================================================
@@ -202,6 +218,10 @@ export const GrupoPage: React.FC = () => {
     setConfirmCancel(false);
 
     setCopiedCode(false);
+
+    setEditandoData(false);
+
+    setErrorData('');
 
     setLoadingDetalhes(true);
 
@@ -636,6 +656,115 @@ export const GrupoPage: React.FC = () => {
 
     } finally {
       setCanceling(false);
+    }
+  };
+
+
+  // =========================================================
+  // INICIAR EDIÇÃO DA DATA
+  // =========================================================
+
+  const iniciarEdicaoData = () => {
+    setErrorData('');
+
+    if (selectedGrupo?.dataInicio) {
+      const d = new Date(selectedGrupo.dataInicio);
+
+      setNovaData(
+        d.toISOString().split('T')[0]
+      );
+
+      setNovoHorario(
+        `${String(d.getHours()).padStart(2, '0')}:${String(
+          d.getMinutes()
+        ).padStart(2, '0')}`
+      );
+    } else {
+      setNovaData('');
+      setNovoHorario('');
+    }
+
+    setEditandoData(true);
+  };
+
+
+  // =========================================================
+  // ALTERAR DATA DO PASSEIO
+  // =========================================================
+
+  const handleAlterarData = async (
+    grupoId: number
+  ) => {
+    if (alterandoData) return;
+
+    if (!novaData || !novoHorario) {
+      setErrorData(
+        'Selecione a data e o horário do passeio.'
+      );
+      return;
+    }
+
+    const dataInicio = `${novaData}T${novoHorario}:00`;
+
+    setAlterandoData(true);
+
+    setErrorData('');
+
+    try {
+      console.log(
+        '[GrupoPage] Alterando data do grupo:',
+        grupoId,
+        dataInicio
+      );
+
+      const data = await alterarDataGrupo(
+        grupoId,
+        dataInicio,
+        getAuthHeader
+      );
+
+      console.log(
+        '[GrupoPage] Resposta alterar data:',
+        data
+      );
+
+      // Atualiza a data na lista e nos detalhes exibidos.
+      setSelectedGrupo(prev =>
+        prev
+          ? {
+              ...prev,
+              dataInicio: data?.dataInicio ?? dataInicio
+            }
+          : prev
+      );
+
+      setGrupoDetalhes(prev =>
+        prev
+          ? {
+              ...prev,
+              dataInicio: data?.dataInicio ?? dataInicio
+            }
+          : prev
+      );
+
+      await carregarMeusGrupos();
+
+      setEditandoData(false);
+
+    } catch (err) {
+      console.error(
+        '[GrupoPage] Erro ao alterar data:',
+        err
+      );
+
+      setErrorData(
+        err instanceof Error
+          ? err.message
+          : 'Erro ao alterar a data do passeio.'
+      );
+
+    } finally {
+      setAlterandoData(false);
     }
   };
 
@@ -1216,7 +1345,6 @@ export const GrupoPage: React.FC = () => {
                         Data e Horário
                       </span>
 
-
                       <span className="text-xs font-bold text-[#1a535c] mt-0.5 block">
 
                         {selectedGrupo.dataInicio
@@ -1235,9 +1363,113 @@ export const GrupoPage: React.FC = () => {
 
                       </span>
 
+
+                      {grupoDetalhes &&
+                      usuarioEhCriador() && (
+                        <button
+                          type="button"
+                          onClick={iniciarEdicaoData}
+                          className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-[#4ecdc4] hover:text-[#1a535c] transition"
+                        >
+                          <Clock className="w-3.5 h-3.5" />
+                          Alterar Data
+                        </button>
+                      )}
+
                     </div>
 
                   </div>
+
+
+                  {/* =================================================
+                      EDITAR DATA (LARGURA TOTAL)
+                  ================================================== */}
+
+                  {editandoData && (
+
+                    <div className="bg-[#f5f7fa] p-4 rounded-2xl border border-slate-200 space-y-3">
+
+                      <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
+                        <Calendar className="w-4 h-4 text-[#4ecdc4]" />
+                        Remarcar Passeio
+                      </span>
+
+                      <div className="space-y-2">
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">
+                            Data
+                          </label>
+
+                          <input
+                            type="date"
+                            value={novaData}
+                            onChange={e =>
+                              setNovaData(e.target.value)
+                            }
+                            min={new Date().toISOString().split('T')[0]}
+                            className="w-full p-3 bg-white rounded-xl border border-slate-200 text-sm font-semibold text-[#1a535c] focus:outline-none focus:border-[#4ecdc4]"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">
+                            Horário
+                          </label>
+
+                          <input
+                            type="time"
+                            value={novoHorario}
+                            onChange={e =>
+                              setNovoHorario(e.target.value)
+                            }
+                            className="w-full p-3 bg-white rounded-xl border border-slate-200 text-sm font-semibold text-[#1a535c] focus:outline-none focus:border-[#4ecdc4]"
+                          />
+                        </div>
+
+                        {errorData && (
+                          <div className="text-[11px] font-semibold text-rose-600">
+                            {errorData}
+                          </div>
+                        )}
+
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditandoData(false);
+                            setErrorData('');
+                          }}
+                          disabled={alterandoData}
+                          className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition"
+                        >
+                          Cancelar
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleAlterarData(
+                              selectedGrupo.idGrupo
+                            )
+                          }
+                          disabled={alterandoData}
+                          className="bg-[#4ecdc4] hover:bg-[#4ecdc4]/90 disabled:opacity-60 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"
+                        >
+                          <Calendar className="w-4 h-4" />
+                          {alterandoData
+                            ? 'Salvando...'
+                            : 'Salvar Data'}
+                        </button>
+
+                      </div>
+
+                    </div>
+
+                  )}
 
 
                   {/* =================================================

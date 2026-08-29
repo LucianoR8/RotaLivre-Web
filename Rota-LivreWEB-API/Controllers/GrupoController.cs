@@ -576,6 +576,87 @@ namespace Rota_LivreWEB_API.Controllers
 
 
         // =========================================================
+        // ALTERAR DATA DO PASSEIO
+        // SOMENTE O CRIADOR
+        // =========================================================
+
+        [Authorize]
+        [HttpPut("{idGrupo}/data")]
+        public async Task<ActionResult> AlterarData(
+            int idGrupo,
+            [FromBody] AlterarDataGrupoDto dto)
+        {
+            var userIdClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            var userId = int.Parse(userIdClaim);
+
+            var grupo = await _context.Grupo
+                .FirstOrDefaultAsync(g => g.id_grupo == idGrupo);
+
+            if (grupo == null)
+                return NotFound(new
+                {
+                    mensagem = "Grupo não encontrado."
+                });
+
+            // SOMENTE O CRIADOR
+            if (grupo.id_criador != userId)
+            {
+                return Forbid();
+            }
+
+            if (grupo.status == "FINALIZADO")
+            {
+                return BadRequest(new
+                {
+                    mensagem = "Este passeio já foi finalizado."
+                });
+            }
+
+            if (grupo.status == "CANCELADO")
+            {
+                return BadRequest(new
+                {
+                    mensagem = "Este passeio foi cancelado."
+                });
+            }
+
+            // -------------------------------------------------
+            // CONVERTE DATA/HORA DE SÃO PAULO PARA UTC
+            // (mesmo procedimento usado na criação do grupo)
+            // -------------------------------------------------
+
+            var horarioSaoPaulo =
+                TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
+
+            var dataInicioLocal = DateTime.SpecifyKind(
+                dto.DataInicio,
+                DateTimeKind.Unspecified
+            );
+
+            var dataInicioUtc =
+                TimeZoneInfo.ConvertTimeToUtc(
+                    dataInicioLocal,
+                    horarioSaoPaulo
+                );
+
+            grupo.data_inicio = dataInicioUtc;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                mensagem = "Data do passeio atualizada com sucesso.",
+                idGrupo = grupo.id_grupo,
+                dataInicio = grupo.data_inicio
+            });
+        }
+
+        // =========================================================
         // INICIAR PASSEIO
         // =========================================================
 

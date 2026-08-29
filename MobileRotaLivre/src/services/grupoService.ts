@@ -131,6 +131,36 @@ export async function sairDoGrupo(
 }
 
 
+export async function alterarDataGrupo(
+  idGrupo: number,
+  dataInicio: string,
+  getAuthHeader: () => Record<string, string>
+) {
+  const response = await fetch(
+    `/api/grupo/${idGrupo}/data`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ dataInicio })
+    }
+  );
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    throw new Error(
+      data?.mensagem ||
+      'Não foi possível alterar a data do passeio.'
+    );
+  }
+
+  return data;
+}
+
+
 export async function cancelarGrupo(
   idGrupo: number,
   getAuthHeader: () => Record<string, string>

@@ -22,11 +22,14 @@ namespace Rota_LivreWEB_API.Controllers
         {
             int? idUsuario = HttpContext.Session.GetInt32("IdUsuario");
             ViewBag.NomeUsuario = "Visitante";
+            ViewBag.FotoPerfilUrl = null;
+            ViewBag.IdUsuario = idUsuario;
 
             if (idUsuario != null)
             {
                 var usuario = await _usuarioRp.BuscarPorIdAsync(idUsuario.Value);
                 ViewBag.NomeUsuario = usuario?.nome_completo ?? "Usuário";
+                ViewBag.FotoPerfilUrl = usuario?.FotoPerfilUrl;
             }
 
             var categorias = await _categoriaRp.ObterCategoriasAsync();

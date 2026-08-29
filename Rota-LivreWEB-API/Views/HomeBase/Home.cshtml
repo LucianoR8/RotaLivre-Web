@@ -862,8 +862,28 @@
                 <h1 class="name-pj">Rota Livre</h1>
             </div>
             <div class="text-end">
-                <button class="opc1 opcA btn btn-primary" type="button" onclick="window.location.href='/Login/Login'">Entrar</button>
-                <button class="opcA btn btn-outline-primary" type="button" onclick="window.location.href='/RotaLivre/Create'">Cadastrar</button>
+                @if (ViewBag.IdUsuario != null)
+                {
+                    <a href="/Perfil/Perfil" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="@(string.IsNullOrEmpty(ViewBag.FotoPerfilUrl as string) ? Url.Content("~/img/profilepic.png") : ViewBag.FotoPerfilUrl)" alt="Foto Perfil" class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;">
+                        <span class="text-dark fw-semibold">@ViewBag.NomeUsuario</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+                        <li><a class="dropdown-item" href="/Perfil/Perfil"><i class="fas fa-user me-2"></i> Meu Perfil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form asp-action="Logout" asp-controller="Login" method="post" class="px-2">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="dropdown-item text-danger p-0 bg-transparent border-0"><i class="fas fa-sign-out-alt me-2"></i> Sair</button>
+                            </form>
+                        </li>
+                    </ul>
+                }
+                else
+                {
+                    <button class="opc1 opcA btn btn-primary" type="button" onclick="window.location.href='/Login/Login'">Entrar</button>
+                    <button class="opcA btn btn-outline-primary" type="button" onclick="window.location.href='/RotaLivre/Create'">Cadastrar</button>
+                }
             </div>
         </div>
     </header>

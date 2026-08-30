@@ -130,22 +130,58 @@ const carregarDadosDaApi = async () => {
   const handleStartCreateCategory = () => { setCategoryToEdit(null); setActiveScreen('category-new'); };
   const handleStartEditCategory = (cat: Category) => { setCategoryToEdit(cat); setActiveScreen('category-edit'); };
 
-  const handleSaveCategory = async (categoryData: Partial<Category>) => {
-    try {
-      if (categoryToEdit) {
-        await categoriaService.atualizar(categoryToEdit.id, categoryData);
-        addToast('success', 'Categoria Atualizada', 'A categoria foi salva com sucesso no banco de dados.');
-      } else {
-        await categoriaService.criar(categoryData);
-        addToast('success', 'Categoria Criada', 'A nova categoria já está disponível no app.');
-      }
-      setActiveScreen('categories');
-      setCategoryToEdit(null);
-      carregarDadosDaApi(); // Recarrega a lista
-    } catch (error) {
-      addToast('error', 'Erro ao Salvar', 'Ocorreu um erro ao comunicar com a API.');
+  const handleSaveCategory = async (
+  categoryData: Partial<Category>,
+  imageFile?: File | null
+) => {
+  try {
+    if (categoryToEdit) {
+
+      await categoriaService.atualizar(
+        categoryToEdit.id,
+        categoryData,
+        imageFile
+      );
+
+      addToast(
+        'success',
+        'Categoria Atualizada',
+        'A categoria foi salva com sucesso no banco de dados.'
+      );
+
+    } else {
+
+      await categoriaService.criar(
+        categoryData,
+        imageFile
+      );
+
+      addToast(
+        'success',
+        'Categoria Criada',
+        'A nova categoria já está disponível no app.'
+      );
     }
-  };
+
+    setActiveScreen('categories');
+    setCategoryToEdit(null);
+
+    await carregarDadosDaApi();
+
+  } catch (error) {
+
+    console.error(
+      '❌ ERRO AO SALVAR CATEGORIA:',
+      error
+    );
+
+    addToast(
+      'error',
+      'Erro ao Salvar',
+      'Ocorreu um erro ao comunicar com a API.'
+    );
+  }
+};
 
   // =========================================================================
   // PASSEIO CRUD

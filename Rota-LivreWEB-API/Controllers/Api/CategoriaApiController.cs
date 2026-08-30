@@ -108,25 +108,46 @@ namespace Rota_LivreWEB_API.Controllers.Api
         // DELETAR CATEGORIA
         // =========================================================
 
+        // =========================================================
+        // DELETAR CATEGORIA
+        // =========================================================
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletarCategoria(
-            int id)
+        public async Task<IActionResult> DeletarCategoria(int id)
         {
             var categoria =
                 await _context.Categoria.FindAsync(id);
 
             if (categoria == null)
-                return NotFound();
+            {
+                return NotFound(new
+                {
+                    mensagem = "Categoria não encontrada."
+                });
+            }
 
-            // Por enquanto continua como soft delete
-            categoria.ativo = false;
-            categoria.atualizado_em = DateTime.UtcNow;
+            // Verifica se existem passeios usando esta categoria
+            var possuiPasseios =
+                await _context.Passeio
+                    .AnyAsync(p => p.id_categoria == id);
+
+            if (possuiPasseios)
+            {
+                return Conflict(new
+                {
+                    mensagem =
+                        "Não é possível excluir esta categoria porque existem passeios vinculados a ela."
+                });
+            }
+
+            // Exclusão REAL da categoria
+            _context.Categoria.Remove(categoria);
 
             await _context.SaveChangesAsync();
 
             return Ok(new
             {
-                mensagem = "Categoria desativada com sucesso."
+                mensagem = "Categoria excluída definitivamente."
             });
         }
 

@@ -1,0 +1,6 @@
+{
+  "name": "Rota Livre - Painel Administrativo",
+  "description": "Painel de controle administrativo completo para gestão de categorias, passeios turísticos, disponibilidades e métricas do aplicativo Rota Livre.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

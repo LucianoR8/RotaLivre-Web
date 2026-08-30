@@ -107,7 +107,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("PainelAdminPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://seu-painel-rotalivre.pages.dev") // URL do Cloudflare
+        policy.WithOrigins("http://localhost:3000", "https://rotalivre-admin.luciribsantos.workers.dev") // URL do Cloudflare
               .AllowAnyHeader()
               .AllowAnyMethod();
     });

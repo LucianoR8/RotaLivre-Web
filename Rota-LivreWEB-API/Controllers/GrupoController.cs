@@ -756,8 +756,7 @@ namespace Rota_LivreWEB_API.Controllers
                 }
             }
 
-
-            await _context.SaveChangesAsync();
+            
 
 
             return Ok(new

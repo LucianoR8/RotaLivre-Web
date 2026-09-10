@@ -52,7 +52,6 @@ namespace Rota_LivreWEB_API.Controllers
                 // UPDATE
                 localizacao.latitude = dto.Latitude;
                 localizacao.longitude = dto.Longitude;
-                localizacao.data_atualizacao = DateTime.UtcNow;
             }
             else
             {
@@ -62,8 +61,7 @@ namespace Rota_LivreWEB_API.Controllers
                     id_grupo = dto.IdGrupo,
                     id_usuario = userId,
                     latitude = dto.Latitude,
-                    longitude = dto.Longitude,
-                    data_atualizacao = DateTime.UtcNow
+                    longitude = dto.Longitude
                 };
                 _context.GrupoLocalizacao.Add(localizacao);
             }

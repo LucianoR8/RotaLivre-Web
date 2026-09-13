@@ -293,7 +293,7 @@ export const GrupoPage: React.FC = () => {
       console.log('[GrupoPage] Body:', body);
       console.log('[GrupoPage] Headers:', headers);
 
-      const res = await fetch('/api/grupo/entrar', {
+      const res = await fetch('https://rotalivre-web.onrender.com/api/grupo/entrar', {
         method: 'POST',
         headers,
         body: JSON.stringify(body)

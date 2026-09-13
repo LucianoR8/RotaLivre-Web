@@ -52,10 +52,13 @@ export interface IniciarPasseioResponse {
   dataInicioGrupo: string;
 }
 
+// ADICIONADO: URL Base do Backend
+const API_BASE_URL = 'https://rotalivre-web.onrender.com';
+
 export async function buscarMeusPendentes(
   getAuthHeader: () => Record<string, string>
 ): Promise<PasseioPendenteDto[]> {
-  const response = await fetch('/api/grupo/meus-pendentes', {
+  const response = await fetch(`${API_BASE_URL}/api/grupo/meus-pendentes`, {
     headers: getAuthHeader()
   });
 
@@ -70,7 +73,7 @@ export async function buscarGrupo(
   idGrupo: number,
   getAuthHeader: () => Record<string, string>
 ): Promise<GrupoDetalhesDto> {
-  const response = await fetch(`/api/grupo/${idGrupo}`, {
+  const response = await fetch(`${API_BASE_URL}/api/grupo/${idGrupo}`, {
     headers: getAuthHeader()
   });
 
@@ -85,7 +88,7 @@ export async function iniciarPasseio(
   idGrupo: number,
   getAuthHeader: () => Record<string, string>
 ): Promise<IniciarPasseioResponse> {
-  const response = await fetch(`/api/grupo/${idGrupo}/iniciar`, {
+  const response = await fetch(`${API_BASE_URL}/api/grupo/${idGrupo}/iniciar`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -102,13 +105,12 @@ export async function iniciarPasseio(
   return data;
 }
 
-
 export async function sairDoGrupo(
   idGrupo: number,
   getAuthHeader: () => Record<string, string>
 ) {
   const response = await fetch(
-    `/api/grupo/${idGrupo}/sair`,
+    `${API_BASE_URL}/api/grupo/${idGrupo}/sair`,
     {
       method: 'POST',
       headers: {
@@ -130,14 +132,13 @@ export async function sairDoGrupo(
   return data;
 }
 
-
 export async function alterarDataGrupo(
   idGrupo: number,
   dataInicio: string,
   getAuthHeader: () => Record<string, string>
 ) {
   const response = await fetch(
-    `/api/grupo/${idGrupo}/data`,
+    `${API_BASE_URL}/api/grupo/${idGrupo}/data`,
     {
       method: 'PUT',
       headers: {
@@ -160,13 +161,12 @@ export async function alterarDataGrupo(
   return data;
 }
 
-
 export async function cancelarGrupo(
   idGrupo: number,
   getAuthHeader: () => Record<string, string>
 ) {
   const response = await fetch(
-    `/api/grupo/${idGrupo}/cancelar`,
+    `${API_BASE_URL}/api/grupo/${idGrupo}/cancelar`,
     {
       method: 'POST',
       headers: {
@@ -188,13 +188,12 @@ export async function cancelarGrupo(
   return data;
 }
 
-
 export async function finalizarPasseio(
   idGrupo: number,
   getAuthHeader: () => Record<string, string>
 ) {
   const response = await fetch(
-    `/api/grupo/${idGrupo}/finalizar`,
+    `${API_BASE_URL}/api/grupo/${idGrupo}/finalizar`,
     {
       method: 'POST',
       headers: {

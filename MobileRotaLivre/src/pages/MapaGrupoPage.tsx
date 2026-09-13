@@ -16,7 +16,8 @@ import { useAuth } from '../context/AuthContext';
 import {
   GrupoDetalhesDto,
   buscarGrupo,
-  iniciarPasseio
+  iniciarPasseio,
+  finalizarPasseio
 } from '../services/grupoService';
 
 import { passeioService } from '../services/passeioService';
@@ -413,7 +414,7 @@ export const MapaGrupoPage: React.FC = () => {
 
           // D) Persistência Periódica na API C# (A cada 45 segundos para poupar o Render/Supabase)
           const agora = Date.now();
-          if (agora - lastSyncTimeRef.current > 45000) {
+          if (agora - lastSyncTimeRef.current > 120000) {
             lastSyncTimeRef.current = agora;
             api.post('/localizacao/sync', {
               idGrupo: grupoId,
@@ -489,6 +490,24 @@ export const MapaGrupoPage: React.FC = () => {
     }
     navigate('/grupos');
   };
+
+  const handleEncerrarPasseio = async () => {
+  if (!grupo) return;
+  
+  const confirmar = window.confirm("Deseja encerrar este passeio definitivamente para todos?");
+  if (!confirmar) return;
+
+  try {
+    // Chama o endpoint da sua GrupoController
+    await finalizarPasseio(grupo.idGrupo, getAuthHeader);
+    
+    // Desconecta e volta pra home
+    handleVoltar(); 
+  } catch (error) {
+    console.error('[AoVivo] Erro ao encerrar:', error);
+    setErrorMsg('Erro ao encerrar o passeio.');
+  }
+};
 
   const formatarData = (data?: string | null) => {
     if (!data) return 'Não definida';
@@ -786,6 +805,17 @@ export const MapaGrupoPage: React.FC = () => {
               <Power className="w-4 h-4" />
               <span>Voltar para Meus Grupos</span>
             </button>
+
+            {grupo.criadorId === getUsuarioId() && (
+  <button
+    onClick={handleEncerrarPasseio}
+    className="w-full bg-rose-600 hover:bg-rose-700 text-white font-extrabold py-4 rounded-2xl text-sm transition shadow-lg flex items-center justify-center gap-2 mt-2"
+  >
+    <Power className="w-5 h-5" />
+    <span>Encerrar Passeio Definitivamente</span>
+  </button>
+)}
+
           </div>
         </>
       )}

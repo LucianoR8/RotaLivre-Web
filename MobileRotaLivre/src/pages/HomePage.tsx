@@ -226,6 +226,43 @@ export const HomePage: React.FC = () => {
 
 
   // ==========================================
+  // RESOLVEDOR UNIVERSAL DE IMAGENS
+  // ==========================================
+  
+  // ==========================================
+  // RESOLVEDOR DE IMAGENS (100% SUPABASE)
+  // ==========================================
+  
+  // Puxa a URL do .env ou usa a que encontrei no seu log como garantia
+  // Puxa a URL do .env ignorando a chatice do TypeScript
+  const SUPABASE_URL = (import.meta as any).env.VITE_SUPABASE_URL || 'https://pylxiwcqkqvxsuhgpacb.supabase.co';
+  // O nome do bucket que você está usando (conforme o seu console log)
+  const BUCKET_NAME = 'fotos-perfil'; 
+
+  const getImageUrl = (url?: string, pasta: 'categorias' | 'passeios' = 'passeios') => {
+    if (!url) {
+      return 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800';
+    }
+
+    // 1. A string já tem a URL do Supabase escondida no meio?
+    const supabaseIndex = url.indexOf('supabase.co');
+    if (supabaseIndex !== -1) {
+      // Recorta exatamente onde começa o "http" do Supabase e descarta o Render
+      const httpIndex = url.lastIndexOf('http', supabaseIndex);
+      return url.substring(httpIndex);
+    }
+
+    // 2. Se a API mandou o link do Render com o nome do arquivo (ex: categoria_123.jpg)
+    // Nós ignoramos o Render, extraímos só o nome do arquivo e montamos a URL pro Supabase.
+    const nomeArquivo = url.split('/').pop();
+    
+    // Define a subpasta dentro do bucket
+    const pastaStorage = pasta === 'categorias' ? 'fotos-categorias' : 'fotos-passeios';
+
+    return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/${pastaStorage}/${nomeArquivo}`;
+  };
+
+  // ==========================================
   // LOADING
   // ==========================================
 
@@ -351,7 +388,7 @@ export const HomePage: React.FC = () => {
 
                     {passeio.imagemUrl && (
                       <img
-                        src={passeio.imagemUrl}
+                        src={getImageUrl(passeio.imagemUrl, 'passeios')}
                         alt={passeio.nome}
                         className="w-12 h-12 rounded-lg object-cover"
                       />
@@ -456,7 +493,7 @@ export const HomePage: React.FC = () => {
             >
 
               <img
-                src={categoria.imgUrl}
+                src={getImageUrl(categoria.imgUrl, 'categorias')}
                 alt={categoria.tipoCategoria}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
@@ -570,7 +607,7 @@ export const HomePage: React.FC = () => {
 
                   {passeio.imagemUrl && (
                     <img
-                      src={passeio.imagemUrl}
+                      src={getImageUrl(passeio.imagemUrl, 'passeios')}
                       alt={passeio.nome}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
@@ -745,7 +782,7 @@ export const HomePage: React.FC = () => {
 
                   {passeio.imagemUrl && (
                     <img
-                      src={passeio.imagemUrl}
+                      src={getImageUrl(passeio.imagemUrl, 'passeios')}
                       alt={passeio.nome}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />

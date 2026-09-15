@@ -106,7 +106,8 @@ Capturas de tela:
 - [Versão Web](docs/screenshots-web.md)
 - [Versão Mobile](docs/screenshots-mobile.md)
 
-Site disponível em: [Rota Livre](https://rotalivre-web.onrender.com/)
+- Site disponível em: [Rota Livre](https://rotalivre-web.onrender.com/)
+- App em formato web sendo desenvolvido em:[App](https://android-bql.pages.dev/)
 
 ---
 

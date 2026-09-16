@@ -8,5 +8,6 @@
         public string Funcionamento { get; set; }
         public string ImagemUrl { get; set; }
         public string Status { get; set; }
+        public EnderecoDto Endereco { get; set; }
     }
 }

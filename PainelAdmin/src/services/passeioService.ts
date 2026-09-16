@@ -278,20 +278,22 @@ export const passeioService = {
     }
 
     const payload = {
-      nome:
-        tour.name?.trim() ?? '',
-
-      categoriaId:
-        Number(tour.categoryId),
-
-      descricao:
-        tour.description?.trim() ?? '',
-
-      funcionamento:
-        tour.operatingDescription
-          ?.trim() ?? '',
-
+      nome: tour.name?.trim() ?? '',
+      categoriaId: Number(tour.categoryId),
+      descricao: tour.description?.trim() ?? '',
+      funcionamento: tour.operatingDescription?.trim() ?? '',
       imagemUrl,
+      // NOVO: Adicionando o mapeamento do endereço e coordenadas
+      endereco: {
+        nomeRua: tour.address?.street ?? '',
+        numeroRua: tour.address?.number ?? '',
+        complemento: tour.address?.complement ?? '',
+        bairro: tour.address?.neighborhood ?? '',
+        cep: tour.address?.zipCode ?? '',
+        latitude: tour.location?.latitude ?? 0,
+        longitude: tour.location?.longitude ?? 0,
+        raioMetros: 500
+      }
     };
 
     console.log('======================================');
@@ -367,25 +369,24 @@ export const passeioService = {
     }
 
     const payload = {
-      nome:
-        tour.name?.trim() ?? '',
-
-      categoriaId:
-        Number(tour.categoryId),
-
-      descricao:
-        tour.description?.trim() ?? '',
-
-      funcionamento:
-        tour.operatingDescription
-          ?.trim() ?? '',
-
+      nome: tour.name?.trim() ?? '',
+      categoriaId: Number(tour.categoryId),
+      descricao: tour.description?.trim() ?? '',
+      funcionamento: tour.operatingDescription?.trim() ?? '',
       imagemUrl,
-
-      status:
-        tour.status ?? 'ativo',
+      status: tour.status ?? 'ativo',
+      // NOVO: Adicionando o mapeamento do endereço e coordenadas
+      endereco: {
+        nomeRua: tour.address?.street ?? '',
+        numeroRua: tour.address?.number ?? '',
+        complemento: tour.address?.complement ?? '',
+        bairro: tour.address?.neighborhood ?? '',
+        cep: tour.address?.zipCode ?? '',
+        latitude: tour.location?.latitude ?? 0,
+        longitude: tour.location?.longitude ?? 0,
+        raioMetros: 500
+      }
     };
-
     console.log('======================================');
     console.log('📤 ATUALIZANDO PASSEIO');
     console.log('ID:', id);

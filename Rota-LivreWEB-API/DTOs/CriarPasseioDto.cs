@@ -7,5 +7,7 @@
         public string Descricao { get; set; }
         public string Funcionamento { get; set; }
         public string ImagemUrl { get; set; }
+
+        public EnderecoDto Endereco { get; set; }
     }
 }

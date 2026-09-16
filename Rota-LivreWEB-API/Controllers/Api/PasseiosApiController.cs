@@ -72,8 +72,7 @@ namespace Rota_LivreWEB_API.Controllers.Api
         // =========================================================
 
         [HttpPost]
-        public async Task<ActionResult> Post(
-            [FromBody] CriarPasseioDto dto)
+        public async Task<ActionResult> Post([FromBody] CriarPasseioDto dto)
         {
             var passeio = new Rota_LivreWEB_API.Models.Passeio
             {
@@ -86,14 +85,29 @@ namespace Rota_LivreWEB_API.Controllers.Api
             };
 
             _context.Passeio.Add(passeio);
+            await _context.SaveChangesAsync(); // Isso gera o id_passeio no banco
 
-            await _context.SaveChangesAsync();
+            // NOVO: Criar o vínculo do Endereço com o Passeio recém-criado
+            if (dto.Endereco != null)
+            {
+                var endereco = new Rota_LivreWEB_API.Models.Endereco
+                {
+                    id_passeio = passeio.id_passeio,
+                    nome_rua = dto.Endereco.NomeRua,
+                    numero_rua = dto.Endereco.NumeroRua,
+                    complemento = dto.Endereco.Complemento ?? "",
+                    bairro = dto.Endereco.Bairro,
+                    cep = dto.Endereco.Cep,
+                    Latitude = dto.Endereco.Latitude,
+                    Longitude = dto.Endereco.Longitude,
+                    RaioMetros = dto.Endereco.RaioMetros > 0 ? dto.Endereco.RaioMetros : 500
+                };
 
-            return CreatedAtAction(
-                nameof(Get),
-                new { id = passeio.id_passeio },
-                passeio
-            );
+                _context.Endereco.Add(endereco);
+                await _context.SaveChangesAsync();
+            }
+
+            return CreatedAtAction(nameof(Get), new { id = passeio.id_passeio }, passeio);
         }
 
         // =========================================================
@@ -219,42 +233,48 @@ namespace Rota_LivreWEB_API.Controllers.Api
 
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> AtualizarPasseio(
-            int id,
-            [FromBody] AtualizarPasseioDto dto)
+        public async Task<IActionResult> AtualizarPasseio(int id, [FromBody] AtualizarPasseioDto dto)
         {
-            var passeio =
-                await _context.Passeio.FindAsync(id);
+            // NOVO: Usar Include para trazer o endereço junto com o passeio
+            var passeio = await _context.Passeio
+                .Include(p => p.Endereco)
+                .FirstOrDefaultAsync(p => p.id_passeio == id);
 
             if (passeio == null)
             {
-                return NotFound(new
-                {
-                    mensagem = "Passeio não encontrado."
-                });
+                return NotFound(new { mensagem = "Passeio não encontrado." });
             }
 
-            var userId =
-                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            // Atualiza dados do passeio
             passeio.nome_passeio = dto.Nome;
             passeio.id_categoria = dto.CategoriaId;
             passeio.descricao = dto.Descricao;
             passeio.funcionamento = dto.Funcionamento;
             passeio.img_url = dto.ImagemUrl;
+            passeio.status = string.IsNullOrWhiteSpace(dto.Status) ? "ativo" : dto.Status;
+            passeio.atualizado_por = userId != null ? int.Parse(userId) : null;
+            passeio.atualizado_em = DateTime.UtcNow;
 
-            passeio.status =
-                string.IsNullOrWhiteSpace(dto.Status)
-                    ? "ativo"
-                    : dto.Status;
+            // NOVO: Atualiza ou Cria os dados do Endereço
+            if (dto.Endereco != null)
+            {
+                if (passeio.Endereco == null)
+                {
+                    // Se o passeio antigo não tinha endereço, cria a relação
+                    passeio.Endereco = new Rota_LivreWEB_API.Models.Endereco { id_passeio = passeio.id_passeio };
+                }
 
-            passeio.atualizado_por =
-                userId != null
-                    ? int.Parse(userId)
-                    : null;
-
-            passeio.atualizado_em =
-                DateTime.UtcNow;
+                passeio.Endereco.nome_rua = dto.Endereco.NomeRua;
+                passeio.Endereco.numero_rua = dto.Endereco.NumeroRua;
+                passeio.Endereco.complemento = dto.Endereco.Complemento ?? "";
+                passeio.Endereco.bairro = dto.Endereco.Bairro;
+                passeio.Endereco.cep = dto.Endereco.Cep;
+                passeio.Endereco.Latitude = dto.Endereco.Latitude;
+                passeio.Endereco.Longitude = dto.Endereco.Longitude;
+                passeio.Endereco.RaioMetros = dto.Endereco.RaioMetros > 0 ? dto.Endereco.RaioMetros : 500;
+            }
 
             await _context.SaveChangesAsync();
 

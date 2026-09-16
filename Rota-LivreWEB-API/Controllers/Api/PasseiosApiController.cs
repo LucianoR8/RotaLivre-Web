@@ -6,6 +6,7 @@ using Rota_LivreWEB_API.Repositories;
 using Rota_LivreWEB_API.Data;
 using System.Security.Claims;
 using System.Net.Http.Headers;
+using Microsoft.EntityFrameworkCore;
 
 namespace Rota_LivreWEB_API.Controllers.Api
 {

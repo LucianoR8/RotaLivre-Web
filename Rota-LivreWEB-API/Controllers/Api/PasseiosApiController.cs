@@ -101,7 +101,9 @@ namespace Rota_LivreWEB_API.Controllers.Api
                     cep = dto.Endereco.Cep,
                     Latitude = dto.Endereco.Latitude,
                     Longitude = dto.Endereco.Longitude,
-                    RaioMetros = dto.Endereco.RaioMetros > 0 ? dto.Endereco.RaioMetros : 500
+                    RaioMetros = dto.Endereco.RaioMetros > 0 ? dto.Endereco.RaioMetros : 500,
+                    cidade = dto.Endereco.Cidade ?? "",
+                    uf = dto.Endereco.Uf ?? "",
                 };
 
                 _context.Endereco.Add(endereco);
@@ -275,6 +277,8 @@ namespace Rota_LivreWEB_API.Controllers.Api
                 passeio.Endereco.Latitude = dto.Endereco.Latitude;
                 passeio.Endereco.Longitude = dto.Endereco.Longitude;
                 passeio.Endereco.RaioMetros = dto.Endereco.RaioMetros > 0 ? dto.Endereco.RaioMetros : 500;
+                passeio.Endereco.uf = dto.Endereco.Uf;
+                passeio.Endereco.cidade = dto.Endereco.Cidade;
             }
 
             await _context.SaveChangesAsync();

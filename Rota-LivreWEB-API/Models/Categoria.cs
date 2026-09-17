@@ -19,6 +19,15 @@ namespace Rota_LivreWEB_API.Models
         [ForeignKey("atualizado_por")]
         public Usuario? AdminAtualizacao { get; set; }
 
+        public int? id_categoria_pai { get; set; }
+
+        [ForeignKey("id_categoria_pai")]
+        public Categoria? CategoriaPai { get; set; }
+
+        // Lista para o Entity Framework trazer as subcategorias automaticamente
+        public ICollection<Categoria> Subcategorias { get; set; } = new List<Categoria>();
+  
+
 
         public Categoria()
         {

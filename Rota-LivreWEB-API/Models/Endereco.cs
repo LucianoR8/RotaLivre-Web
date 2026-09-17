@@ -23,6 +23,9 @@ namespace Rota_LivreWEB_API.Models
         [Column("raio_metros")]
         public int RaioMetros { get; set; } = 500;
 
+        public string? cidade { get; set; }
+        public string? uf { get; set; }
+
         public int id_passeio { get; set; }
     }
 

@@ -59,6 +59,13 @@ namespace Rota_LivreWEB_API.Data
                 entity.HasKey(e => e.id_passeio);
             });
 
+            modelBuilder.Entity<Categoria>()
+                .HasOne(c => c.CategoriaPai)
+                .WithMany(c => c.Subcategorias)
+                .HasForeignKey(c => c.id_categoria_pai)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull); 
+
             modelBuilder.Entity<Grupo>()
                 .HasOne(g => g.Passeio)
                 .WithMany()

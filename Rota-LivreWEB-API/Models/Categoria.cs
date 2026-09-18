@@ -26,7 +26,12 @@ namespace Rota_LivreWEB_API.Models
 
         // Lista para o Entity Framework trazer as subcategorias automaticamente
         public ICollection<Categoria> Subcategorias { get; set; } = new List<Categoria>();
-  
+        public string classificacao { get; set; } = "TEMA";
+
+        // NOVO: Listas para o EF Core navegar no relacionamento N:M
+        public ICollection<CategoriaVinculo> VinculosComoCidade { get; set; } = new List<CategoriaVinculo>();
+        public ICollection<CategoriaVinculo> VinculosComoTema { get; set; } = new List<CategoriaVinculo>();
+
 
 
         public Categoria()

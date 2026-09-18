@@ -24,7 +24,13 @@ namespace Rota_LivreWEB_API.Models
         public bool UsuarioJaCurtiu { get; set; }
         public bool UsuarioJaPendente { get; set; }
 
-        
+
+        // NOVO: Esse representará a CIDADE do passeio (ex: São Paulo)
+        public int? id_cidade { get; set; }
+
+        [ForeignKey("id_cidade")]
+        public Categoria Cidade { get; set; }
+
         public string status { get; set; } = "ativo";
         public int? atualizado_por { get; set; }
         public DateTime? atualizado_em { get; set; }

@@ -64,7 +64,27 @@ namespace Rota_LivreWEB_API.Data
                 .WithMany(c => c.Subcategorias)
                 .HasForeignKey(c => c.id_categoria_pai)
                 .IsRequired(false)
-                .OnDelete(DeleteBehavior.SetNull); 
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Configura a chave composta da tabela intermediária
+            modelBuilder.Entity<CategoriaVinculo>()
+                .HasKey(cv => new { cv.id_cidade, cv.id_tema });
+
+            modelBuilder.Entity<CategoriaVinculo>()
+                .HasOne(cv => cv.Cidade)
+                .WithMany(c => c.VinculosComoCidade)
+                .HasForeignKey(cv => cv.id_cidade);
+
+            modelBuilder.Entity<CategoriaVinculo>()
+                .HasOne(cv => cv.Tema)
+                .WithMany(c => c.VinculosComoTema)
+                .HasForeignKey(cv => cv.id_tema);
+
+            // Configura a nova ligação de Cidade no Passeio
+            modelBuilder.Entity<Passeio>()
+                .HasOne(p => p.Cidade)
+                .WithMany()
+                .HasForeignKey(p => p.id_cidade);
 
             modelBuilder.Entity<Grupo>()
                 .HasOne(g => g.Passeio)

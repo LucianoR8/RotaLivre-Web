@@ -14,6 +14,10 @@ export interface Category {
   tourCount?: number;
   isActive: boolean;
 
+  // NOVO: Adicionando os campos para a nova arquitetura
+  classificacao?: string; // 'CIDADE' ou 'TEMA'
+  cidadesVinculadas?: number[]; // IDs das cidades se for um Tema
+
   audit?: {
     lastEditedBy: string;
     lastEditedAt: string;
@@ -42,8 +46,14 @@ export interface TourAddress {
 export interface Tour {
   id: number;
   name: string;
+  
   categoryId: number;
   categoryName?: string;
+
+  // NOVO: Id da Cidade
+  cityId?: number; 
+  cityName?: string;
+
   photoUrl: string;
   description: string;
   operatingDescription: string;

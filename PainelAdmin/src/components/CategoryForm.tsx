@@ -1,33 +1,17 @@
-import {
-  useState,
-  useEffect,
-  FormEvent,
-  ChangeEvent,
-} from 'react';
-
+import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { Category } from '../types';
-
-import {
-  ArrowLeft,
-  Save,
-  Image as ImageIcon,
-  Upload,
-  History,
-} from 'lucide-react';
+import { ArrowLeft, Save, Image as ImageIcon, Upload, History } from 'lucide-react';
 
 interface CategoryFormProps {
   categoryToEdit: Category | null;
-
-  onSave: (
-    categoryData: Partial<Category>,
-    imageFile?: File | null
-  ) => void;
-
+  categories: Category[]; // NOVO: Traz as categorias para montar os checkboxes
+  onSave: (categoryData: Partial<Category>, imageFile?: File | null) => void;
   onCancel: () => void;
 }
 
 export function CategoryForm({
   categoryToEdit,
+  categories,
   onSave,
   onCancel,
 }: CategoryFormProps) {
@@ -37,63 +21,48 @@ export function CategoryForm({
   // ESTADOS
   // =========================================================
 
-  const [name, setName] = useState(
-    categoryToEdit?.name || ''
+  const [name, setName] = useState(categoryToEdit?.name || '');
+  const [imageUrl, setImageUrl] = useState(categoryToEdit?.imageUrl || '');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState(categoryToEdit?.imageUrl || '');
+  const [isActive, setIsActive] = useState(categoryToEdit?.isActive ?? true);
+
+  // Novos estados para a classificação
+  const [classificacao, setClassificacao] = useState<'CIDADE' | 'TEMA'>(
+    (categoryToEdit?.classificacao as 'CIDADE' | 'TEMA') || 'TEMA'
   );
 
-  const [imageUrl, setImageUrl] = useState(
-    categoryToEdit?.imageUrl || ''
+  const [cidadesVinculadas, setCidadesVinculadas] = useState<number[]>(
+    categoryToEdit?.cidadesVinculadas || []
   );
 
-  const [imageFile, setImageFile] =
-    useState<File | null>(null);
-
-  const [imagePreview, setImagePreview] =
-    useState(
-      categoryToEdit?.imageUrl || ''
-    );
-
-  const [isActive, setIsActive] = useState(
-    categoryToEdit?.isActive ?? true
-  );
+  // Filtra as categorias que são 'CIDADE'
+  const cityCategories = categories?.filter(
+    (c) => c.classificacao === 'CIDADE' && c.id !== categoryToEdit?.id
+  ) || [];
 
   // =========================================================
   // ATUALIZA FORM AO TROCAR CATEGORIA
   // =========================================================
 
   useEffect(() => {
-    setName(
-      categoryToEdit?.name || ''
-    );
-
-    setImageUrl(
-      categoryToEdit?.imageUrl || ''
-    );
-
-    setImagePreview(
-      categoryToEdit?.imageUrl || ''
-    );
-
+    setName(categoryToEdit?.name || '');
+    setImageUrl(categoryToEdit?.imageUrl || '');
+    setImagePreview(categoryToEdit?.imageUrl || '');
     setImageFile(null);
-
-    setIsActive(
-      categoryToEdit?.isActive ?? true
-    );
+    setIsActive(categoryToEdit?.isActive ?? true);
+    setClassificacao((categoryToEdit?.classificacao as 'CIDADE' | 'TEMA') || 'TEMA');
+    setCidadesVinculadas(categoryToEdit?.cidadesVinculadas || []);
   }, [categoryToEdit]);
 
   // =========================================================
-  // SELECIONAR IMAGEM
+  // MÉTODOS DE AÇÃO
   // =========================================================
 
-  const handleImageChange = (
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
-    const file =
-      e.target.files?.[0];
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
 
-    if (!file) {
-      return;
-    }
+    if (!file) return;
 
     console.log('======================================');
     console.log('🖼️ IMAGEM DE CATEGORIA SELECIONADA');
@@ -103,52 +72,42 @@ export function CategoryForm({
     console.log('======================================');
 
     setImageFile(file);
-
-    const previewUrl =
-      URL.createObjectURL(file);
-
+    const previewUrl = URL.createObjectURL(file);
     setImagePreview(previewUrl);
   };
 
-  // =========================================================
-  // SUBMIT
-  // =========================================================
+  const handleToggleCity = (cityId: number) => {
+    setCidadesVinculadas((prev) =>
+      prev.includes(cityId)
+        ? prev.filter((id) => id !== cityId)
+        : [...prev, cityId]
+    );
+  };
 
-  const handleSubmit = (
-    e: FormEvent
-  ) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     if (!name.trim()) {
-      console.warn(
-        '⚠️ Nome da categoria não informado.'
-      );
-
+      console.warn('⚠️ Nome da categoria não informado.');
       return;
     }
 
     const data: Partial<Category> = {
       name: name.trim(),
-
-      imageUrl:
-        imageUrl?.trim() || '',
-
+      imageUrl: imageUrl?.trim() || '',
       isActive,
+      classificacao,
+      // Se for cidade, zera os vínculos. Se for tema, envia as selecionadas
+      cidadesVinculadas: classificacao === 'TEMA' ? cidadesVinculadas : [],
     };
 
     console.log('======================================');
     console.log('📤 CATEGORY FORM ENVIANDO');
     console.log('Dados:', data);
-    console.log(
-      'Arquivo:',
-      imageFile
-    );
+    console.log('Arquivo:', imageFile);
     console.log('======================================');
 
-    onSave(
-      data,
-      imageFile
-    );
+    onSave(data, imageFile);
   };
 
   // =========================================================
@@ -156,19 +115,10 @@ export function CategoryForm({
   // =========================================================
 
   return (
-    <div
-      id="category-form-screen"
-      className="max-w-4xl mx-auto space-y-6"
-    >
-
-      {/* =====================================================
-          CABEÇALHO
-      ====================================================== */}
-
+    <div id="category-form-screen" className="max-w-4xl mx-auto space-y-6">
+      {/* CABEÇALHO */}
       <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-
         <div className="flex items-center gap-3">
-
           <button
             type="button"
             onClick={onCancel}
@@ -177,290 +127,194 @@ export function CategoryForm({
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-
           <div>
-
             <h2 className="text-xl font-extrabold text-slate-800">
-              {isEditing
-                ? 'Editar Categoria'
-                : 'Cadastrar Nova Categoria'}
+              {isEditing ? 'Editar Categoria' : 'Cadastrar Nova Categoria'}
             </h2>
-
             <p className="text-xs text-slate-500 mt-1">
               {isEditing
                 ? 'Atualize as informações da categoria.'
                 : 'Cadastre uma nova categoria de passeios.'}
             </p>
-
           </div>
-
         </div>
-
       </div>
 
-      {/* =====================================================
-          FORMULÁRIO
-      ====================================================== */}
-
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6"
-      >
-
+      {/* FORMULÁRIO */}
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
-
-          {/* =================================================
-              NOME
-          ================================================== */}
-
+          
+          {/* NOME */}
           <div>
-
-            <label
-              htmlFor="category-name"
-              className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2"
-            >
-              Nome da Categoria{' '}
-              <span className="text-[#ff6b6b]">
-                *
-              </span>
+            <label htmlFor="category-name" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              Nome da Categoria <span className="text-[#ff6b6b]">*</span>
             </label>
-
             <input
               id="category-name"
               type="text"
               required
               value={name}
-              onChange={(e) =>
-                setName(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setName(e.target.value)}
               placeholder="Ex.: Museus"
               className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#1a535c] transition-all"
             />
-
           </div>
 
           {/* =================================================
-              UPLOAD DA IMAGEM
+              CLASSIFICAÇÃO E VÍNCULOS
           ================================================== */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                Tipo de Categoria <span className="text-[#ff6b6b]">*</span>
+              </label>
+              <div className="flex gap-4 h-[42px] items-center">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="classificacao"
+                    value="TEMA"
+                    checked={classificacao === 'TEMA'}
+                    onChange={() => setClassificacao('TEMA')}
+                    className="w-4 h-4 text-[#1a535c] border-slate-300 focus:ring-[#4ecdc4]"
+                  />
+                  <span className="text-sm font-medium text-slate-700">Tema / Passeio</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="classificacao"
+                    value="CIDADE"
+                    checked={classificacao === 'CIDADE'}
+                    onChange={() => setClassificacao('CIDADE')}
+                    className="w-4 h-4 text-[#1a535c] border-slate-300 focus:ring-[#4ecdc4]"
+                  />
+                  <span className="text-sm font-medium text-slate-700">Cidade</span>
+                </label>
+              </div>
+            </div>
 
-          <div>
-
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-              Imagem da Categoria{' '}
-              <span className="text-[#ff6b6b]">
-                *
-              </span>
-            </label>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-              {/* SELEÇÃO */}
-
+            {/* Checkboxes aparecem apenas se for um TEMA */}
+            {classificacao === 'TEMA' && (
               <div>
-
-                <label
-                  htmlFor="category-image"
-                  className="w-full min-h-[180px] rounded-xl border-2 border-dashed border-slate-300 hover:border-[#4ecdc4] bg-slate-50 hover:bg-slate-100 flex flex-col items-center justify-center cursor-pointer transition-all"
-                >
-
-                  <div className="p-3 rounded-xl bg-white shadow-sm mb-3">
-
-                    <Upload className="w-6 h-6 text-[#1a535c]" />
-
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                  Pertence a quais cidades?
+                </label>
+                {cityCategories.length === 0 ? (
+                  <p className="text-sm text-slate-500 italic py-2">Nenhuma cidade cadastrada ainda.</p>
+                ) : (
+                  <div className="flex flex-col gap-2 max-h-40 overflow-y-auto p-3 border border-slate-200 rounded-xl bg-slate-50">
+                    {cityCategories.map((city) => (
+                      <label key={city.id} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={cidadesVinculadas.includes(city.id)}
+                          onChange={() => handleToggleCity(city.id)}
+                          className="w-4 h-4 text-[#1a535c] rounded border-slate-300 focus:ring-[#4ecdc4]"
+                        />
+                        <span className="text-sm text-slate-700">{city.name}</span>
+                      </label>
+                    ))}
                   </div>
+                )}
+              </div>
+            )}
+          </div>
 
-                  <span className="text-sm font-bold text-slate-700">
-                    Selecionar imagem
-                  </span>
-
-                  <span className="text-xs text-slate-400 mt-1">
-                    JPG, PNG ou WEBP
-                  </span>
-
+          {/* UPLOAD DA IMAGEM */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              Imagem da Categoria <span className="text-[#ff6b6b]">*</span>
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              
+              {/* SELEÇÃO */}
+              <div>
+                <label htmlFor="category-image" className="w-full min-h-[180px] rounded-xl border-2 border-dashed border-slate-300 hover:border-[#4ecdc4] bg-slate-50 hover:bg-slate-100 flex flex-col items-center justify-center cursor-pointer transition-all">
+                  <div className="p-3 rounded-xl bg-white shadow-sm mb-3">
+                    <Upload className="w-6 h-6 text-[#1a535c]" />
+                  </div>
+                  <span className="text-sm font-bold text-slate-700">Selecionar imagem</span>
+                  <span className="text-xs text-slate-400 mt-1">JPG, PNG ou WEBP</span>
                   {imageFile && (
-
                     <span className="text-xs text-[#1a535c] font-semibold mt-3 px-3 text-center break-all">
                       {imageFile.name}
                     </span>
-
                   )}
-
                 </label>
-
                 <input
                   id="category-image"
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
-                  onChange={
-                    handleImageChange
-                  }
+                  onChange={handleImageChange}
                   className="hidden"
                 />
-
               </div>
 
               {/* PREVIEW */}
-
               <div>
-
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Pré-visualização
-                </p>
-
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pré-visualização</p>
                 <div className="w-full h-[180px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
-
                   {imagePreview ? (
-
                     <img
                       src={imagePreview}
                       alt="Preview da categoria"
                       className="w-full h-full object-cover"
-                      onError={() => {
-                        setImagePreview('');
-                      }}
+                      onError={() => { setImagePreview(''); }}
                     />
-
                   ) : (
-
                     <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
-
                       <ImageIcon className="w-10 h-10 text-slate-300 mb-2" />
-
-                      <span className="text-xs">
-                        Nenhuma imagem selecionada
-                      </span>
-
+                      <span className="text-xs">Nenhuma imagem selecionada</span>
                     </div>
-
                   )}
-
                 </div>
-
               </div>
 
             </div>
-
-            {/* URL ATUAL */}
-
             {imageUrl && !imageFile && (
-
               <p className="text-[11px] text-slate-400 mt-2 break-all">
                 Imagem atual: {imageUrl}
               </p>
-
             )}
-
           </div>
 
-          {/* =================================================
-              STATUS
-          ================================================== */}
-
+          {/* STATUS */}
           <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200">
-
             <div>
-
-              <p className="text-sm font-bold text-slate-700">
-                Categoria ativa
-              </p>
-
-              <p className="text-xs text-slate-500 mt-1">
-                Categorias ativas ficam disponíveis no sistema.
-              </p>
-
+              <p className="text-sm font-bold text-slate-700">Categoria ativa</p>
+              <p className="text-xs text-slate-500 mt-1">Categorias ativas ficam disponíveis no sistema.</p>
             </div>
-
             <button
               type="button"
-              onClick={() =>
-                setIsActive(
-                  !isActive
-                )
-              }
+              onClick={() => setIsActive(!isActive)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                isActive
-                  ? 'bg-[#1a535c]'
-                  : 'bg-slate-300'
+                isActive ? 'bg-[#1a535c]' : 'bg-slate-300'
               }`}
             >
-
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  isActive
-                    ? 'translate-x-6'
-                    : 'translate-x-1'
-                }`}
-              />
-
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                isActive ? 'translate-x-6' : 'translate-x-1'
+              }`} />
             </button>
-
           </div>
-
         </div>
 
-        {/* =====================================================
-            AUDITORIA
-        ====================================================== */}
-
-        {isEditing &&
-          categoryToEdit?.audit && (
-
-            <div className="bg-slate-100/80 rounded-2xl border border-slate-200/80 p-5 flex items-start gap-3.5">
-
-              <div className="p-2 rounded-xl bg-white text-[#1a535c] shadow-sm shrink-0">
-
-                <History className="w-5 h-5" />
-
-              </div>
-
-              <div className="text-xs space-y-1">
-
-                <span className="font-bold text-slate-700 uppercase tracking-wider block">
-                  Registro de Auditoria
-                </span>
-
-                <p className="text-slate-600 font-medium">
-
-                  Última edição por:{' '}
-
-                  <strong className="text-slate-900">
-                    {
-                      categoryToEdit
-                        .audit
-                        .lastEditedBy
-                    }
-                  </strong>
-
-                </p>
-
-                <p className="text-slate-500 font-medium">
-
-                  Em:{' '}
-
-                  <span className="font-semibold text-slate-800">
-                    {
-                      categoryToEdit
-                        .audit
-                        .lastEditedAt
-                    }
-                  </span>
-
-                </p>
-
-              </div>
-
+        {/* AUDITORIA */}
+        {isEditing && categoryToEdit?.audit && (
+          <div className="bg-slate-100/80 rounded-2xl border border-slate-200/80 p-5 flex items-start gap-3.5">
+            <div className="p-2 rounded-xl bg-white text-[#1a535c] shadow-sm shrink-0">
+              <History className="w-5 h-5" />
             </div>
+            <div className="text-xs space-y-1">
+              <span className="font-bold text-slate-700 uppercase tracking-wider block">Registro de Auditoria</span>
+              <p className="text-slate-600 font-medium">Última edição por: <strong className="text-slate-900">{categoryToEdit.audit.lastEditedBy}</strong></p>
+              <p className="text-slate-500 font-medium">Em: <span className="font-semibold text-slate-800">{categoryToEdit.audit.lastEditedAt}</span></p>
+            </div>
+          </div>
+        )}
 
-          )}
-
-        {/* =====================================================
-            BOTÕES
-        ====================================================== */}
-
+        {/* BOTÕES */}
         <div className="flex items-center justify-end gap-3 pt-2">
-
           <button
             type="button"
             onClick={onCancel}
@@ -468,24 +322,15 @@ export function CategoryForm({
           >
             Cancelar
           </button>
-
           <button
             type="submit"
             className="inline-flex items-center gap-2 bg-[#1a535c] hover:bg-[#154249] text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-md transition-all active:scale-98 cursor-pointer"
           >
-
             <Save className="w-4 h-4 text-[#4ecdc4]" />
-
-            <span>
-              Salvar Categoria
-            </span>
-
+            <span>Salvar Categoria</span>
           </button>
-
         </div>
-
       </form>
-
     </div>
   );
 }

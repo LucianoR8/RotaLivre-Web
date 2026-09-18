@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Rota_LivreWEB_API.Data;
 using Rota_LivreWEB_API.Models;
 using System.Net.Http.Headers;
+using Rota_LivreWEB_API.DTOs;
 
 namespace Rota_LivreWEB_API.Controllers.Api
 {

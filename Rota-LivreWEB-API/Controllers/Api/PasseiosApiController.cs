@@ -78,6 +78,7 @@ namespace Rota_LivreWEB_API.Controllers.Api
             var passeio = new Rota_LivreWEB_API.Models.Passeio
             {
                 id_categoria = dto.CategoriaId,
+                id_cidade = dto.CidadeId, // NOVO: Vínculo da cidade salvo no passeio
                 nome_passeio = dto.Nome,
                 descricao = dto.Descricao,
                 funcionamento = dto.Funcionamento,
@@ -253,6 +254,7 @@ namespace Rota_LivreWEB_API.Controllers.Api
             // Atualiza dados do passeio
             passeio.nome_passeio = dto.Nome;
             passeio.id_categoria = dto.CategoriaId;
+            passeio.id_cidade = dto.CidadeId; // NOVO: Atualiza a cidade do passeio
             passeio.descricao = dto.Descricao;
             passeio.funcionamento = dto.Funcionamento;
             passeio.img_url = dto.ImagemUrl;

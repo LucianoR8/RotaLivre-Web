@@ -41,57 +41,33 @@ export const passeioService = {
             // DADOS PRINCIPAIS
             // =========================
 
-            id: Number(
-              p.id_passeio ??
-              p.id ??
-              0
-            ),
+            id: Number(p.id_passeio ?? p.id ?? 0),
 
-            name:
-              p.nome_passeio ??
-              p.nome ??
-              '',
+            name: p.nome_passeio ?? p.nome ?? '',
 
-            description:
-              p.descricao ??
-              '',
+            description: p.descricao ?? '',
 
-            operatingDescription:
-              p.funcionamento ??
-              '',
+            operatingDescription: p.funcionamento ?? '',
 
-            photoUrl:
-              p.img_url ??
-              p.imagemUrl ??
-              p.imagem_url ??
-              '',
+            photoUrl: p.img_url ?? p.imagemUrl ?? p.imagem_url ?? '',
 
-            status:
-              p.status ??
-              'ativo',
+            status: p.status ?? 'ativo',
 
             // =========================
-            // CATEGORIA
+            // CATEGORIA E CIDADE
             // =========================
 
-            categoryId: Number(
-              p.id_categoria ??
-              p.categoriaId ??
-              0
-            ),
+            categoryId: Number(p.id_categoria ?? p.categoriaId ?? 0),
 
-            categoryName:
-              p.categoriaNome ??
-              p.nomeCategoria ??
-              '',
+            categoryName: p.categoriaNome ?? p.nomeCategoria ?? '',
+
+            cityId: Number(p.id_cidade ?? p.cidadeId ?? 0),
 
             // =========================
             // CURTIDAS
             // =========================
 
-            reviewsCount:
-              p.quantidadeCurtidas ??
-              0,
+            reviewsCount: p.quantidadeCurtidas ?? 0,
 
             // =========================
             // ENDEREÇO
@@ -99,25 +75,11 @@ export const passeioService = {
 
             address: endereco
               ? {
-                  street:
-                    endereco.nomeRua ??
-                    '',
-
-                  number:
-                    endereco.numeroRua ??
-                    '',
-
-                  complement:
-                    endereco.complemento ??
-                    '',
-
-                  neighborhood:
-                    endereco.bairro ??
-                    '',
-
-                  zipCode:
-                    endereco.cep ??
-                    '',
+                  street: endereco.nomeRua ?? '',
+                  number: endereco.numeroRua ?? '',
+                  complement: endereco.complemento ?? '',
+                  neighborhood: endereco.bairro ?? '',
+                  zipCode: endereco.cep ?? '',
                 }
               : undefined,
 
@@ -126,14 +88,10 @@ export const passeioService = {
             // =========================
 
             location:
-              latitude != null &&
-              longitude != null
+              latitude != null && longitude != null
                 ? {
-                    latitude:
-                      Number(latitude),
-
-                    longitude:
-                      Number(longitude),
+                    latitude: Number(latitude),
+                    longitude: Number(longitude),
                   }
                 : undefined,
 
@@ -141,66 +99,41 @@ export const passeioService = {
             // DISPONIBILIDADES
             // =========================
 
-            availabilities:
-              Array.isArray(
-                p.availabilities
-              )
-                ? p.availabilities
-                : undefined,
+            availabilities: Array.isArray(p.availabilities)
+              ? p.availabilities
+              : undefined,
 
             // =========================
             // AUDITORIA
             // =========================
 
-            audit:
-              p.atualizado_em
-                ? {
-                    lastEditedBy:
-                      p.adminAtualizacao
-                        ?.nome_completo ??
-                      'Admin',
+            audit: p.atualizado_em
+              ? {
+                  lastEditedBy:
+                    p.adminAtualizacao?.nome_completo ?? 'Admin',
 
-                    lastEditedAt:
-                      new Date(
-                        p.atualizado_em
-                      ).toLocaleString(
-                        'pt-BR'
-                      ),
-                  }
-                : undefined,
+                  lastEditedAt: new Date(p.atualizado_em).toLocaleString(
+                    'pt-BR'
+                  ),
+                }
+              : undefined,
           };
 
           return tour;
         }
       );
 
-      console.log(
-        '🔄 PASSEIOS APÓS CONVERSÃO:'
-      );
-
+      console.log('🔄 PASSEIOS APÓS CONVERSÃO:');
       console.log(passeios);
-
-      console.log(
-        `✅ TOTAL DE PASSEIOS RECEBIDOS: ${passeios.length}`
-      );
+      console.log(`✅ TOTAL DE PASSEIOS RECEBIDOS: ${passeios.length}`);
 
       return passeios;
     } catch (error: any) {
-      console.error(
-        '❌ ERRO AO BUSCAR PASSEIOS:',
-        error
-      );
+      console.error('❌ ERRO AO BUSCAR PASSEIOS:', error);
 
       if (error.response) {
-        console.error(
-          'Status:',
-          error.response.status
-        );
-
-        console.error(
-          'Resposta da API:',
-          error.response.data
-        );
+        console.error('Status:', error.response.status);
+        console.error('Resposta da API:', error.response.data);
       }
 
       throw error;
@@ -212,74 +145,60 @@ export const passeioService = {
   // =========================================================
 
   uploadImagem: async (imagem: File): Promise<string> => {
-  console.log('======================================');
-  console.log('📤 ENVIANDO IMAGEM DO PASSEIO');
-  console.log('Arquivo:', imagem.name);
-  console.log('Tipo:', imagem.type);
-  console.log('Tamanho:', imagem.size);
-  console.log('======================================');
+    console.log('======================================');
+    console.log('📤 ENVIANDO IMAGEM DO PASSEIO');
+    console.log('Arquivo:', imagem.name);
+    console.log('Tipo:', imagem.type);
+    console.log('Tamanho:', imagem.size);
+    console.log('======================================');
 
-  try {
-    const formData = new FormData();
+    try {
+      const formData = new FormData();
 
-    formData.append('imagem', imagem);
+      formData.append('imagem', imagem);
 
-    const response = await api.post(
-      '/PasseiosApi/upload-imagem',
-      formData
-    );
-
-    console.log('✅ IMAGEM ENVIADA COM SUCESSO:');
-    console.log(response.data);
-
-    return response.data.imagemUrl;
-
-  } catch (error: any) {
-    console.error(
-      '❌ ERRO AO ENVIAR IMAGEM:',
-      error
-    );
-
-    if (error.response) {
-      console.error(
-        'Status:',
-        error.response.status
+      const response = await api.post(
+        '/PasseiosApi/upload-imagem',
+        formData
       );
 
-      console.error(
-        'Resposta da API:',
-        error.response.data
-      );
+      console.log('✅ IMAGEM ENVIADA COM SUCESSO:');
+      console.log(response.data);
+
+      return response.data.imagemUrl;
+    } catch (error: any) {
+      console.error('❌ ERRO AO ENVIAR IMAGEM:', error);
+
+      if (error.response) {
+        console.error('Status:', error.response.status);
+        console.error('Resposta da API:', error.response.data);
+      }
+
+      throw error;
     }
+  },
 
-    throw error;
-  }
-},
   // =========================================================
   // CRIAR PASSEIO
   // =========================================================
 
-  criar: async (
-    tour: Partial<Tour>,
-    photoFile?: File | null
-  ) => {
-    let imagemUrl =
-      tour.photoUrl?.trim() ?? '';
+  criar: async (tour: Partial<Tour>, photoFile?: File | null) => {
+    let imagemUrl = tour.photoUrl?.trim() ?? '';
 
     /*
      * Se uma nova imagem foi selecionada,
      * fazemos o upload antes de criar o passeio.
      */
     if (photoFile) {
-      imagemUrl =
-        await passeioService.uploadImagem(
-          photoFile
-        );
+      imagemUrl = await passeioService.uploadImagem(photoFile);
     }
 
     const payload = {
       nome: tour.name?.trim() ?? '',
       categoriaId: Number(tour.categoryId),
+      
+      cidadeId: Number(tour.cityId), // NOVO: Vínculo da cidade enviado pro back
+      
       descricao: tour.description?.trim() ?? '',
       funcionamento: tour.operatingDescription?.trim() ?? '',
       imagemUrl,
@@ -292,8 +211,8 @@ export const passeioService = {
         cep: tour.address?.zipCode ?? '',
         latitude: tour.location?.latitude ?? 0,
         longitude: tour.location?.longitude ?? 0,
-        raioMetros: 500
-      }
+        raioMetros: 500,
+      },
     };
 
     console.log('======================================');
@@ -303,39 +222,21 @@ export const passeioService = {
     console.log('======================================');
 
     try {
-      const response =
-        await api.post(
-          '/PasseiosApi',
-          payload
-        );
+      const response = await api.post('/PasseiosApi', payload);
 
-      console.log(
-        '✅ PASSEIO CRIADO - RESPOSTA DA API:'
-      );
-
+      console.log('✅ PASSEIO CRIADO - RESPOSTA DA API:');
       console.log(response.data);
 
       return response.data;
     } catch (error: any) {
-      console.error(
-        '❌ ERRO AO CRIAR PASSEIO:',
-        error
-      );
+      console.error('❌ ERRO AO CRIAR PASSEIO:', error);
 
       if (error.response) {
         console.error(
           'Resposta completa da API:',
-          JSON.stringify(
-            error.response.data,
-            null,
-            2
-          )
+          JSON.stringify(error.response.data, null, 2)
         );
-
-        console.error(
-          'Status:',
-          error.response.status
-        );
+        console.error('Status:', error.response.status);
       }
 
       throw error;
@@ -351,8 +252,7 @@ export const passeioService = {
     tour: Partial<Tour>,
     photoFile?: File | null
   ) => {
-    let imagemUrl =
-      tour.photoUrl?.trim() ?? '';
+    let imagemUrl = tour.photoUrl?.trim() ?? '';
 
     /*
      * Se uma nova imagem foi selecionada,
@@ -362,15 +262,15 @@ export const passeioService = {
      * removida do Storage.
      */
     if (photoFile) {
-      imagemUrl =
-        await passeioService.uploadImagem(
-          photoFile
-        );
+      imagemUrl = await passeioService.uploadImagem(photoFile);
     }
 
     const payload = {
       nome: tour.name?.trim() ?? '',
       categoriaId: Number(tour.categoryId),
+      
+      cidadeId: Number(tour.cityId), // NOVO: Vínculo da cidade enviado pro back
+      
       descricao: tour.description?.trim() ?? '',
       funcionamento: tour.operatingDescription?.trim() ?? '',
       imagemUrl,
@@ -384,8 +284,8 @@ export const passeioService = {
         cep: tour.address?.zipCode ?? '',
         latitude: tour.location?.latitude ?? 0,
         longitude: tour.location?.longitude ?? 0,
-        raioMetros: 500
-      }
+        raioMetros: 500,
+      },
     };
     console.log('======================================');
     console.log('📤 ATUALIZANDO PASSEIO');
@@ -395,35 +295,18 @@ export const passeioService = {
     console.log('======================================');
 
     try {
-      const response =
-        await api.put(
-          `/PasseiosApi/${id}`,
-          payload
-        );
+      const response = await api.put(`/PasseiosApi/${id}`, payload);
 
-      console.log(
-        '✅ PASSEIO ATUALIZADO - RESPOSTA DA API:'
-      );
-
+      console.log('✅ PASSEIO ATUALIZADO - RESPOSTA DA API:');
       console.log(response.data);
 
       return response.data;
     } catch (error: any) {
-      console.error(
-        '❌ ERRO AO ATUALIZAR PASSEIO:',
-        error
-      );
+      console.error('❌ ERRO AO ATUALIZAR PASSEIO:', error);
 
       if (error.response) {
-        console.error(
-          'Status:',
-          error.response.status
-        );
-
-        console.error(
-          'Resposta:',
-          error.response.data
-        );
+        console.error('Status:', error.response.status);
+        console.error('Resposta:', error.response.data);
       }
 
       throw error;
@@ -434,42 +317,21 @@ export const passeioService = {
   // DELETAR PASSEIO
   // =========================================================
 
-  deletar: async (
-    id: number
-  ) => {
-    console.log(
-      '🗑️ EXCLUINDO PASSEIO:',
-      id
-    );
+  deletar: async (id: number) => {
+    console.log('🗑️ EXCLUINDO PASSEIO:', id);
 
     try {
-      const response =
-        await api.delete(
-          `/PasseiosApi/${id}`
-        );
+      const response = await api.delete(`/PasseiosApi/${id}`);
 
-      console.log(
-        '✅ PASSEIO EXCLUÍDO:',
-        response.data
-      );
+      console.log('✅ PASSEIO EXCLUÍDO:', response.data);
 
       return response.data;
     } catch (error: any) {
-      console.error(
-        '❌ ERRO AO EXCLUIR PASSEIO:',
-        error
-      );
+      console.error('❌ ERRO AO EXCLUIR PASSEIO:', error);
 
       if (error.response) {
-        console.error(
-          'Status:',
-          error.response.status
-        );
-
-        console.error(
-          'Resposta:',
-          error.response.data
-        );
+        console.error('Status:', error.response.status);
+        console.error('Resposta:', error.response.data);
       }
 
       throw error;

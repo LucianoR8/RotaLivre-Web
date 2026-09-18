@@ -24,6 +24,9 @@ namespace Rota_LivreWEB_API.Data
         public DbSet<UsuarioLocalizacao> UsuarioLocalizacao { get; set; }
         public DbSet<PasseioPendente> PasseioPendente { get; set; }
 
+        // NOVO: Adicionando o DbSet da Tabela Intermediária
+        public DbSet<CategoriaVinculo> CategoriaVinculo { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,13 +61,6 @@ namespace Rota_LivreWEB_API.Data
             {
                 entity.HasKey(e => e.id_passeio);
             });
-
-            modelBuilder.Entity<Categoria>()
-                .HasOne(c => c.CategoriaPai)
-                .WithMany(c => c.Subcategorias)
-                .HasForeignKey(c => c.id_categoria_pai)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.SetNull);
 
             // Configura a chave composta da tabela intermediária
             modelBuilder.Entity<CategoriaVinculo>()
@@ -136,8 +132,6 @@ namespace Rota_LivreWEB_API.Data
                 .HasOne(pp => pp.Grupo)
                 .WithMany()
                 .HasForeignKey(pp => pp.id_grupo);
-
         }
-
     }
 }

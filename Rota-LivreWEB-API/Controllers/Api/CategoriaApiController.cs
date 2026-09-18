@@ -26,6 +26,9 @@ namespace Rota_LivreWEB_API.Controllers.Api
         // LISTAR CATEGORIAS
         // =========================================================
 
+        // =========================================================
+        // LISTAR CATEGORIAS
+        // =========================================================
         [HttpGet]
         public async Task<IActionResult> GetCategorias()
         {
@@ -37,11 +40,14 @@ namespace Rota_LivreWEB_API.Controllers.Api
                     tipo_categoria = c.tipo_categoria,
                     img = c.img,
                     ativo = c.ativo,
+                    classificacao = c.classificacao, // Retorna se é CIDADE ou TEMA
                     atualizado_por = c.atualizado_por,
                     atualizado_em = c.atualizado_em,
 
-                    tourCount = _context.Passeio
-                        .Count(p => p.id_categoria == c.id_categoria)
+                    // Traz a lista de IDs das cidades que este tema pertence (para marcar as checkboxes no Front)
+                    cidadesVinculadas = c.VinculosComoTema.Select(v => v.id_cidade).ToList(),
+
+                    tourCount = _context.Passeio.Count(p => p.id_categoria == c.id_categoria)
                 })
                 .ToListAsync();
 
@@ -51,56 +57,81 @@ namespace Rota_LivreWEB_API.Controllers.Api
         // =========================================================
         // CRIAR CATEGORIA
         // =========================================================
-
         [HttpPost]
-        public async Task<IActionResult> CriarCategoria(
-            [FromBody] Categoria categoria)
+        public async Task<IActionResult> CriarCategoria([FromBody] CategoriaDto dto)
         {
-            categoria.atualizado_em = DateTime.UtcNow;
+            var categoria = new Categoria
+            {
+                tipo_categoria = dto.TipoCategoria,
+                img = dto.ImgUrl,
+                ativo = dto.Ativo,
+                classificacao = string.IsNullOrWhiteSpace(dto.Classificacao) ? "TEMA" : dto.Classificacao,
+                atualizado_em = DateTime.UtcNow
+            };
 
             _context.Categoria.Add(categoria);
+            await _context.SaveChangesAsync(); // Gera o ID da categoria nova
 
-            await _context.SaveChangesAsync();
+            // Se for um TEMA e vieram cidades vinculadas, salva na tabela intermediária
+            if (categoria.classificacao == "TEMA" && dto.CidadesVinculadas != null && dto.CidadesVinculadas.Any())
+            {
+                foreach (var idCidade in dto.CidadesVinculadas)
+                {
+                    _context.CategoriaVinculo.Add(new CategoriaVinculo
+                    {
+                        id_tema = categoria.id_categoria,
+                        id_cidade = idCidade
+                    });
+                }
+                await _context.SaveChangesAsync();
+            }
 
-            return CreatedAtAction(
-                nameof(GetCategorias),
-                new { id = categoria.id_categoria },
-                categoria
-            );
+            return CreatedAtAction(nameof(GetCategorias), new { id = categoria.id_categoria }, categoria);
         }
 
         // =========================================================
         // ATUALIZAR CATEGORIA
         // =========================================================
-
         [HttpPut("{id}")]
-        public async Task<IActionResult> AtualizarCategoria(
-            int id,
-            [FromBody] Categoria categoriaAtualizada)
+        public async Task<IActionResult> AtualizarCategoria(int id, [FromBody] CategoriaDto dto)
         {
-            var categoria =
-                await _context.Categoria.FindAsync(id);
+            var categoria = await _context.Categoria
+                .Include(c => c.VinculosComoTema)
+                .FirstOrDefaultAsync(c => c.id_categoria == id);
 
             if (categoria == null)
                 return NotFound();
 
-            categoria.tipo_categoria =
-                categoriaAtualizada.tipo_categoria;
+            categoria.tipo_categoria = dto.TipoCategoria;
+            categoria.img = dto.ImgUrl;
+            categoria.ativo = dto.Ativo;
+            categoria.classificacao = string.IsNullOrWhiteSpace(dto.Classificacao) ? "TEMA" : dto.Classificacao;
+            categoria.atualizado_em = DateTime.UtcNow;
 
-            categoria.img =
-                categoriaAtualizada.img;
+            // Atualiza os vínculos se for um TEMA
+            if (categoria.classificacao == "TEMA")
+            {
+                // 1. Remove os vínculos antigos
+                if (categoria.VinculosComoTema.Any())
+                {
+                    _context.CategoriaVinculo.RemoveRange(categoria.VinculosComoTema);
+                }
 
-            categoria.ativo =
-                categoriaAtualizada.ativo;
-
-            categoria.atualizado_por =
-                categoriaAtualizada.atualizado_por;
-
-            categoria.atualizado_em =
-                DateTime.UtcNow;
+                // 2. Adiciona os novos vínculos selecionados no Front-end
+                if (dto.CidadesVinculadas != null && dto.CidadesVinculadas.Any())
+                {
+                    foreach (var idCidade in dto.CidadesVinculadas)
+                    {
+                        _context.CategoriaVinculo.Add(new CategoriaVinculo
+                        {
+                            id_tema = categoria.id_categoria,
+                            id_cidade = idCidade
+                        });
+                    }
+                }
+            }
 
             await _context.SaveChangesAsync();
-
             return Ok(categoria);
         }
 

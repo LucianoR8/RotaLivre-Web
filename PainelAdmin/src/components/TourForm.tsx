@@ -38,7 +38,7 @@ export function TourForm({
     (tourApiData?.categoriaNome ? themeCategories.find((cat) => cat.name === tourApiData.categoriaNome)?.id : undefined) ??
     (themeCategories.length > 0 ? themeCategories[0].id : 0);
 
-  const initialCityId = tourToEdit?.cityId ?? (cityCategories.length > 0 ? cityCategories[0].id : 0);
+  const initialCityId = tourToEdit?.cityId || 0;
 
   // ============================================================
   // ESTADOS PRINCIPAIS

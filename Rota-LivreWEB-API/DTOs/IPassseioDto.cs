@@ -13,5 +13,7 @@ namespace Rota_LivreWEB_API.DTOs
         public int QuantidadeCurtidas { get; set; }
         public string CategoriaNome { get; set; }
         public int CategoriaId { get; set; }
+        public int? CidadeId { get; set; }
+        public string? CidadeNome { get; set; }
     }
 }

@@ -32,6 +32,7 @@ namespace Rota_LivreWEB_API.Services
 
             var categorias = await _context.Categoria
                 .Where(c => c.ativo) // Garante que só categorias ativas apareçam no App
+                .Include(c => c.VinculosComoTema)
                 .Select(c => new CategoriaDto // ou CategoriaHomeDto dependendo de como está na sua HomeDto
                 {
                     IdCategoria = c.id_categoria,

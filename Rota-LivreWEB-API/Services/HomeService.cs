@@ -27,23 +27,29 @@ namespace Rota_LivreWEB_API.Services
                 );
 
             // =========================================================
-            // CATEGORIAS (AGORA COM CIDADES E TEMAS)
+            // CATEGORIAS (AGORA COM CIDADES E TEMAS - SEGURO)
             // =========================================================
 
-            var categorias = await _context.Categoria
-                .Where(c => c.ativo) // Garante que só categorias ativas apareçam no App
+            // 1. Trazemos os dados para a memória (Garante que o EF Core não vai ignorar os vínculos)
+            var categoriasDb = await _context.Categoria
+                .Where(c => c.ativo)
                 .Include(c => c.VinculosComoTema)
-                .Select(c => new CategoriaDto // ou CategoriaHomeDto dependendo de como está na sua HomeDto
-                {
-                    IdCategoria = c.id_categoria,
-                    TipoCategoria = c.tipo_categoria,
-                    ImgUrl = c.img, // Agora pega o link direto do Supabase salvo no banco
-
-                    // NOVO: Campos vitais para a navegação do App
-                    Classificacao = c.classificacao,
-                    CidadesVinculadas = c.VinculosComoTema.Select(v => v.id_cidade).ToList()
-                })
                 .ToListAsync();
+
+            // 2. Fazemos o mapeamento já com os dados seguros na memória
+            var categorias = categoriasDb.Select(c => new CategoriaDto
+            {
+                IdCategoria = c.id_categoria,
+                TipoCategoria = c.tipo_categoria,
+                ImgUrl = c.img,
+
+                // Trata a classificação para nunca ir nula
+                Classificacao = string.IsNullOrWhiteSpace(c.classificacao) ? "TEMA" : c.classificacao,
+
+                // Mapeia as cidades com 100% de garantia
+                CidadesVinculadas = c.VinculosComoTema.Select(v => v.id_cidade).ToList()
+            })
+            .ToList();
 
             // =========================================================
             // DESTAQUES

@@ -80,7 +80,13 @@ export const HomePage: React.FC = () => {
       });
 
       console.log("✅ CATEGORIAS TRATADAS NO FRONT:", categoriasTratadas);
-
+      console.log("🔍 VÍNCULOS RECEBIDOS DA API:");
+      categoriasTratadas.forEach(c => {
+        if (c.classificacao === 'TEMA') {
+           console.log(`▶ Tema: ${c.tipoCategoria} | Cidades (IDs):`, c.cidadesVinculadas);
+        }
+      });
+      
       setCategorias(categoriasTratadas);
       setDestaques(dados.destaques ?? []);
       setFavoritados(dados.favoritados ?? []);

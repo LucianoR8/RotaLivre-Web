@@ -26,115 +26,71 @@ namespace Rota_LivreWEB_API.Services
                     u => u.id_usuario == usuarioId
                 );
 
-
             // =========================================================
-            // CATEGORIAS
+            // CATEGORIAS (AGORA COM CIDADES E TEMAS)
             // =========================================================
-            //
-            // ATENÇÃO:
-            // Aqui mantemos temporariamente o Render porque
-            // o campo de categoria ainda parece armazenar
-            // somente o nome do arquivo.
-            //
-            // Quando migrarmos as categorias para o Supabase,
-            // trocamos ImgUrl para c.img.
-            //
 
             var categorias = await _context.Categoria
-                .Select(c => new CategoriaDto
+                .Where(c => c.ativo) // Garante que só categorias ativas apareçam no App
+                .Select(c => new CategoriaDto // ou CategoriaHomeDto dependendo de como está na sua HomeDto
                 {
-                    IdCategoria =
-                        c.id_categoria,
+                    IdCategoria = c.id_categoria,
+                    TipoCategoria = c.tipo_categoria,
+                    ImgUrl = c.img, // Agora pega o link direto do Supabase salvo no banco
 
-                    TipoCategoria =
-                        c.tipo_categoria,
-
-                    ImgUrl =
-                        $"https://rotalivre-web.onrender.com/img/categorias/{c.img}"
+                    // NOVO: Campos vitais para a navegação do App
+                    Classificacao = c.classificacao,
+                    CidadesVinculadas = c.VinculosComoTema.Select(v => v.id_cidade).ToList()
                 })
                 .ToListAsync();
-
 
             // =========================================================
             // DESTAQUES
             // =========================================================
-            //
-            // Agora a imagem vem diretamente do banco.
-            // O banco deve conter a URL pública do Supabase.
-            //
 
             var destaques = await _context.Passeio
+                .Where(p => p.status == "ativo") // Garante que passeios inativos não apareçam
                 .Select(p => new PasseioDto
                 {
-                    Id =
-                        p.id_passeio,
+                    Id = p.id_passeio,
+                    Nome = p.nome_passeio,
+                    Descricao = p.descricao,
+                    Funcionamento = p.funcionamento,
+                    ImagemUrl = p.img_url,
 
-                    Nome =
-                        p.nome_passeio,
+                    CategoriaId = p.id_categoria,
+                    CidadeId = p.id_cidade, // Enviando a cidade para o Front
 
-                    Descricao =
-                        p.descricao,
-
-                    Funcionamento =
-                        p.funcionamento,
-
-                    ImagemUrl =
-                        p.img_url,
-
-                    QuantidadeCurtidas =
-                        _context.CurtidaPasseio
-                            .Count(c =>
-                                c.id_passeio ==
-                                p.id_passeio)
+                    QuantidadeCurtidas = _context.CurtidaPasseio
+                            .Count(c => c.id_passeio == p.id_passeio)
                 })
-                .OrderByDescending(
-                    p => p.QuantidadeCurtidas
-                )
+                .OrderByDescending(p => p.QuantidadeCurtidas)
                 .Take(5)
                 .ToListAsync();
-
 
             // =========================================================
             // FAVORITADOS
             // =========================================================
 
-            var favoritados =
-                await _context.CurtidaPasseio
+            var favoritados = await _context.CurtidaPasseio
+                .Where(c => c.id_usuario == usuarioId && c.Passeio.status == "ativo")
+                .Select(c => new PasseioDto
+                {
+                    Id = c.Passeio.id_passeio,
+                    Nome = c.Passeio.nome_passeio,
+                    Descricao = c.Passeio.descricao,
+                    Funcionamento = c.Passeio.funcionamento,
+                    ImagemUrl = c.Passeio.img_url,
 
-                    .Where(c =>
-                        c.id_usuario ==
-                        usuarioId)
+                    CategoriaId = c.Passeio.id_categoria,
+                    CidadeId = c.Passeio.id_cidade, // Enviando a cidade para o Front
 
-                    .Select(c => new PasseioDto
-                    {
-                        Id =
-                            c.Passeio.id_passeio,
+                    QuantidadeCurtidas = _context.CurtidaPasseio
+                            .Count(cp => cp.id_passeio == c.id_passeio),
 
-                        Nome =
-                            c.Passeio.nome_passeio,
-
-                        Descricao =
-                            c.Passeio.descricao,
-
-                        Funcionamento =
-                            c.Passeio.funcionamento,
-
-                        // URL direta do Supabase
-                        ImagemUrl =
-                            c.Passeio.img_url,
-
-                        QuantidadeCurtidas =
-                            _context.CurtidaPasseio
-                                .Count(cp =>
-                                    cp.id_passeio ==
-                                    c.id_passeio),
-
-                        UsuarioJaCurtiu =
-                            true
-                    })
-
-                    .ToListAsync();
-
+                    UsuarioJaCurtiu = true
+                })
+                .ToListAsync();
 
             // =========================================================
             // RETORNO
@@ -142,17 +98,10 @@ namespace Rota_LivreWEB_API.Services
 
             return new HomeDto
             {
-                NomeUsuario =
-                    usuario?.nome_completo,
-
-                Destaques =
-                    destaques,
-
-                Categorias =
-                    categorias,
-
-                Favoritados =
-                    favoritados
+                NomeUsuario = usuario?.nome_completo,
+                Destaques = destaques,
+                Categorias = categorias,
+                Favoritados = favoritados
             };
         }
     }

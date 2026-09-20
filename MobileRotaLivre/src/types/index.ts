@@ -1,3 +1,5 @@
+// src/types/index.ts
+
 export interface Endereco {
   nomeRua: string;
   numeroRua: string;
@@ -36,7 +38,6 @@ export interface Usuario {
   fotoPerfilUrl?: string | null;
 }
 
-
 export interface MembroGrupo {
   id_usuario: number;
   nome: string;
@@ -56,13 +57,10 @@ export interface Grupo {
   membros: MembroGrupo[];
 }
 
-// src/types/index.ts
-
 export interface LoginRequest {
   email: string;
   senha: string;
 }
-
 
 export interface LoginResponse {
   token: string;
@@ -76,14 +74,17 @@ export interface PasseioDto {
   preco?: number;
   funcionamento: string;
   categoriaNome: string;
+  
+  // NOVO: Adicionado suporte para a Cidade
+  cidadeId?: number;
+  cidadeNome?: string;
+  
   imagemUrl?: string;
   usuarioJaCurtiu: boolean;
   usuarioJaPendente?: boolean;
   quantidadeCurtidas: number;
   endereco?: Endereco;
 }
-
-// src/types/index.ts
 
 export interface UsuarioCadastroDto {
   nome: string;
@@ -103,6 +104,10 @@ export interface CategoriaHomeDto {
   idCategoria: number;
   tipoCategoria: string;
   imgUrl: string;
+  
+  // NOVO: Identifica se é Cidade ou Tema e as suas ligações
+  classificacao?: string;
+  cidadesVinculadas?: number[];
 }
 
 export interface PasseioHomeDto {

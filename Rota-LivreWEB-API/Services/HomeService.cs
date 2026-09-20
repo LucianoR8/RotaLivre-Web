@@ -27,16 +27,18 @@ namespace Rota_LivreWEB_API.Services
                 );
 
             // =========================================================
-            // CATEGORIAS (AGORA COM CIDADES E TEMAS - SEGURO)
+            // CATEGORIAS (AGORA COM CIDADES E TEMAS - 100% SEGURO)
             // =========================================================
 
-            // 1. Trazemos os dados para a memória (Garante que o EF Core não vai ignorar os vínculos)
+            // 1. Busca todas as categorias ativas diretamente para a memória
             var categoriasDb = await _context.Categoria
                 .Where(c => c.ativo)
-                .Include(c => c.VinculosComoTema)
                 .ToListAsync();
 
-            // 2. Fazemos o mapeamento já com os dados seguros na memória
+            // 2. Busca TODOS os vínculos da tabela intermediária diretamente!
+            var vinculosDb = await _context.CategoriaVinculo.ToListAsync();
+
+            // 3. Fazemos o mapeamento e o cruzamento manualmente (Impossível o EF Core ignorar)
             var categorias = categoriasDb.Select(c => new CategoriaDto
             {
                 IdCategoria = c.id_categoria,
@@ -46,8 +48,11 @@ namespace Rota_LivreWEB_API.Services
                 // Trata a classificação para nunca ir nula
                 Classificacao = string.IsNullOrWhiteSpace(c.classificacao) ? "TEMA" : c.classificacao,
 
-                // Mapeia as cidades com 100% de garantia
-                CidadesVinculadas = c.VinculosComoTema.Select(v => v.id_cidade).ToList()
+                // Cruza os dados em memória: procura na lista de vínculos onde o tema é esta categoria
+                CidadesVinculadas = vinculosDb
+                    .Where(v => v.id_tema == c.id_categoria)
+                    .Select(v => v.id_cidade)
+                    .ToList()
             })
             .ToList();
 

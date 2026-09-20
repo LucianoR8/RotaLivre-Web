@@ -50,7 +50,7 @@ export const HomePage: React.FC = () => {
   const favoritadosRef = useRef<HTMLDivElement>(null);
 
   // ==========================================
-  // CARREGAR DADOS DA HOME
+  // CARREGAR DADOS DA HOME (BLINDADO)
   // ==========================================
   const carregarDadosHome = async () => {
     try {
@@ -58,13 +58,28 @@ export const HomePage: React.FC = () => {
       setError(null);
       const dados = await homeService.carregarHome();
       
+      console.log("📥 DADOS BRUTOS DA API (HOME):", dados);
+
       setNomeUsuario(dados.nomeUsuario ?? '');
-      // Mapeia para garantir que o Front leia corretamente mesmo se vier nulo da API
-      const categoriasTratadas = (dados.categorias ?? []).map(c => ({
-        ...c,
-        classificacao: c.classificacao ?? 'TEMA',
-        cidadesVinculadas: c.cidadesVinculadas ?? []
-      }));
+      
+      // Mapeamento à prova de balas para garantir que o Front leia corretamente 
+      // mesmo que a API mande os campos com Maiúsculas ou como String.
+      const categoriasTratadas = (dados.categorias ?? []).map((c: any) => {
+        const id = Number(c.idCategoria || c.IdCategoria || c.id_categoria || 0);
+        
+        // Garante que o array de cidades existe e converte tudo para Número
+        const arrayCidadesRaw = c.cidadesVinculadas || c.CidadesVinculadas || [];
+        const arrayCidadesNumeros = Array.isArray(arrayCidadesRaw) ? arrayCidadesRaw.map(Number) : [];
+
+        return {
+          ...c,
+          idCategoria: id,
+          classificacao: c.classificacao || c.Classificacao || 'TEMA',
+          cidadesVinculadas: arrayCidadesNumeros
+        };
+      });
+
+      console.log("✅ CATEGORIAS TRATADAS NO FRONT:", categoriasTratadas);
 
       setCategorias(categoriasTratadas);
       setDestaques(dados.destaques ?? []);
@@ -127,7 +142,7 @@ export const HomePage: React.FC = () => {
   const temasDaCidadeSelecionada = categorias.filter(c => 
     c.classificacao === 'TEMA' && 
     cidadeSelecionada && 
-    c.cidadesVinculadas?.includes(cidadeSelecionada.idCategoria)
+    c.cidadesVinculadas?.includes(Number(cidadeSelecionada.idCategoria))
   );
 
   const selecionarCidade = (cidade: CategoriaHomeDto) => {

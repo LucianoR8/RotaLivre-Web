@@ -439,5 +439,26 @@ namespace Rota_LivreWEB_API.Services
                 throw new Exception($"Supabase retornou {(int)response.StatusCode}: {erro}");
             }
         }
+
+        public async Task<IEnumerable<PasseioDto>> GetByCidadeECategoriaAsync(int cidadeId, int categoriaId)
+        {
+            return await _context.Passeio
+                .Include(p => p.Categoria)
+                .Include(p => p.Cidade)
+                .Where(p => p.id_cidade == cidadeId && p.id_categoria == categoriaId && p.status == "ativo")
+                .Select(p => new PasseioDto
+                {
+                    Id = p.id_passeio,
+                    Nome = p.nome_passeio,
+                    Descricao = p.descricao,
+                    ImagemUrl = p.img_url,
+                    CategoriaId = p.id_categoria,
+                    CategoriaNome = p.Categoria != null ? p.Categoria.tipo_categoria : null,
+                    CidadeId = p.id_cidade,
+                    CidadeNome = p.Cidade != null ? p.Cidade.tipo_categoria : null,
+                    QuantidadeCurtidas = _context.CurtidaPasseio.Count(c => c.id_passeio == p.id_passeio)
+                })
+                .ToListAsync();
+        }
     }
 }

@@ -8,7 +8,6 @@ export const categoriaService = {
   // =========================================================
   // LISTAR CATEGORIAS
   // =========================================================
-
   listar: async (): Promise<Category[]> => {
     try {
       console.log('======================================');
@@ -22,15 +21,11 @@ export const categoriaService = {
       console.log(response.data);
 
       if (!Array.isArray(response.data)) {
-        console.error(
-          '❌ A resposta de categorias não é um array:',
-          response.data
-        );
+        console.error('❌ A resposta de categorias não é um array:', response.data);
         return [];
       }
 
-      const categorias: Category[] = response.data.map(
-        (c: any): Category => ({
+      const categorias: Category[] = response.data.map((c: any): Category => ({
           id: Number(c.id_categoria ?? c.id ?? 0),
           name: c.tipo_categoria ?? c.nome ?? '',
           imageUrl: c.img ?? c.imagemUrl ?? c.imagem_url ?? '',
@@ -72,7 +67,6 @@ export const categoriaService = {
   // =========================================================
   // UPLOAD DA IMAGEM
   // =========================================================
-
   uploadImagem: async (imagem: File): Promise<string> => {
     console.log('======================================');
     console.log('📤 ENVIANDO IMAGEM DA CATEGORIA');
@@ -93,12 +87,10 @@ export const categoriaService = {
       return response.data.imagemUrl;
     } catch (error: any) {
       console.error('❌ ERRO AO ENVIAR IMAGEM DA CATEGORIA:', error);
-
       if (error.response) {
         console.error('Status:', error.response.status);
         console.error('Resposta:', error.response.data);
       }
-
       throw error;
     }
   },
@@ -106,21 +98,16 @@ export const categoriaService = {
   // =========================================================
   // CRIAR CATEGORIA
   // =========================================================
-
   criar: async (categoria: Partial<Category>, photoFile?: File | null) => {
     let imagemUrl = categoria.imageUrl?.trim() ?? '';
 
-    // -------------------------------------------------------
     // UPLOAD
-    // -------------------------------------------------------
     if (photoFile) {
       console.log('📤 Fazendo upload da imagem da nova categoria...');
       imagemUrl = await categoriaService.uploadImagem(photoFile);
     }
 
-    // -------------------------------------------------------
     // PAYLOAD
-    // -------------------------------------------------------
     const payload = {
       TipoCategoria: categoria.name?.trim() ?? '',
       ImgUrl: imagemUrl,
@@ -137,19 +124,15 @@ export const categoriaService = {
 
     try {
       const response = await api.post('/CategoriaApi', payload);
-
       console.log('✅ CATEGORIA CRIADA:');
       console.log(response.data);
-
       return response.data;
     } catch (error: any) {
       console.error('❌ ERRO AO CRIAR CATEGORIA:', error);
-
       if (error.response) {
         console.error('Status:', error.response.status);
         console.error('Resposta:', error.response.data);
       }
-
       throw error;
     }
   },
@@ -157,21 +140,16 @@ export const categoriaService = {
   // =========================================================
   // ATUALIZAR CATEGORIA
   // =========================================================
-
   atualizar: async (id: number, categoria: Partial<Category>, photoFile?: File | null) => {
     let imagemUrl = categoria.imageUrl?.trim() ?? '';
 
-    // -------------------------------------------------------
     // UPLOAD DE NOVA IMAGEM
-    // -------------------------------------------------------
     if (photoFile) {
       console.log('📤 Fazendo upload da nova imagem da categoria...');
       imagemUrl = await categoriaService.uploadImagem(photoFile);
     }
 
-    // -------------------------------------------------------
     // PAYLOAD
-    // -------------------------------------------------------
     const payload = {
       IdCategoria: id,
       TipoCategoria: categoria.name?.trim() ?? '',
@@ -190,19 +168,15 @@ export const categoriaService = {
 
     try {
       const response = await api.put(`/CategoriaApi/${id}`, payload);
-
       console.log('✅ CATEGORIA ATUALIZADA:');
       console.log(response.data);
-
       return response.data;
     } catch (error: any) {
       console.error('❌ ERRO AO ATUALIZAR CATEGORIA:', error);
-
       if (error.response) {
         console.error('Status:', error.response.status);
         console.error('Resposta:', error.response.data);
       }
-
       throw error;
     }
   },
@@ -210,24 +184,19 @@ export const categoriaService = {
   // =========================================================
   // DELETAR CATEGORIA
   // =========================================================
-
   deletar: async (id: number) => {
     console.log('🗑️ EXCLUINDO CATEGORIA:', id);
 
     try {
       const response = await api.delete(`/CategoriaApi/${id}`);
-
       console.log('✅ CATEGORIA EXCLUÍDA:', response.data);
-
       return response.data;
     } catch (error: any) {
       console.error('❌ ERRO AO EXCLUIR CATEGORIA:', error);
-
       if (error.response) {
         console.error('Status:', error.response.status);
         console.error('Resposta:', error.response.data);
       }
-
       throw error;
     }
   },

@@ -27,32 +27,33 @@ namespace Rota_LivreWEB_API.Services
                 );
 
             // =========================================================
-            // CATEGORIAS (AGORA COM CIDADES E TEMAS - 100% SEGURO)
+            // CATEGORIAS (TRUQUE DO TIPO ANÔNIMO PARA FORÇAR O JOIN)
             // =========================================================
 
-            // 1. Busca todas as categorias ativas diretamente para a memória
+            // 1. O EF Core funciona na perfeição quando projetamos para tipos anônimos
             var categoriasDb = await _context.Categoria
                 .Where(c => c.ativo)
+                .Select(c => new
+                {
+                    c.id_categoria,
+                    c.tipo_categoria,
+                    c.img,
+                    c.classificacao,
+                    c.ativo,
+                    // Aqui o EF Core não tem como falhar
+                    IdsCidades = c.VinculosComoTema.Select(v => v.id_cidade).ToList()
+                })
                 .ToListAsync();
 
-            // 2. Busca TODOS os vínculos da tabela intermediária diretamente!
-            var vinculosDb = await _context.CategoriaVinculo.ToListAsync();
-
-            // 3. Fazemos o mapeamento e o cruzamento manualmente (Impossível o EF Core ignorar)
+            // 2. Agora mapeamos para o DTO na memória do servidor
             var categorias = categoriasDb.Select(c => new CategoriaDto
             {
                 IdCategoria = c.id_categoria,
                 TipoCategoria = c.tipo_categoria,
                 ImgUrl = c.img,
-
-                // Trata a classificação para nunca ir nula
+                Ativo = c.ativo,
                 Classificacao = string.IsNullOrWhiteSpace(c.classificacao) ? "TEMA" : c.classificacao,
-
-                // Cruza os dados em memória: procura na lista de vínculos onde o tema é esta categoria
-                CidadesVinculadas = vinculosDb
-                    .Where(v => v.id_tema == c.id_categoria)
-                    .Select(v => v.id_cidade)
-                    .ToList()
+                CidadesVinculadas = c.IdsCidades
             })
             .ToList();
 
@@ -61,7 +62,7 @@ namespace Rota_LivreWEB_API.Services
             // =========================================================
 
             var destaques = await _context.Passeio
-                .Where(p => p.status == "ativo") // Garante que passeios inativos não apareçam
+                .Where(p => p.status == "ativo")
                 .Select(p => new PasseioDto
                 {
                     Id = p.id_passeio,
@@ -71,7 +72,7 @@ namespace Rota_LivreWEB_API.Services
                     ImagemUrl = p.img_url,
 
                     CategoriaId = p.id_categoria,
-                    CidadeId = p.id_cidade, // Enviando a cidade para o Front
+                    CidadeId = p.id_cidade,
 
                     QuantidadeCurtidas = _context.CurtidaPasseio
                             .Count(c => c.id_passeio == p.id_passeio)
@@ -95,7 +96,7 @@ namespace Rota_LivreWEB_API.Services
                     ImagemUrl = c.Passeio.img_url,
 
                     CategoriaId = c.Passeio.id_categoria,
-                    CidadeId = c.Passeio.id_cidade, // Enviando a cidade para o Front
+                    CidadeId = c.Passeio.id_cidade,
 
                     QuantidadeCurtidas = _context.CurtidaPasseio
                             .Count(cp => cp.id_passeio == c.id_passeio),

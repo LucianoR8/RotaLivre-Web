@@ -27,19 +27,22 @@ namespace Rota_LivreWEB_API.Services
                 );
 
             // =========================================================
-            // CATEGORIAS (CRUZAMENTO SEGURO EM MEMÓRIA)
+            // CATEGORIAS (DEDUÇÃO INTELIGENTE ATRAVÉS DOS PASSEIOS)
             // =========================================================
 
-            // 1. Buscamos todas as categorias ativas e guardamos na memória
+            // 1. Buscamos todas as categorias ativas
             var categoriasDb = await _context.Categoria
                 .Where(c => c.ativo)
                 .ToListAsync();
 
-            // 2. Buscamos TODOS os vínculos diretamente da tabela intermediária
-            var vinculosDb = await _context.CategoriaVinculo.ToListAsync();
+            // 2. Buscamos TODOS os passeios ativos para deduzir as ligações
+            // Trazemos apenas id_cidade e id_categoria para a consulta ser ultra rápida
+            var passeiosDb = await _context.Passeio
+                .Where(p => p.status == "ativo" && p.id_cidade != null && p.id_categoria != null)
+                .Select(p => new { p.id_cidade, p.id_categoria })
+                .ToListAsync();
 
-            // 3. Mapeamos para o DTO e cruzamos os dados manualmente. 
-            // Como fazemos isto em memória, o Entity Framework não consegue ignorar os vínculos.
+            // 3. Mapeamos as categorias e o C# deduz os vínculos automaticamente!
             var categorias = categoriasDb.Select(c => new CategoriaDto
             {
                 IdCategoria = c.id_categoria,
@@ -48,11 +51,16 @@ namespace Rota_LivreWEB_API.Services
                 Ativo = c.ativo,
                 Classificacao = string.IsNullOrWhiteSpace(c.classificacao) ? "TEMA" : c.classificacao,
 
-                // Onde o id do tema no vínculo for igual ao id desta categoria, extrai o id da cidade
-                CidadesVinculadas = vinculosDb
-                    .Where(v => v.id_tema == c.id_categoria)
-                    .Select(v => v.id_cidade)
-                    .ToList()
+                // A MÁGICA ACONTECE AQUI:
+                // Se a categoria for um TEMA, procura nos passeios todas as cidades 
+                // que têm passeios vinculados a este tema. Pega apenas os IDs únicos (Distinct).
+                CidadesVinculadas = (string.IsNullOrWhiteSpace(c.classificacao) ? "TEMA" : c.classificacao) == "TEMA"
+                    ? passeiosDb
+                        .Where(p => p.id_categoria == c.id_categoria && p.id_cidade.HasValue)
+                        .Select(p => p.id_cidade.Value)
+                        .Distinct()
+                        .ToList()
+                    : new List<int>()
             })
             .ToList();
 

@@ -27,25 +27,19 @@ namespace Rota_LivreWEB_API.Services
                 );
 
             // =========================================================
-            // CATEGORIAS (TRUQUE DO TIPO ANÔNIMO PARA FORÇAR O JOIN)
+            // CATEGORIAS (CRUZAMENTO SEGURO EM MEMÓRIA)
             // =========================================================
 
-            // 1. O EF Core funciona na perfeição quando projetamos para tipos anônimos
+            // 1. Buscamos todas as categorias ativas e guardamos na memória
             var categoriasDb = await _context.Categoria
                 .Where(c => c.ativo)
-                .Select(c => new
-                {
-                    c.id_categoria,
-                    c.tipo_categoria,
-                    c.img,
-                    c.classificacao,
-                    c.ativo,
-                    // Aqui o EF Core não tem como falhar
-                    IdsCidades = c.VinculosComoTema.Select(v => v.id_cidade).ToList()
-                })
                 .ToListAsync();
 
-            // 2. Agora mapeamos para o DTO na memória do servidor
+            // 2. Buscamos TODOS os vínculos diretamente da tabela intermediária
+            var vinculosDb = await _context.CategoriaVinculo.ToListAsync();
+
+            // 3. Mapeamos para o DTO e cruzamos os dados manualmente. 
+            // Como fazemos isto em memória, o Entity Framework não consegue ignorar os vínculos.
             var categorias = categoriasDb.Select(c => new CategoriaDto
             {
                 IdCategoria = c.id_categoria,
@@ -53,7 +47,12 @@ namespace Rota_LivreWEB_API.Services
                 ImgUrl = c.img,
                 Ativo = c.ativo,
                 Classificacao = string.IsNullOrWhiteSpace(c.classificacao) ? "TEMA" : c.classificacao,
-                CidadesVinculadas = c.IdsCidades
+
+                // Onde o id do tema no vínculo for igual ao id desta categoria, extrai o id da cidade
+                CidadesVinculadas = vinculosDb
+                    .Where(v => v.id_tema == c.id_categoria)
+                    .Select(v => v.id_cidade)
+                    .ToList()
             })
             .ToList();
 

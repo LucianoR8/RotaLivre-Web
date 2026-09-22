@@ -8,7 +8,6 @@ import {
   Heart,
   MapPin,
   Tag,
-  Trophy,
   ArrowRight,
   Sparkles,
   ChevronLeft,
@@ -287,7 +286,7 @@ export const HomePage: React.FC = () => {
       <section className="my-10 animate-fadeIn">
         
         {/* NAVEGAÇÃO / CABEÇALHO */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <h2 className="text-2xl font-bold text-[#1a535c] flex items-center gap-2">
             {!cidadeSelecionada && <><MapPin className="w-7 h-7 text-[#ff6b6b] animate-bounce-slow" /> Destinos Disponíveis</>}
             {cidadeSelecionada && !temaSelecionado && <><Compass className="w-7 h-7 text-[#ff6b6b] animate-bounce-slow" /> O que fazer em {cidadeSelecionada.tipoCategoria}?</>}
@@ -297,7 +296,7 @@ export const HomePage: React.FC = () => {
           {cidadeSelecionada && (
             <button
               onClick={temaSelecionado ? voltarParaTemas : voltarParaCidades}
-              className="flex items-center gap-2 text-sm font-bold text-[#1a535c] bg-[#1a535c]/10 px-4 py-2 rounded-full hover:bg-[#1a535c]/20 transition-colors"
+              className="flex items-center gap-2 text-sm font-bold text-[#1a535c] bg-[#1a535c]/10 px-4 py-2 rounded-full hover:bg-[#1a535c]/20 transition-colors whitespace-nowrap"
             >
               <ArrowLeft className="w-4 h-4" />
               {temaSelecionado ? 'Escolher outro tema' : 'Trocar de cidade'}
@@ -305,14 +304,14 @@ export const HomePage: React.FC = () => {
           )}
 
           {!cidadeSelecionada && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 self-end sm:self-auto">
               <button onClick={() => scroll(categoriasRef, -320)} className="p-2.5 rounded-full bg-white text-[#1a535c] border border-slate-200 hover:bg-[#4ecdc4] hover:text-white transition shadow-sm"><ChevronLeft className="w-5 h-5" /></button>
               <button onClick={() => scroll(categoriasRef, 320)} className="p-2.5 rounded-full bg-white text-[#1a535c] border border-slate-200 hover:bg-[#4ecdc4] hover:text-white transition shadow-sm"><ChevronRight className="w-5 h-5" /></button>
             </div>
           )}
         </div>
 
-        {/* PASSO 1: MOSTRAR CIDADES */}
+        {/* PASSO 1: MOSTRAR CIDADES (Mantido como carrossel horizontal) */}
         {!cidadeSelecionada && (
           <div ref={categoriasRef} className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory py-2 px-0.5">
             {cidadesDisponiveis.map(cidade => (
@@ -336,15 +335,15 @@ export const HomePage: React.FC = () => {
           </div>
         )}
 
-        {/* PASSO 2: MOSTRAR TEMAS VINCULADOS À CIDADE */}
+        {/* PASSO 2: MOSTRAR TEMAS VINCULADOS À CIDADE (Agora em grelha responsiva) */}
         {cidadeSelecionada && !temaSelecionado && (
-          <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory py-2 px-0.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-2">
             {temasDaCidadeSelecionada.length > 0 ? (
               temasDaCidadeSelecionada.map(tema => (
                 <div
                   key={tema.idCategoria}
                   onClick={() => selecionarTema(tema)}
-                  className="group relative h-64 w-[75vw] max-w-[260px] shrink-0 snap-start rounded-3xl overflow-hidden shadow-md bg-white transition-all duration-300 hover:shadow-xl cursor-pointer"
+                  className="group relative h-64 w-full rounded-3xl overflow-hidden shadow-md bg-white transition-all duration-300 hover:shadow-xl cursor-pointer"
                 >
                   <img src={getImageUrl(tema.imgUrl, 'categorias')} alt={tema.tipoCategoria} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1a535c]/90 via-[#1a535c]/40 to-transparent" />
@@ -359,7 +358,7 @@ export const HomePage: React.FC = () => {
                 </div>
               ))
             ) : (
-              <div className="w-full text-center py-10 bg-slate-50 rounded-3xl border border-slate-100">
+              <div className="w-full col-span-full text-center py-10 bg-slate-50 rounded-3xl border border-slate-100">
                 <Compass className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                 <p className="text-slate-500 font-medium">Ainda não há roteiros registados para {cidadeSelecionada.tipoCategoria}.</p>
               </div>
@@ -367,22 +366,30 @@ export const HomePage: React.FC = () => {
           </div>
         )}
 
-        {/* PASSO 3: MOSTRAR PASSEIOS DAQUELE TEMA NESSA CIDADE */}
+        {/* PASSO 3: MOSTRAR PASSEIOS DAQUELE TEMA NESSA CIDADE (Agora com o mesmo design dos destaques) */}
         {cidadeSelecionada && temaSelecionado && (
           <div>
             {carregandoFiltro ? (
               <p className="text-center py-10 text-slate-500 font-semibold animate-pulse">A procurar as melhores opções...</p>
             ) : passeiosFiltrados.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-2">
                 {passeiosFiltrados.map(passeio => (
-                  <div key={passeio.id} onClick={() => navigate(`/passeio/${passeio.id}`)} className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-slate-100 flex items-center">
-                    <img src={getImageUrl(passeio.imagemUrl, 'passeios')} alt={passeio.nome} className="w-32 h-32 object-cover" />
-                    <div className="p-4 flex-1">
-                      <h4 className="font-bold text-[#1a535c] line-clamp-1">{passeio.nome}</h4>
-                      <p className="text-xs text-slate-500 line-clamp-2 mt-1">{passeio.descricao}</p>
-                      <div className="mt-3 flex items-center justify-between text-xs text-[#ff6b6b] font-bold">
-                        <span className="flex items-center gap-1"><Heart className="w-3.5 h-3.5 fill-current" /> {passeio.quantidadeCurtidas || 0}</span>
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <div key={passeio.id} onClick={() => navigate(`/passeio/${passeio.id}`)} className="group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-slate-100 flex flex-col h-full">
+                    <div className="relative h-52 shrink-0 overflow-hidden">
+                      {passeio.imagemUrl && <img src={getImageUrl(passeio.imagemUrl, 'passeios')} alt={passeio.nome} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />}
+                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-[#ff6b6b] flex items-center gap-1 shadow-sm">
+                        <Heart className="w-3.5 h-3.5 fill-current" /><span>{passeio.quantidadeCurtidas || 0}</span>
+                      </div>
+                    </div>
+                    <div className="p-6 flex flex-col flex-1">
+                      <h3 className="text-xl font-bold text-[#1a535c] flex items-center gap-2 mb-2">
+                        <MapPin className="w-5 h-5 text-[#ff6b6b] shrink-0" /><span className="line-clamp-1">{passeio.nome}</span>
+                      </h3>
+                      <p className="text-xs text-slate-500 line-clamp-3 mb-4 flex-1">{passeio.descricao}</p>
+                      
+                      {/* Opcional: botão/indicador extra no final do card para convidar o clique */}
+                      <div className="pt-2 border-t border-slate-100 text-xs font-bold text-[#4ecdc4] flex items-center gap-1 group-hover:text-[#1a535c] transition-colors mt-auto">
+                        Ver detalhes do passeio <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
                   </div>
@@ -414,15 +421,15 @@ export const HomePage: React.FC = () => {
             {destaques.map(passeio => {
               const porcentagem = maxCurtidas > 0 ? Math.round((passeio.quantidadeCurtidas * 100) / maxCurtidas) : 0;
               return (
-                <div key={passeio.id} onClick={() => navigate(`/passeio/${passeio.id}`)} className="group w-[78vw] max-w-[270px] shrink-0 snap-start bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-slate-100">
-                  <div className="relative h-52 overflow-hidden">
+                <div key={passeio.id} onClick={() => navigate(`/passeio/${passeio.id}`)} className="group w-[78vw] max-w-[270px] shrink-0 snap-start bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-slate-100 flex flex-col">
+                  <div className="relative h-52 shrink-0 overflow-hidden">
                     {passeio.imagemUrl && <img src={getImageUrl(passeio.imagemUrl, 'passeios')} alt={passeio.nome} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />}
                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-[#ff6b6b] flex items-center gap-1 shadow-sm"><Heart className="w-3.5 h-3.5 fill-current" /><span>{passeio.quantidadeCurtidas}</span></div>
                   </div>
-                  <div className="p-6">
+                  <div className="p-6 flex flex-col flex-1">
                     <h3 className="text-xl font-bold text-[#1a535c] flex items-center gap-2 mb-2"><MapPin className="w-5 h-5 text-[#ff6b6b] shrink-0" /><span className="truncate">{passeio.nome}</span></h3>
-                    <p className="text-xs text-slate-500 line-clamp-2 mb-4">{passeio.descricao}</p>
-                    <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                    <p className="text-xs text-slate-500 line-clamp-2 mb-4 flex-1">{passeio.descricao}</p>
+                    <div className="space-y-1.5 pt-2 border-t border-slate-100 mt-auto">
                       <div className="flex items-center justify-between text-xs font-semibold text-[#1a535c]">
                         <span className="flex items-center gap-1"><Heart className="w-4 h-4 text-[#ff6b6b] fill-current" /> {passeio.quantidadeCurtidas} curtidas</span>
                         <span className="text-slate-400 font-medium">{porcentagem}% do topo</span>
@@ -448,14 +455,14 @@ export const HomePage: React.FC = () => {
           {favoritados.length > 0 ? (
             <div ref={favoritadosRef} className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory py-2 px-0.5">
               {favoritados.map(passeio => (
-                <div key={passeio.id} onClick={() => navigate(`/passeio/${passeio.id}`)} className="group w-[78vw] max-w-[270px] shrink-0 snap-start bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-slate-100">
-                  <div className="relative h-52 overflow-hidden">
+                <div key={passeio.id} onClick={() => navigate(`/passeio/${passeio.id}`)} className="group w-[78vw] max-w-[270px] shrink-0 snap-start bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-slate-100 flex flex-col">
+                  <div className="relative h-52 shrink-0 overflow-hidden">
                     {passeio.imagemUrl && <img src={getImageUrl(passeio.imagemUrl, 'passeios')} alt={passeio.nome} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />}
                     <button type="button" onClick={(e) => handleToggleCurtida(e, passeio.id)} className="absolute top-3 right-3 p-2.5 rounded-full bg-[#ff6b6b] text-white transition shadow-md hover:scale-110"><Heart className="w-5 h-5 fill-current" /></button>
                   </div>
-                  <div className="p-6">
+                  <div className="p-6 flex flex-col flex-1">
                     <h3 className="text-xl font-bold text-[#1a535c] flex items-center gap-2 mb-2"><MapPin className="w-5 h-5 text-[#ff6b6b] shrink-0" /><span className="truncate">{passeio.nome}</span></h3>
-                    <p className="text-xs text-slate-500 line-clamp-2 mb-4">{passeio.descricao}</p>
+                    <p className="text-xs text-slate-500 line-clamp-2 mb-4 flex-1">{passeio.descricao}</p>
                   </div>
                 </div>
               ))}

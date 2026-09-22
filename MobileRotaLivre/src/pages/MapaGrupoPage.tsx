@@ -42,7 +42,9 @@ import {
   ChevronRight,
   CalendarDays,
   AlertTriangle,
-  ShieldCheck
+  ShieldCheck,
+  Maximize,
+  Minimize
 } from 'lucide-react';
 
 import L from 'leaflet';
@@ -78,7 +80,7 @@ interface PeerLocation {
 }
 
 // =========================================================
-// ÍCONES CUSTOMIZADOS LEAFLET (SEM BUGS DE IMAGEM DO ASSET)
+// ÍCONES CUSTOMIZADOS LEAFLET
 // =========================================================
 
 const criarIconeUsuario = (nome: string, isMe: boolean, dentroDaArea: boolean = true) => {
@@ -128,14 +130,16 @@ export const MapaGrupoPage: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState('');
 
   // =======================================================
-  // ESTADOS DE GPS E GEOFENCING
+  // ESTADOS DE GPS E GEOFENCING E TELA CHEIA
   // =======================================================
 
   const [minhaPosicao, setMinhaPosicao] = useState<{ lat: number; lng: number } | null>(null);
   const [dentroDoPerimetro, setDentroDoPerimetro] = useState<boolean | null>(null);
   const [distanciaDoCentro, setDistanciaDoCentro] = useState<number | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Referências Leaflet e Marcadores
+  const mapWrapperRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMap = useRef<L.Map | null>(null);
   const myMarkerRef = useRef<L.Marker | null>(null);
@@ -163,6 +167,37 @@ export const MapaGrupoPage: React.FC = () => {
     if (!paramId) return null;
     const numero = Number(paramId);
     return Number.isFinite(numero) ? numero : null;
+  };
+
+  // =======================================================
+  // CONTROLE DE TELA CHEIA (FULLSCREEN)
+  // =======================================================
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isFull = !!document.fullscreenElement;
+      setIsFullscreen(isFull);
+      
+      // Força o Leaflet a recalcular o tamanho do mapa após entrar ou sair da tela cheia
+      setTimeout(() => {
+        if (leafletMap.current) {
+          leafletMap.current.invalidateSize();
+        }
+      }, 200);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      mapWrapperRef.current?.requestFullscreen().catch(err => {
+        console.warn(`Erro ao tentar abrir tela cheia: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
   };
 
   // =======================================================
@@ -217,7 +252,6 @@ export const MapaGrupoPage: React.FC = () => {
       setGrupo(data);
       sessionStorage.setItem('activeLiveGrupoId', String(idFinal));
 
-      // Busca dados completos do passeio para obter latitude/longitude do perímetro
       if (data.idPasseio) {
         try {
           const passeioDados = await passeioService.buscarPorId(data.idPasseio);
@@ -266,7 +300,6 @@ export const MapaGrupoPage: React.FC = () => {
   useEffect(() => {
     if (!mapRef.current || leafletMap.current) return;
 
-    // Coordenada inicial (São Paulo como padrão enquanto o GPS carrega)
     const initialLat = passeioCompleto?.endereco?.latitude ?? -23.5874;
     const initialLng = passeioCompleto?.endereco?.longitude ?? -46.6576;
 
@@ -294,35 +327,39 @@ export const MapaGrupoPage: React.FC = () => {
   }, [mapRef.current]);
 
   // =======================================================
-  // DESENHAR PERÍMETRO DO PASSEIO (GEOFENCE VISUAL)
+  // DESENHAR E ATUALIZAR PERÍMETRO DO PASSEIO BLINDADO
   // =======================================================
 
   useEffect(() => {
     if (!leafletMap.current || !passeioCompleto?.endereco) return;
 
-    const { latitude, longitude, raioMetros } = passeioCompleto.endereco;
+    const lat = Number(passeioCompleto.endereco.latitude);
+    const lng = Number(passeioCompleto.endereco.longitude);
+    const raio = Number(passeioCompleto.endereco.raioMetros) || 400;
 
-    if (latitude && longitude) {
-      const raio = raioMetros ?? 400;
+    if (!isNaN(lat) && !isNaN(lng)) {
+      const isFora = dentroDoPerimetro === false;
+      const corHex = isFora ? '#ef4444' : '#4ecdc4';
 
-      // Remove círculo anterior se houver
       if (circlePerimetroRef.current) {
-        circlePerimetroRef.current.remove();
+        circlePerimetroRef.current.setStyle({
+          color: corHex,
+          fillColor: corHex
+        });
+      } else {
+        circlePerimetroRef.current = L.circle([lat, lng], {
+          radius: raio,
+          color: corHex,
+          fillColor: corHex,
+          fillOpacity: 0.12,
+          weight: 2,
+          dashArray: '5, 5'
+        }).addTo(leafletMap.current);
+
+        leafletMap.current.setView([lat, lng], 15);
       }
-
-      // Adiciona círculo do perímetro do passeio
-      circlePerimetroRef.current = L.circle([latitude, longitude], {
-        radius: raio,
-        color: '#4ecdc4',
-        fillColor: '#4ecdc4',
-        fillOpacity: 0.12,
-        weight: 2,
-        dashArray: '5, 5'
-      }).addTo(leafletMap.current);
-
-      leafletMap.current.setView([latitude, longitude], 15);
     }
-  }, [passeioCompleto]);
+  }, [passeioCompleto, dentroDoPerimetro]);
 
   // =======================================================
   // SUPABASE REALTIME (BROADCAST) + GPS NATIVO
@@ -334,7 +371,6 @@ export const MapaGrupoPage: React.FC = () => {
 
     if (!grupoId || !meuId) return;
 
-    // 1. Canal do Supabase Realtime
     const channelName = `grupo_localizacao_${grupoId}`;
     const channel = supabase.channel(channelName);
 
@@ -343,7 +379,6 @@ export const MapaGrupoPage: React.FC = () => {
         const peer: PeerLocation = payload.payload;
         if (!peer || peer.idUsuario === meuId) return;
 
-        // Atualiza ou cria marcador do amigo no Leaflet
         if (leafletMap.current) {
           let marker = friendsMarkersRef.current.get(peer.idUsuario);
 
@@ -360,7 +395,6 @@ export const MapaGrupoPage: React.FC = () => {
       })
       .subscribe();
 
-    // 2. Rastreamento de GPS do Navegador
     let watchId: number | null = null;
 
     if ('geolocation' in navigator) {
@@ -371,35 +405,41 @@ export const MapaGrupoPage: React.FC = () => {
 
           setMinhaPosicao({ lat, lng });
 
-          // A) Atualiza Marcador Pessoal no Leaflet
-          if (leafletMap.current) {
-            const nomeUsuario = (usuario as any)?.nome_completo || (usuario as any)?.nome || 'Eu';
-
-            if (myMarkerRef.current) {
-              myMarkerRef.current.setLatLng([lat, lng]);
-            } else {
-              myMarkerRef.current = L.marker([lat, lng], {
-                icon: criarIconeUsuario(nomeUsuario, true)
-              }).addTo(leafletMap.current);
-            }
-          }
-
-          // B) Cálculo de Geofencing (Geolib)
+          // CÁLCULO DE GEOFENCING (GEOLIB) IMEDIATO
+          let isDentro = true;
+          let dist = 0;
+          
           if (passeioCompleto?.endereco?.latitude && passeioCompleto?.endereco?.longitude) {
-            const dist = getDistance(
+            dist = getDistance(
               { latitude: lat, longitude: lng },
               {
-                latitude: passeioCompleto.endereco.latitude,
-                longitude: passeioCompleto.endereco.longitude
+                latitude: Number(passeioCompleto.endereco.latitude),
+                longitude: Number(passeioCompleto.endereco.longitude)
               }
             );
 
             setDistanciaDoCentro(dist);
-            const raioMaximo = passeioCompleto.endereco.raioMetros ?? 400;
-            setDentroDoPerimetro(dist <= raioMaximo);
+            const raioMaximo = Number(passeioCompleto.endereco.raioMetros) || 400;
+            isDentro = dist <= raioMaximo;
+            setDentroDoPerimetro(isDentro);
           }
 
-          // C) Supabase Broadcast (Em memória, super rápido)
+          // ATUALIZA MARCADOR PESSOAL NO LEAFLET COM A COR CORRETA
+          if (leafletMap.current) {
+            const nomeUsuario = (usuario as any)?.nome_completo || (usuario as any)?.nome || 'Eu';
+            
+            const novoIcone = criarIconeUsuario(nomeUsuario, true, isDentro);
+
+            if (myMarkerRef.current) {
+              myMarkerRef.current.setLatLng([lat, lng]);
+              myMarkerRef.current.setIcon(novoIcone);
+            } else {
+              myMarkerRef.current = L.marker([lat, lng], {
+                icon: novoIcone
+              }).addTo(leafletMap.current);
+            }
+          }
+
           channel.send({
             type: 'broadcast',
             event: 'posicao',
@@ -412,7 +452,6 @@ export const MapaGrupoPage: React.FC = () => {
             }
           });
 
-          // D) Persistência Periódica na API C# (A cada 45 segundos para poupar o Render/Supabase)
           const agora = Date.now();
           if (agora - lastSyncTimeRef.current > 120000) {
             lastSyncTimeRef.current = agora;
@@ -438,7 +477,6 @@ export const MapaGrupoPage: React.FC = () => {
       if (watchId !== null) navigator.geolocation.clearWatch(watchId);
       supabase.removeChannel(channel);
 
-      // Limpa marcadores de amigos ao sair
       friendsMarkersRef.current.forEach(m => m.remove());
       friendsMarkersRef.current.clear();
       if (myMarkerRef.current) {
@@ -449,7 +487,7 @@ export const MapaGrupoPage: React.FC = () => {
   }, [grupo?.idGrupo, usuario, passeioCompleto]);
 
   // =======================================================
-  // INICIAR PASSEIO
+  // INICIAR PASSEIO E OUTRAS FUNÇÕES MANTIDAS
   // =======================================================
 
   const handleIniciarPasseio = async () => {
@@ -492,27 +530,18 @@ export const MapaGrupoPage: React.FC = () => {
   };
 
   const handleEncerrarPasseio = async () => {
-  if (!grupo) return;
-  
-  const confirmar = window.confirm("Deseja encerrar este passeio definitivamente para todos?");
-  if (!confirmar) return;
-
-  try {
-    // Chama o endpoint da sua GrupoController
-    await finalizarPasseio(grupo.idGrupo, getAuthHeader);
+    if (!grupo) return;
     
-    // Desconecta e volta pra home
-    handleVoltar(); 
-  } catch (error) {
-    console.error('[AoVivo] Erro ao encerrar:', error);
-    setErrorMsg('Erro ao encerrar o passeio.');
-  }
-};
+    const confirmar = window.confirm("Deseja encerrar este passeio definitivamente para todos?");
+    if (!confirmar) return;
 
-  const formatarData = (data?: string | null) => {
-    if (!data) return 'Não definida';
-    const date = new Date(data);
-    return Number.isNaN(date.getTime()) ? data : date.toLocaleDateString('pt-BR');
+    try {
+      await finalizarPasseio(grupo.idGrupo, getAuthHeader);
+      handleVoltar(); 
+    } catch (error) {
+      console.error('[AoVivo] Erro ao encerrar:', error);
+      setErrorMsg('Erro ao encerrar o passeio.');
+    }
   };
 
   // =======================================================
@@ -686,10 +715,26 @@ export const MapaGrupoPage: React.FC = () => {
               </span>
             </div>
 
+            {/* WRAPPER DO MAPA COM O BOTÃO TELA CHEIA */}
             <div
-              ref={mapRef}
-              className="w-full h-80 rounded-2xl overflow-hidden shadow-inner border border-slate-100"
-            />
+              ref={mapWrapperRef}
+              className={`relative w-full bg-slate-100 transition-all ${
+                isFullscreen 
+                  ? 'h-screen rounded-none z-[9999]' 
+                  : 'h-80 rounded-2xl overflow-hidden shadow-inner border border-slate-100'
+              }`}
+            >
+              <div ref={mapRef} className="w-full h-full" />
+              
+              <button
+                onClick={toggleFullscreen}
+                type="button"
+                className="absolute bottom-4 right-4 z-[1000] bg-white p-2.5 rounded-xl shadow-lg text-[#1a535c] hover:bg-[#4ecdc4] hover:text-white transition-colors border border-slate-200"
+                title={isFullscreen ? "Sair da Tela Cheia" : "Tela Cheia"}
+              >
+                {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+              </button>
+            </div>
 
             {/* STATUS DO GEOFENCING */}
             <div className="mt-3">
@@ -807,15 +852,14 @@ export const MapaGrupoPage: React.FC = () => {
             </button>
 
             {grupo.criadorId === getUsuarioId() && (
-  <button
-    onClick={handleEncerrarPasseio}
-    className="w-full bg-rose-600 hover:bg-rose-700 text-white font-extrabold py-4 rounded-2xl text-sm transition shadow-lg flex items-center justify-center gap-2 mt-2"
-  >
-    <Power className="w-5 h-5" />
-    <span>Encerrar Passeio Definitivamente</span>
-  </button>
-)}
-
+              <button
+                onClick={handleEncerrarPasseio}
+                className="w-full bg-rose-600 hover:bg-rose-700 text-white font-extrabold py-4 rounded-2xl text-sm transition shadow-lg flex items-center justify-center gap-2 mt-2"
+              >
+                <Power className="w-5 h-5" />
+                <span>Encerrar Passeio Definitivamente</span>
+              </button>
+            )}
           </div>
         </>
       )}

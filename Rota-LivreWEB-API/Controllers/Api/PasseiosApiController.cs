@@ -436,9 +436,13 @@ namespace Rota_LivreWEB_API.Controllers.Api
             });
         }
 
-        public async Task<IEnumerable<PasseioDto>> GetByCidadeECategoriaAsync(int cidadeId, int categoriaId)
+        // =========================================================
+        // BUSCAR PASSEIOS POR CIDADE E CATEGORIA (TEMA) AQUI! 🚨
+        // =========================================================
+        [HttpGet("cidade/{cidadeId}/categoria/{categoriaId}")]
+        public async Task<IActionResult> GetByCidadeECategoriaAsync(int cidadeId, int categoriaId)
         {
-            return await _context.Passeio
+            var passeios = await _context.Passeio
                 .Include(p => p.Categoria)
                 .Include(p => p.Cidade)
                 .Where(p => p.id_cidade == cidadeId && p.id_categoria == categoriaId && p.status == "ativo")
@@ -455,6 +459,8 @@ namespace Rota_LivreWEB_API.Controllers.Api
                     QuantidadeCurtidas = _context.CurtidaPasseio.Count(c => c.id_passeio == p.id_passeio)
                 })
                 .ToListAsync();
+
+            return Ok(passeios);
         }
     }
 }

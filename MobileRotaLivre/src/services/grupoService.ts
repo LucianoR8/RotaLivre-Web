@@ -5,6 +5,7 @@ export interface PasseioPendenteDto {
   codigoConvite: string;
   status: string;
   dataInicio?: string;
+  dataFim?: string; // ADICIONADO AQUI
   criadorId: number;
   passeio: {
     id: number;
@@ -30,6 +31,7 @@ export interface GrupoDetalhesDto {
 
   dataCriacao: string;
   dataInicio?: string;
+  dataFim?: string; // ADICIONADO AQUI
 
   criadorId: number;
 
@@ -52,7 +54,7 @@ export interface IniciarPasseioResponse {
   dataInicioGrupo: string;
 }
 
-// ADICIONADO: URL Base do Backend
+// URL Base do Backend
 const API_BASE_URL = 'https://rotalivre-web.onrender.com';
 
 export async function buscarMeusPendentes(

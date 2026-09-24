@@ -450,67 +450,7 @@ export function TourForm({
           </div>
         </div>
 
-        {/* DISPONIBILIDADES */}
-        <div id="section-availability" className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-[#1a535c]/10 text-[#1a535c]">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-800">4. Disponibilidade de Horários</h3>
-                <p className="text-xs text-slate-500">Datas e horários disponíveis para o passeio</p>
-              </div>
-            </div>
-            <button type="button" onClick={handleAddAvailabilityBlock} className="inline-flex items-center gap-2 px-3 py-2 bg-[#1a535c] hover:bg-[#154249] text-white text-xs font-bold rounded-xl transition-colors">
-              <Plus className="w-4 h-4" /> Adicionar data
-            </button>
-          </div>
-
-          {availabilities.length === 0 && (
-            <div className="py-8 text-center text-sm text-slate-400">Nenhuma data de disponibilidade cadastrada.</div>
-          )}
-
-          <div className="space-y-4">
-            {availabilities.map((block) => (
-              <div key={block.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Data</label>
-                    <input type="date" value={block.date} onChange={(e) => handleUpdateBlockDate(block.id, e.target.value)} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm" />
-                  </div>
-                  <button type="button" onClick={() => handleRemoveAvailabilityBlock(block.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="mt-4">
-                  <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Horários</label>
-                  <div className="flex flex-wrap gap-2">
-                    {block.timeSlots.map((slot) => (
-                      <div key={slot} className="inline-flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700">
-                        {slot}
-                        <button type="button" onClick={() => handleRemoveTimeSlot(block.id, slot)} className="text-red-400 hover:text-red-600">
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <input type="time" value={newTimeInputs[block.id] || ''} onChange={(e) => setNewTimeInputs({ ...newTimeInputs, [block.id]: e.target.value })} className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm" />
-                    <button type="button" onClick={() => handleAddTimeSlot(block.id)} className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100">
-                      <Plus className="w-3.5 h-3.5" /> Adicionar
-                    </button>
-                    <button type="button" onClick={() => handleApplyPresetTimes(block.id, ['09:00', '12:00', '14:00', '16:00'])} className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100">
-                      Horários comuns
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        
 
         {/* AUDITORIA */}
         {isEditing && tourToEdit?.audit && (

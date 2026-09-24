@@ -18,14 +18,14 @@ namespace Rota_LivreWEB_API.Controllers.Api
         }
 
         [HttpGet]
-        public async Task<ActionResult> Get()
+        public async Task<ActionResult> Get([FromQuery] double? lat, [FromQuery] double? lng)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (userId == null)
                 return Unauthorized();
 
-            var home = await _service.GetHomeAsync(int.Parse(userId));
+            var home = await _service.GetHomeAsync(int.Parse(userId), lat, lng);
 
             return Ok(home);
         }

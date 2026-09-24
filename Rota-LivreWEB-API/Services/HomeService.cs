@@ -15,7 +15,7 @@ namespace Rota_LivreWEB_API.Services
             _context = context;
         }
 
-        public async Task<HomeDto> GetHomeAsync(int usuarioId)
+        public async Task<HomeDto> GetHomeAsync(int usuarioId, double? lat = null, double? lng = null)
         {
             // =========================================================
             // USUÁRIO
@@ -65,11 +65,55 @@ namespace Rota_LivreWEB_API.Services
             .ToList();
 
             // =========================================================
-            // DESTAQUES
+            // DESTAQUES (FILTRADOS POR LOCALIZAÇÃO)
             // =========================================================
 
-            var destaques = await _context.Passeio
-                .Where(p => p.status == "ativo")
+            int? cidadeIdDestaque = null;
+
+            // Se o Front-end enviou o GPS do usuário
+            if (lat.HasValue && lng.HasValue)
+            {
+                // Busca apenas as coordenadas dos passeios ativos na memória (ultra rápido)
+                // Onde garantimos que Latitude e Longitude não são nulas e convertemos para double puro
+                var passeiosCoords = await _context.Passeio
+                    .Where(p => p.status == "ativo"
+                             && p.id_cidade != null
+                             && p.Endereco != null
+                             && p.Endereco.Latitude != null
+                             && p.Endereco.Longitude != null)
+                    .Select(p => new
+                    {
+                        p.id_cidade,
+                        Latitude = (double)p.Endereco.Latitude,
+                        Longitude = (double)p.Endereco.Longitude
+                    })
+                    .ToListAsync();
+
+                if (passeiosCoords.Any())
+                {
+                    // Descobre matematicamente qual é a cidade com o passeio mais próximo do usuário
+                    var maisProximo = passeiosCoords
+                        .OrderBy(p => Math.Pow(p.Latitude - lat.Value, 2) + Math.Pow(p.Longitude - lng.Value, 2))
+                        .FirstOrDefault();
+
+                    if (maisProximo != null)
+                    {
+                        cidadeIdDestaque = maisProximo.id_cidade;
+                    }
+                }
+            }
+
+            // Inicia a query base dos destaques
+            var queryDestaques = _context.Passeio.Where(p => p.status == "ativo");
+
+            // Se encontrou uma cidade próxima, filtra só para essa cidade. 
+            // Senão, traz o Top 5 global.
+            if (cidadeIdDestaque.HasValue)
+            {
+                queryDestaques = queryDestaques.Where(p => p.id_cidade == cidadeIdDestaque.Value);
+            }
+
+            var destaques = await queryDestaques
                 .Select(p => new PasseioDto
                 {
                     Id = p.id_passeio,
@@ -77,12 +121,9 @@ namespace Rota_LivreWEB_API.Services
                     Descricao = p.descricao,
                     Funcionamento = p.funcionamento,
                     ImagemUrl = p.img_url,
-
                     CategoriaId = p.id_categoria,
                     CidadeId = p.id_cidade,
-
-                    QuantidadeCurtidas = _context.CurtidaPasseio
-                            .Count(c => c.id_passeio == p.id_passeio)
+                    QuantidadeCurtidas = _context.CurtidaPasseio.Count(c => c.id_passeio == p.id_passeio)
                 })
                 .OrderByDescending(p => p.QuantidadeCurtidas)
                 .Take(5)

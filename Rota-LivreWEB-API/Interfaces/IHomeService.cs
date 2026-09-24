@@ -5,6 +5,6 @@ namespace Rota_LivreWEB_API.Interfaces
 {
     public interface IHomeService
     {
-        Task<HomeDto> GetHomeAsync(int usuarioId);
+        Task<HomeDto> GetHomeAsync(int usuarioId, double? lat = null, double? lng = null);
     }
 }

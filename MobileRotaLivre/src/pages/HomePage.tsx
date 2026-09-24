@@ -51,11 +51,11 @@ export const HomePage: React.FC = () => {
   // ==========================================
   // CARREGAR DADOS DA HOME
   // ==========================================
-  const carregarDadosHome = async () => {
+  const carregarDadosHome = async (lat?: number, lng?: number) => {
     try {
       setLoading(true);
       setError(null);
-      const dados = await homeService.carregarHome();
+      const dados = await homeService.carregarHome(lat, lng);
       
       setNomeUsuario(dados.nomeUsuario ?? '');
       
@@ -87,7 +87,24 @@ export const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
-    carregarDadosHome();
+    // Tenta obter a localização do GPS do usuário primeiro
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          // Usuário permitiu! Carrega a Home com os dados da cidade dele
+          carregarDadosHome(pos.coords.latitude, pos.coords.longitude);
+        },
+        (err) => {
+          // Usuário negou o GPS ou falhou. Carrega a Home global (fallback).
+          console.warn("GPS negado ou indisponível. Carregando destaques globais.", err);
+          carregarDadosHome();
+        },
+        { timeout: 7000 } // Dá 7 segundos para o GPS responder
+      );
+    } else {
+      // Navegador não suporta GPS
+      carregarDadosHome();
+    }
   }, []);
 
   const scroll = (ref: React.RefObject<HTMLDivElement | null>, offset: number) => {
@@ -199,7 +216,7 @@ export const HomePage: React.FC = () => {
         <div className="bg-white rounded-3xl shadow-lg p-8 text-center max-w-md">
           <h2 className="text-xl font-bold text-red-600 mb-3">Erro ao carregar a Home</h2>
           <p className="text-slate-600 mb-6">{error}</p>
-          <button onClick={carregarDadosHome} className="px-6 py-3 rounded-full bg-[#1a535c] text-white font-bold">
+          <button onClick={() => carregarDadosHome()} className="px-6 py-3 rounded-full bg-[#1a535c] text-white font-bold">
             Tentar novamente
           </button>
         </div>

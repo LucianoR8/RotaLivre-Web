@@ -346,54 +346,7 @@ export function ToursList({
                         </span>
                       </td>
 
-                      {/* Agenda */}
-                      <td className="py-4 px-4 lg:px-6 hidden lg:table-cell">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-4 h-4 text-[#4ecdc4]" />
-
-                          <span className="text-xs font-semibold text-slate-700">
-                            {tour
-                              .availabilities
-                              ?.length ||
-                              0}{' '}
-                            datas cadastradas
-                          </span>
-                        </div>
-
-                        <div className="flex flex-wrap gap-1 mt-1 max-w-[180px]">
-                          {tour.availabilities
-                            ?.slice(0, 2)
-                            .map(
-                              (
-                                av,
-                                idx
-                              ) => (
-                                <span
-                                  key={
-                                    idx
-                                  }
-                                  className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono font-medium"
-                                >
-                                  {av.date
-                                    .split(
-                                      '-'
-                                    )
-                                    .reverse()
-                                    .join(
-                                      '/'
-                                    )}{' '}
-                                  (
-                                  {
-                                    av
-                                      .timeSlots
-                                      .length
-                                  }{' '}
-                                  horários)
-                                </span>
-                              )
-                            )}
-                        </div>
-                      </td>
+                      
 
                       {/* Ações */}
                       <td className="py-4 px-4 lg:px-6 text-right">

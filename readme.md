@@ -128,13 +128,7 @@ Utilidades/
 ---
 ## Próximas Funcionalidades
 
-* Autenticação JWT
-* Melhorias no sistema de localização
-* Geofencing
-* Melhorias de usabilidade
-* Novas funcionalidades para gerenciamento de passeios
-* Implementação de painel admnistrativo
-* Mudança de escopo para funcionalidade de passeios pendentes
+* Sistema de notificações para alertas durante o passeio
 
 ---
 

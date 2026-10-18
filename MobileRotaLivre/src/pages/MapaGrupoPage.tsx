@@ -21,6 +21,7 @@ import {
 } from '../services/grupoService';
 
 import { passeioService } from '../services/passeioService';
+import { notificationService } from '../services/notificationService';
 import { api } from '../services/api';
 import { supabase } from '../services/supabaseClient';
 import { PasseioDto } from '../types';
@@ -79,6 +80,15 @@ interface PeerLocation {
   timestamp: number;
 }
 
+interface AlertaGeofencePayload {
+  idGrupo: number;
+  nomeGrupo: string;
+  idUsuario: number;
+  nome: string;
+  distancia?: number;
+  timestamp: number;
+}
+
 // =========================================================
 // ÍCONES CUSTOMIZADOS LEAFLET
 // =========================================================
@@ -130,15 +140,16 @@ export const MapaGrupoPage: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState('');
 
   // =======================================================
-  // ESTADOS DE GPS E GEOFENCING E TELA CHEIA
+  // ESTADOS DE GPS, GEOFENCING, NOTIFICAÇÃO E TELA CHEIA
   // =======================================================
 
   const [minhaPosicao, setMinhaPosicao] = useState<{ lat: number; lng: number } | null>(null);
   const [dentroDoPerimetro, setDentroDoPerimetro] = useState<boolean | null>(null);
   const [distanciaDoCentro, setDistanciaDoCentro] = useState<number | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [alertaSaidaColega, setAlertaSaidaColega] = useState<string | null>(null);
 
-  // Referências Leaflet e Marcadores
+  // Referências Leaflet, Marcadores e Memória de Perímetro
   const mapWrapperRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMap = useRef<L.Map | null>(null);
@@ -146,6 +157,9 @@ export const MapaGrupoPage: React.FC = () => {
   const friendsMarkersRef = useRef<Map<number, L.Marker>>(new Map());
   const circlePerimetroRef = useRef<L.Circle | null>(null);
   const lastSyncTimeRef = useRef<number>(0);
+
+  // Guarda se o usuário JÁ ESTEVE dentro da área neste grupo específico
+  const estavaDentroRef = useRef<boolean>(false);
 
   // =======================================================
   // IDENTIFICAÇÃO DO USUÁRIO
@@ -246,6 +260,11 @@ export const MapaGrupoPage: React.FC = () => {
 
     setLoading(true);
     setErrorMsg('');
+    setAlertaSaidaColega(null);
+
+    // Zera a memória de perímetro ao trocar de grupo para garantir isolamento total
+    estavaDentroRef.current = false;
+    setDentroDoPerimetro(null);
 
     try {
       const data = await buscarGrupo(idFinal, getAuthHeader);
@@ -274,6 +293,9 @@ export const MapaGrupoPage: React.FC = () => {
   // =======================================================
 
   useEffect(() => {
+    notificationService.inicializar();
+    notificationService.pedirPermissao();
+
     const inicializar = async () => {
       const ativos = await carregarGruposAoVivo();
       const grupoId = getGrupoId();
@@ -342,6 +364,8 @@ export const MapaGrupoPage: React.FC = () => {
       const corHex = isFora ? '#ef4444' : '#4ecdc4';
 
       if (circlePerimetroRef.current) {
+        circlePerimetroRef.current.setLatLng([lat, lng]);
+        circlePerimetroRef.current.setRadius(raio);
         circlePerimetroRef.current.setStyle({
           color: corHex,
           fillColor: corHex
@@ -362,15 +386,20 @@ export const MapaGrupoPage: React.FC = () => {
   }, [passeioCompleto, dentroDoPerimetro]);
 
   // =======================================================
-  // SUPABASE REALTIME (BROADCAST) + GPS NATIVO
+  // SUPABASE REALTIME (BROADCAST) + GPS NATIVO + NOTIFICAÇÕES
   // =======================================================
 
   useEffect(() => {
     const grupoId = grupo?.idGrupo;
+    const nomeGrupoAtual = grupo?.nome || `Grupo #${grupoId}`;
     const meuId = getUsuarioId();
 
     if (!grupoId || !meuId) return;
 
+    // Reseta o estado de "estava dentro" sempre que o canal do grupo inicia
+    estavaDentroRef.current = false;
+
+    // Canal exclusivo deste grupo (isolado de todos os outros grupos)
     const channelName = `grupo_localizacao_${grupoId}`;
     const channel = supabase.channel(channelName);
 
@@ -393,6 +422,27 @@ export const MapaGrupoPage: React.FC = () => {
           }
         }
       })
+      .on('broadcast', { event: 'alerta_geofence' }, (payload) => {
+        const alerta: AlertaGeofencePayload = payload.payload;
+        
+        // Confirmação dupla de isolamento: mesmo grupo e não sou eu mesmo
+        if (!alerta || alerta.idGrupo !== grupoId || alerta.idUsuario === meuId) return;
+
+        const msg = `${alerta.nome} acabou de sair da área do passeio!`;
+
+        // 1. Dispara a notificação nativa no telemóvel / navegador
+        notificationService.disparar(
+          `⚠️ [${alerta.nomeGrupo}] Fora da Área!`,
+          msg,
+          `geofence_exit_grupo_${grupoId}_user_${alerta.idUsuario}_${alerta.timestamp}`
+        );
+
+        // 2. Exibe alerta visual no topo do mapa por 8 segundos
+        setAlertaSaidaColega(`⚠️ [${alerta.nomeGrupo}] ${msg}`);
+        setTimeout(() => {
+          setAlertaSaidaColega(prev => (prev === `⚠️ [${alerta.nomeGrupo}] ${msg}` ? null : prev));
+        }, 8000);
+      })
       .subscribe();
 
     let watchId: number | null = null;
@@ -404,6 +454,8 @@ export const MapaGrupoPage: React.FC = () => {
           const lng = pos.coords.longitude;
 
           setMinhaPosicao({ lat, lng });
+
+          const nomeUsuario = (usuario as any)?.nome_completo || (usuario as any)?.nome || 'Integrante';
 
           // CÁLCULO DE GEOFENCING (GEOLIB) IMEDIATO
           let isDentro = true;
@@ -422,12 +474,32 @@ export const MapaGrupoPage: React.FC = () => {
             const raioMaximo = Number(passeioCompleto.endereco.raioMetros) || 400;
             isDentro = dist <= raioMaximo;
             setDentroDoPerimetro(isDentro);
+
+            // LÓGICA: ESTAVA DENTRO DA ÁREA E ACABOU DE SAIR
+            if (isDentro) {
+              estavaDentroRef.current = true;
+            } else if (!isDentro && estavaDentroRef.current === true) {
+              // Marca como falso para não disparar repetidamente enquanto caminha fora
+              estavaDentroRef.current = false;
+
+              // Avisa todos os integrantes DESTE grupo específico
+              channel.send({
+                type: 'broadcast',
+                event: 'alerta_geofence',
+                payload: {
+                  idGrupo: grupoId,
+                  nomeGrupo: nomeGrupoAtual,
+                  idUsuario: meuId,
+                  nome: nomeUsuario,
+                  distancia: dist,
+                  timestamp: Date.now()
+                } as AlertaGeofencePayload
+              });
+            }
           }
 
           // ATUALIZA MARCADOR PESSOAL NO LEAFLET COM A COR CORRETA
           if (leafletMap.current) {
-            const nomeUsuario = (usuario as any)?.nome_completo || (usuario as any)?.nome || 'Eu';
-            
             const novoIcone = criarIconeUsuario(nomeUsuario, true, isDentro);
 
             if (myMarkerRef.current) {
@@ -445,7 +517,7 @@ export const MapaGrupoPage: React.FC = () => {
             event: 'posicao',
             payload: {
               idUsuario: meuId,
-              nome: (usuario as any)?.nome_completo || (usuario as any)?.nome || 'Integrante',
+              nome: nomeUsuario,
               latitude: lat,
               longitude: lng,
               timestamp: Date.now()
@@ -494,6 +566,9 @@ export const MapaGrupoPage: React.FC = () => {
     if (!grupo) return;
     setStarting(true);
     setErrorMsg('');
+
+    // Aproveita o clique humano para garantir permissão de notificações no telemóvel
+    await notificationService.pedirPermissao();
 
     try {
       await iniciarPasseio(grupo.idGrupo, getAuthHeader);
@@ -619,6 +694,14 @@ export const MapaGrupoPage: React.FC = () => {
           <RefreshCw className="w-5 h-5" />
         </button>
       </div>
+
+      {/* ALERTA EM TEMPO REAL QUANDO UM COLEGA SAI DO PERÍMETRO */}
+      {alertaSaidaColega && (
+        <div className="mb-6 p-4 bg-rose-600 text-white rounded-2xl shadow-xl flex items-center gap-3 animate-bounce">
+          <AlertTriangle className="w-6 h-6 shrink-0" />
+          <p className="text-xs sm:text-sm font-extrabold">{alertaSaidaColega}</p>
+        </div>
+      )}
 
       {/* LISTA DE GRUPOS AO VIVO */}
       {gruposAoVivo.length > 0 && (

@@ -13,11 +13,15 @@ export const Header: React.FC = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b-2 border-[#4ecdc4] shadow-sm transition-all">
       <div className="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
+        
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-1.5 group">
-          <span className="font-black text-xl bg-gradient-to-r from-[#1a535c] to-[#4ecdc4] bg-clip-text text-transparent tracking-tight">
-            Rota Livre
-          </span>
+          <img 
+            src="/logo.png" 
+            alt="Rota Livre Logo" 
+            // h-6 deixa a logo com 24px (tamanho do texto antigo). rounded-md suaviza os cantos do JPEG.
+            className="h-14 w-auto object-contain group-hover:scale-105 transition-transform" 
+          />
           <Sparkles className="w-4 h-4 text-[#ff6b6b] animate-spin-slow inline" />
         </Link>
 

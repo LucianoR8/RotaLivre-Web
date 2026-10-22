@@ -17,7 +17,7 @@ export const Footer: React.FC = () => {
           }
         >
           <Home className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px] tracking-tight">Home</span>
+          <span className="text-[10px] tracking-tight"></span>
         </NavLink>
 
         <NavLink
@@ -31,7 +31,7 @@ export const Footer: React.FC = () => {
           }
         >
           <Users className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px] tracking-tight">Grupos</span>
+          <span className="text-[10px] tracking-tight"></span>
         </NavLink>
 
         <NavLink
@@ -51,7 +51,7 @@ export const Footer: React.FC = () => {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ff6b6b]"></span>
             </span>
           </div>
-          <span className="text-[10px] tracking-tight">Ao Vivo</span>
+          <span className="text-[10px] tracking-tight"></span>
         </NavLink>
 
         <NavLink
@@ -65,7 +65,7 @@ export const Footer: React.FC = () => {
           }
         >
           <User className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px] tracking-tight">Perfil</span>
+          <span className="text-[10px] tracking-tight"></span>
         </NavLink>
       </div>
     </footer>

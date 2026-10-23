@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, User, Users, Radio } from 'lucide-react';
+import { Home, User, Users, Radio, MapPin } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
@@ -45,7 +45,7 @@ export const Footer: React.FC = () => {
           }
         >
           <div className="relative">
-            <Radio className="w-5 h-5 mb-0.5" />
+            <MapPin className="w-5 h-5 mb-0.5" />
             <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff6b6b] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ff6b6b]"></span>
